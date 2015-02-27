@@ -76,8 +76,6 @@ const string QCDFileList  = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_
 //const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_BJet_hiptOnly_filelist.txt";
 const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_BJet_2760GeV_halfOfficial_filelist.txt";
 //const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppBJetMC_FOREST_TESTandBIGGERTEST.txt";
-
-
 //const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_CJet_local_filelist.txt";
 //const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppCJetMC_FOREST_BIGGER_TEST.txt";
 //const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppCJetMC_FOREST_TEST.txt";
@@ -224,25 +222,17 @@ int bTagNTuple_Original(int mode=0, int type=0)
   dataType = type;
   int result = 0;
   
-  if (mode == 0 || mode == 2 || mode == 3)
+  switch (dataType) 
     {
-      
-      if (dataType < 0 || dataType > 4) 
-	{
-	  cerr << "Type must be from {0,1,2,3}" << endl;
-	  return -1;
-	}
-      
-      switch (dataType) 
-	{
-	case 0: fileList = dataFileList ; printf("\n you chose data"); weights_file = dataWeightsFile ; break ;
-	case 1: fileList = QCDFileList  ; printf("\n you chose QCD") ; weights_file = QCDWeightsFile  ; break ;
-	case 2: fileList = BJetFileList ; printf("\n you chose BJets"); weights_file = BJetWeightsFile ; break ;
-	case 3: fileList = CJetFileList ; printf("\n you chose CJets"); weights_file = CJetWeightsFile ; break ;
-	}
-
+    case 0: fileList = dataFileList ; printf("\n you chose data"); weights_file = dataWeightsFile ; break ;
+    case 1: fileList = QCDFileList  ; printf("\n you chose QCD") ; weights_file = QCDWeightsFile  ; break ;
+    case 2: fileList = BJetFileList ; printf("\n you chose BJets"); weights_file = BJetWeightsFile ; break ;
+    case 3: fileList = CJetFileList ; printf("\n you chose CJets"); weights_file = CJetWeightsFile ; break ;
+    default:
+      cerr << "Type must be from {0,1,2,3}" << endl;
+      return -1;
     }
-  
+ 
   switch (mode) 
     {
     case 0: result = makeNTuple(type); break;
@@ -312,111 +302,79 @@ int makeNTuple(int type)
 	  if (i%10000 == 0 ) cout << "Processing Event " << i << endl;
 	  
 	  akPu3->GetEntry(i);
+
 	  // Event Selection
-	  if (dataType == 0) 
-	    {
-	      //if (0 || fabs(vz) > 15.0 || !pPAcollisionEventSelectionPA	|| !pHBHENoiseFilter) continue;
-	      if (0 || !pPAcollisionEventSelectionPA	|| !pHBHENoiseFilter) continue;//no cuts version
-	    } 
-	  else if (dataType >= 1) 
-	    {
-	      //if (0 || fabs(vz)>15.0) continue;
-	      if (0) continue;//no cuts version
-	    }
-	  
+	  if ((dataType == 0) && (0 || !pPAcollisionEventSelectionPA || !pHBHENoiseFilter)) continue;
+	  else continue;// (dataType >= 1) 
+	    	  
 	  // Set weight
-	  if (dataType >= 1) 
-	    {
-	      nWeight = MCWeights(pthat);
-	      //nWeight = 1.0;//debug
-	    }
-	  else 
-	    {
-	      nWeight = 1.0;
-	    }
-	  
-	  
+	  if (dataType == 0) nWeights=1.0;
+	  else nWeight = MCWeights(pthat);
+	    	  
 	  // Process every jet
 	  for (int j=0; j<nref; j++) 
 	    {
-	      // Jet selection
-	      // || trackMax[j]/jtpt[j] < 0.01
-	      // || (mupt[j]==0 && mueta[j]==0 && muphi[j]==0)
-	      //if (0 || jtpt[j] < 40.0 || fabs(jteta[j]) > 2.0) continue;
-	      if(0) continue;//no cuts version
-
-	      // Type-specific jet selection
-	      if (dataType == 0) 
+	      
+	      switch(dataType)
 		{
-		  //// W decay cut for data
-		  //if (0
-		  //    || mupt[j]/rawpt[j]>0.95) 
-		  //  {
-		  //    continue;
-		  //  }
-		} 
-	      else if (dataType == 2) 
-		{
-	    // Only bjets from BJet sample
-		  if (fabs(refparton_flavorForB[j])!=5) continue;
-		} 
-	      else if (dataType == 3) 
-		{
-		  // Only cjets from CJet sample
-		  if (fabs(refparton_flavorForB[j])!=4) continue;
-		}
-	      else if (dataType == 1)
-		{
-		  if ( fabs(refparton_flavorForB[j]) == 4 || fabs(refparton_flavorForB[j]) == 5  ) continue; 
+		case 0: break;
+		case 1: /*if ( fabs(refparton_flavorForB[j]) == 4 || fabs(refparton_flavorForB[j]) == 5  ) continue;*/ break;
+		case 2:  if (fabs(refparton_flavorForB[j])!=5) continue; break;
+		case 3:  if (fabs(refparton_flavorForB[j])!=4) continue; break;
 		}
 	      
-	      // Set the branches
+	      //jet branches
 	      nJtpt = jtpt[j];
 	      nJteta = jteta[j];
 	      nJtphi = jtphi[j];
+
+	      //tracks
 	      nTrackMax = trackMax[j];
+
+	      //muons
 	      nMuN  = muN[j];
 	      nMupt = mupt[j];
 	      nMueta = mueta[j];
 	      nMuphi = muphi[j];
 	      nMudr = mudr[j];
-	      if (dataType == 0) nRawpt = rawpt[j];
+	      
+	      //ssv discriminator values
 	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
 	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
+
+	      //secondary vertex variables
 	      nNsvtx = nsvtx[j];
 	      nSvtxntrk = svtxntrk[j];
 	      nSvtxdl = svtxdl[j];
 	      nSvtxdls = svtxdls[j];
 	      nSvtxm = svtxm[j];
 	      nSvtxpt = svtxpt[j];
-	      //nPthat=pthat;
-	      nVz=vz;
-		
 
-	      if (dataType >= 1) 
+	      //event information
+	      nVz=vz;
+
+	      if (dataType == 0) nRawpt = rawpt[j];
+	      else//MC
 		{
 		  nPthat = pthat; // TEMPORARY
 		  nRefpt = refpt[j];
 		  nRefparton_flavorForB = refparton_flavorForB[j];
 		}
-	      
 	      // Fill new tree
 	      newTree.Fill();
 	    }
-	  
 	}
       
       // Cleanup
       cout << "closing " << fileName << endl;
       inFile->Close();
       getline(fileStream, fileName);
-
-
     }
   
   // Write to output file
   outFile->cd();
   cout << "writing tree..." << newTree.GetName() <<endl;
+
   //kOverwrite overwrites backup/partially finished tree
   newTree.Write(newTree.GetName(), TObject::kOverwrite);
   
@@ -428,119 +386,6 @@ int makeNTuple(int type)
   
   return 0;
 }
-
-// Merges the QCD, BJet, and CJet MC ntuples into a single file
-int mergeMCSamples()
-{
-
-  TFile *QCD  = TFile::Open( Form("%s",  QCDOutFile ) );
-  TFile *BJet = TFile::Open( Form("%s", BJetOutFile ) );
-  TFile *CJet = TFile::Open( Form("%s", CJetOutFile ) );
-
-  if (!QCD || !BJet || !CJet) 
-    {
-      cerr << "mergeMCSamples() requires QCD.root, QCD_2.root, BJet.root, and CJet.root to run." << endl;
-      return -1;
-    }
-
-  // Add MC files to chain
-  TChain *ch = new TChain("nt");
-  ch->Add(Form("%s",  QCDOutFile ) );
-  ch->Add(Form("%s", BJetOutFile ) );
-  ch->Add(Form("%s", CJetOutFile ) );
-
-  // Merge chain and output to new file
-  TFile *outFile = new TFile(Form("%s", mergedOutFile), "RECREATE");
-  outFile->cd();
-  ch->Merge(outFile, 0, "keep");
-
-  // Cleanup
-  QCD->Close();
-  BJet->Close();
-  CJet->Close();
-  outFile->Close();
-  delete ch;
-  delete outFile;
-
-  return 0;
-}
-
-int calculateWeights(int type)
-{
-  TTree newTree("nt","nt");
-  newBranches(&newTree);
-  MCWeights(pthat);
-  return 0;
-  
-}
-
-int forestStatistics(int type)
-{
-  int totalCount = 0;
-  int numFile = 0;
-  if (type <= 4 && type >= 1) fileList = QCDFileList; 
-  ifstream inStr(fileList.c_str(), ifstream::in);
-  string fileName;
-  
-  inStr >> fileName;
-  
-  TFile *file = TFile::Open(fileName.c_str());
- 
-  TTree *srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
-
-  while (!inStr.eof()) 
-    {
-      if (type == 0 )//data isn't generated in pt bins, just spit out the total number of entries
-	{
-	  numFile += 1;
-	  totalCount += srctree->GetEntries();
-	  if (numFile%50==0) 
-	    {
-	      cout << "Number of Events for file #"<<numFile << " : " << srctree->GetEntries() << endl;
-	      
-	    }
-	  
-	  inStr >> fileName;
-	  
-	  file = TFile::Open(fileName.c_str());
-	  srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
-	}
-      else//MC Case, spit out Entries by the file, which also corresponds to pt bins
-	{
-	  numFile += 1;
-	  totalCount += srctree->GetEntries();
-	  
-	  cout << "Number of Events for "<< fileName.c_str() << endl;
-	  cout << "is: "<< srctree->GetEntries() << endl;
-
-	  if (!inStr.eof()) cout <<"not the end of the file"<<endl;
-	  else
-	    {
-	      cout << "the end of the file is nigh!" <<endl;
-	      cout << fileName.c_str() << endl;
-	    }
-	  inStr >> fileName;
-	  if (!inStr.eof()) cout <<"not the end of the file"<<endl;
-	  else
-	    {
-	      cout << "the end of the file is nigh!" <<endl;
-	      cout << fileName.c_str() << endl;
-	    }
-	  file = TFile::Open(fileName.c_str());
-	  srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
-	}
-      
-     
-    }
-
-  cout << "Done counting data Events" << endl;
-  cout << "final count = " << totalCount << endl;
-
-  
-  return 0;
-}
-
-//HELPER FUNCTIONS
 
 // Return the corresponding weight for an event based on pthat
 static double MCWeights(double MCPthat)
@@ -586,12 +431,7 @@ static double MCWeights(double MCPthat)
           heavyJetWeights(pthatEntries);
 	}
       
-      // Calculate weights + output to a file
-      
-      
-      //QCDBins = 10
-      
-
+      // Calculate weights
       for (int i=0; i<QCDBins+1; i++) 
 	{
           if (pthatEntries[i]==0) 
@@ -638,40 +478,40 @@ static double MCWeights(double MCPthat)
 }
 
 /*
-   Heavy jet weighting
-   Helper method for MCWeights when the MC is BJet or CJet
-   Takes in QCD pthatEntries and augments them w/ weighted HF pthatEntries
-   Kurt Jung: counting QCD B-Jets per event
-   Kurt Jung: and then counting B-Jets per event in the HF MC
-   Kurt Jung: and scaling back the HF such that the number of b-jets per event matches the QCD jet MC
-   Kurt Jung: so you have high statistics b-jets without biasing the sample"
-
-   ex.
-   10 events in BJet MC, 20 jets
-   10 events in QCD MC, 20 jets
-
-   16 BJets in BJet MC
-   2 BJets in QCD MC
-
-   16/10 = 1.6 BJets/event in BJet MC
-   2/10 = 0.2 BJets/event in QCD MC
-
-   1.6/0.2 = 8
-
-   BJet MC weight = xSec / (10 QCD Events + (10 BJet Events * 8))
-   QCD MC weight = xSec / 10 QCD Events
-
-   20 jets in BJet MC * xSec / 90 = 2/9 xSec
-   20 jets in QCD MC * xSec / 10 = 2 xSec
-
-   Total integral = (2 * 2/9) * xSec
-
-   So the effect of the heavy jet weighting is to decrease
-   the weight for the BJet MC jets -> better statistics/error bars
-   and still have a similar spectrum
-
-   It seems like it works, but I still donk't completely understand why we scale by BJets/Event.
-   */
+  Heavy jet weighting
+  Helper method for MCWeights when the MC is BJet or CJet
+  Takes in QCD pthatEntries and augments them w/ weighted HF pthatEntries
+  Kurt Jung: counting QCD B-Jets per event
+  Kurt Jung: and then counting B-Jets per event in the HF MC
+  Kurt Jung: and scaling back the HF such that the number of b-jets per event matches the QCD jet MC
+  Kurt Jung: so you have high statistics b-jets without biasing the sample"
+  
+  ex.
+  10 events in BJet MC, 20 jets
+  10 events in QCD MC, 20 jets
+  
+  16 BJets in BJet MC
+  2 BJets in QCD MC
+  
+  16/10 = 1.6 BJets/event in BJet MC
+  2/10 = 0.2 BJets/event in QCD MC
+  
+  1.6/0.2 = 8
+  
+  BJet MC weight = xSec / (10 QCD Events + (10 BJet Events * 8))
+  QCD MC weight = xSec / 10 QCD Events
+  
+  20 jets in BJet MC * xSec / 90 = 2/9 xSec
+  20 jets in QCD MC * xSec / 10 = 2 xSec
+  
+  Total integral = (2 * 2/9) * xSec
+  
+  So the effect of the heavy jet weighting is to decrease
+  the weight for the BJet MC jets -> better statistics/error bars
+  and still have a similar spectrum
+  
+  It seems like it works, but I still donk't completely understand why we scale by BJets/Event.
+*/
 
 static void heavyJetWeights(double *pthatEntries)
 {
@@ -874,3 +714,124 @@ static inline void branchAddresses(TTree *akPu3)
 
 
 
+
+
+
+
+
+
+
+//////OLDERCODE
+
+
+
+// Merges the QCD, BJet, and CJet MC ntuples into a single file
+int mergeMCSamples()
+{
+
+  TFile *QCD  = TFile::Open( Form("%s",  QCDOutFile ) );
+  TFile *BJet = TFile::Open( Form("%s", BJetOutFile ) );
+  TFile *CJet = TFile::Open( Form("%s", CJetOutFile ) );
+
+  if (!QCD || !BJet || !CJet) 
+    {
+      cerr << "mergeMCSamples() requires QCD.root, QCD_2.root, BJet.root, and CJet.root to run." << endl;
+      return -1;
+    }
+
+  // Add MC files to chain
+  TChain *ch = new TChain("nt");
+  ch->Add(Form("%s",  QCDOutFile ) );
+  ch->Add(Form("%s", BJetOutFile ) );
+  ch->Add(Form("%s", CJetOutFile ) );
+
+  // Merge chain and output to new file
+  TFile *outFile = new TFile(Form("%s", mergedOutFile), "RECREATE");
+  outFile->cd();
+  ch->Merge(outFile, 0, "keep");
+
+  // Cleanup
+  QCD->Close();
+  BJet->Close();
+  CJet->Close();
+  outFile->Close();
+  delete ch;
+  delete outFile;
+
+  return 0;
+}
+
+int calculateWeights(int type)
+{
+  TTree newTree("nt","nt");
+  newBranches(&newTree);
+  MCWeights(pthat);
+  return 0;
+  
+}
+
+int forestStatistics(int type)
+{
+  int totalCount = 0;
+  int numFile = 0;
+  if (type <= 4 && type >= 1) fileList = QCDFileList; 
+  ifstream inStr(fileList.c_str(), ifstream::in);
+  string fileName;
+  
+  inStr >> fileName;
+  
+  TFile *file = TFile::Open(fileName.c_str());
+ 
+  TTree *srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
+
+  while (!inStr.eof()) 
+    {
+      if (type == 0 )//data isn't generated in pt bins, just spit out the total number of entries
+	{
+	  numFile += 1;
+	  totalCount += srctree->GetEntries();
+	  if (numFile%50==0) 
+	    {
+	      cout << "Number of Events for file #"<<numFile << " : " << srctree->GetEntries() << endl;
+	      
+	    }
+	  
+	  inStr >> fileName;
+	  
+	  file = TFile::Open(fileName.c_str());
+	  srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
+	}
+      else//MC Case, spit out Entries by the file, which also corresponds to pt bins
+	{
+	  numFile += 1;
+	  totalCount += srctree->GetEntries();
+	  
+	  cout << "Number of Events for "<< fileName.c_str() << endl;
+	  cout << "is: "<< srctree->GetEntries() << endl;
+
+	  if (!inStr.eof()) cout <<"not the end of the file"<<endl;
+	  else
+	    {
+	      cout << "the end of the file is nigh!" <<endl;
+	      cout << fileName.c_str() << endl;
+	    }
+	  inStr >> fileName;
+	  if (!inStr.eof()) cout <<"not the end of the file"<<endl;
+	  else
+	    {
+	      cout << "the end of the file is nigh!" <<endl;
+	      cout << fileName.c_str() << endl;
+	    }
+	  file = TFile::Open(fileName.c_str());
+	  srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
+	}
+      
+     
+    }
+
+  cout << "Done counting data Events" << endl;
+  cout << "final count = " << totalCount << endl;
+
+  
+  return 0;
+}
