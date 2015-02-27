@@ -41,13 +41,13 @@ using namespace std;
 
 // Function declarations
 int makeNTuple(int type);
-int mergeMCSamples();
-int calculateWeights(int type);
-int forestStatistics(int type);
 static double MCWeights(double pthat);
 static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
+//int mergeMCSamples();
+//int calculateWeights(int type);
+//int forestStatistics(int type);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -62,54 +62,30 @@ static inline void branchAddresses(TTree *akPu3);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Switches
-int dataType = 0;
+//int dataType = 0;
 string weights_file;
 
 // Macro settings/constants
+//FileLists
+const string fileListPath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
 const string dataFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppMuon_data_filelist.txt";
 const string QCDFileList  = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_QCD_filelist.txt";
-
-//const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_BJet_local_filelist.txt";
-//const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppBJetMC_FOREST_BIGGER_TEST.txt";
-//const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppBJetMC_FOREST_TEST.txt";
-//const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_BJet_OFFICIAL_TEST_filelist.txt";
-//const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_BJet_hiptOnly_filelist.txt";
 const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_BJet_2760GeV_halfOfficial_filelist.txt";
-//const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppBJetMC_FOREST_TESTandBIGGERTEST.txt";
-//const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_CJet_local_filelist.txt";
-//const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppCJetMC_FOREST_BIGGER_TEST.txt";
-//const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppCJetMC_FOREST_TEST.txt";
-//const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_CJet_OFFICIAL_TEST_filelist.txt";
-//const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_CJet_hiptOnly_filelist.txt";
 const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_CJet_2760GeV_halfOfficial_filelist.txt";
-//const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppCJetMC_FOREST_TESTandBIGGERTEST.txt";
 
+//Weight Files
+const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
 const string dataWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/weights_data_noCuts.txt";			 
 const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_noCuts.txt";		 
-
-//const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/OFFICIAL_HFMC/weights_BJet_OFFICIAL_schemeB.txt";
-//const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/hiptOnly_HFMC/weights_BJet_hiptOnly_schemeB.txt";
 const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_noCuts_schemeA.txt";
-//const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/TESTandBIGGERTEST_HFMC/weights_BJet_TESTandBIGGERTEST_schemeA.txt";
-//const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/TEST_HFMC/weights_BJet_TEST_schemeA.txt";
-//const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/BIGGER_TEST/weights_BJet_kurts_BIGGER_TEST_schemeA.txt";
-//const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_HFMC/weights_BJet_kurts_HFMC_schemeA.txt";
-
-//const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/hiptOnly_HFMC/weights_CJet_hiptOnly_schemeB.txt";
-//const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/OFFICIAL_HFMC/weights_CJet_OFFICIAL_schemeB.txt";
 const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_noCuts_schemeA.txt";
-//const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/TESTandBIGGERTEST_HFMC/weights_CJet_TESTandBIGGERTEST_schemeA.txt";
-//const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/TEST_HFMC/weights_CJet_TEST_schemeA.txt";
-//const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/BIGGER_TEST_HFMC/weights_CJet_BIGGER_TEST_schemeA.txt";
-//const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_HFMC/weights_BJet_kurts_HFMC_schemeA.txt";
 
+//Output Files
+const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
 const char* dataOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/data_noCuts_withvz.root";
 const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_noCuts_withvz_noHFJets.root";
 const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_noCuts_withvz_schemeA.root";
 const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_noCuts_withvz_schemeA.Root";
-
-//const char* mergedOutFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_samples/MC_HFaugmented_schemeA.root";
-const char* mergedOutFile = "";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -163,6 +139,7 @@ int   muN[1000];
 float mueta[1000];
 float muphi[1000];
 float mudr[1000];
+float muptrel[1000];
 float discr_ssvHighEff[1000];
 float discr_ssvHighPur[1000];
 int   nsvtx[1000];
@@ -171,6 +148,10 @@ float svtxdl[1000];
 float svtxdls[1000];
 float svtxm[1000];
 float svtxpt[1000];
+float ip3d[1000];
+float ip3ds[1000];
+float ip2d[1000];
+float ip2ds[1000];
 float pthat;                      // MC
 float refpt[1000];                // MC
 int   refparton_flavorForB[1000]; // MC
@@ -178,6 +159,7 @@ int   refparton_flavorForB[1000]; // MC
 // hltanalysis/HltTree
 int HLT_PAMu3_v1;
 int HLT_PAMu7_v1;
+int HLT_PAMu12_v1;
 int HLT_PAMu3PFJet40_v1;
 
 // hiEvtAnalyzer/HiTree
@@ -191,38 +173,52 @@ int pHBHENoiseFilter;
 double nJtpt;
 double nJteta;
 double nJtphi;
+
 double nTrackMax;
+
 double nMupt;
 double nRawpt;
 double nMueta;
 double nMuphi;
 int    nMuN;
 double nMudr;
+double nMuptrel;
+
 double nDiscr_ssvHighEff;
 double nDiscr_ssvHighPur;
+
+double nIp3d;
+double nIp3ds;
+double nIp2d;
+double nIp2ds;
+
 int    nNsvtx;
 int    nSvtxntrk;
 double nSvtxdl;
 double nSvtxdls;
 double nSvtxm;
 double nSvtxpt;
+
 double nPthat; // TEMPORARY
+
 double nVz;
 double nRefpt;                // MC
 int    nRefparton_flavorForB; // MC
+
 double nWeight;
+
 string fileList; 
+
+int result;
+int dataType;
 
 // Main functions
 // Mode: 0-makeNTuple(), 1-mergeMCSamples()
 // Type: 0-data, 1-QCD, 2-BJet, 3-CJet
 
-int bTagNTuple_Original(int mode=0, int type=0)
+int bTagNTuple_Original(int type=0)
 {
-  dataType = type;
-  int result = 0;
-  
-  switch (dataType) 
+  switch (type) 
     {
     case 0: fileList = dataFileList ; printf("\n you chose data"); weights_file = dataWeightsFile ; break ;
     case 1: fileList = QCDFileList  ; printf("\n you chose QCD") ; weights_file = QCDWeightsFile  ; break ;
@@ -232,23 +228,13 @@ int bTagNTuple_Original(int mode=0, int type=0)
       cerr << "Type must be from {0,1,2,3}" << endl;
       return -1;
     }
- 
-  switch (mode) 
-    {
-    case 0: result = makeNTuple(type); break;
-    case 1: result = mergeMCSamples(); break;
-    case 2: result = calculateWeights(type); break;
-    case 3: result = forestStatistics(type); break;
-    default:
-      cerr << "First argument (mode) must be either 0 (make ntuple) or 1 (merge MC ntuples) or 2 (calculate weights) or 3 (forest statistics)" << endl;
-      return -1;
-    }
+
+  result = makeNTuple(type);
+  
   return result;
 }
 
 // Processes files and outputs an ntuple
-// Type: 0-data, 1-QCD, 2-BJet, 3-CJet
-
 int makeNTuple(int type)
 {
   // Set global data/QCD/BJet/CJet switch
@@ -256,6 +242,7 @@ int makeNTuple(int type)
 
   // Initialize output file
   TFile *outFile;
+
   switch (dataType) 
     {
     case 0: outFile = new TFile( Form("%s",dataOutFile) , "RECREATE" ); break;
@@ -337,10 +324,17 @@ int makeNTuple(int type)
 	      nMueta = mueta[j];
 	      nMuphi = muphi[j];
 	      nMudr = mudr[j];
+	      nMuptrel = muptrel[j];
 	      
 	      //ssv discriminator values
 	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
 	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
+
+	      //impact parameter, 2d, 3d, significances
+	      nIp3d  = ip3d[j] ;
+	      nIp3ds = ip3ds[j];
+	      nIp2d  = ip2d[j] ;
+	      nIp2ds = ip2ds[j];
 
 	      //secondary vertex variables
 	      nNsvtx = nsvtx[j];
@@ -353,8 +347,9 @@ int makeNTuple(int type)
 	      //event information
 	      nVz=vz;
 
-	      if (dataType == 0) nRawpt = rawpt[j];
-	      else//MC
+	      nRawpt = rawpt[j];
+
+	      if(dataType>=1)
 		{
 		  nPthat = pthat; // TEMPORARY
 		  nRefpt = refpt[j];
@@ -420,6 +415,8 @@ static double MCWeights(double MCPthat)
       double pthatEntries[QCDBins+1];
       for (int i=0; i<QCDBins+1; i++) 
 	{
+	  char JetsCut[200];
+	  sprintf(JetsCut, "%s&&abs(jteta)<2&&abs(vz)<15", pthatCut[i].c_str());
           pthatEntries[i] = ch->GetEntries(pthatCut[i].c_str());
           cout << "\tQCD pthatEntries with " << pthatCut[i] << ": " << pthatEntries[i] << endl;
 	}
@@ -434,14 +431,12 @@ static double MCWeights(double MCPthat)
       // Calculate weights
       for (int i=0; i<QCDBins+1; i++) 
 	{
-          if (pthatEntries[i]==0) 
+	  //if there are no entries there's nothing to weigh
+          if (pthatEntries[i]==0) weight[i] = 0.0;
+	  else//there are entries to weight
 	    {
-              weight[i] = 0.0;
-	    } 
-	  else  //( i != QCDBins ) 
-	    {
-	      if( i == QCDBins) weight[i] = xsection[i]/pthatEntries[i];//so i dont run off the end of the xsec array, last bin will fit like crap, thats okay.
-	      else weight[i] = (xsection[i] - xsection[i+1])/pthatEntries[i];
+	      if (i!=QCDBins) weight[i] = (xsection[i] - xsection[i+1])/pthatEntries[i];
+	      else weight[i] = xsection[i]/pthatEntries[i];//so i dont run off the end of the xsec array, whats the xsec @ pthat=infty anyways? pretty sure it's zero.
 	    }
 	  
           cout << "weight[" << i << "] = " << weight[i] << endl;
@@ -477,42 +472,6 @@ static double MCWeights(double MCPthat)
   return weight[j];
 }
 
-/*
-  Heavy jet weighting
-  Helper method for MCWeights when the MC is BJet or CJet
-  Takes in QCD pthatEntries and augments them w/ weighted HF pthatEntries
-  Kurt Jung: counting QCD B-Jets per event
-  Kurt Jung: and then counting B-Jets per event in the HF MC
-  Kurt Jung: and scaling back the HF such that the number of b-jets per event matches the QCD jet MC
-  Kurt Jung: so you have high statistics b-jets without biasing the sample"
-  
-  ex.
-  10 events in BJet MC, 20 jets
-  10 events in QCD MC, 20 jets
-  
-  16 BJets in BJet MC
-  2 BJets in QCD MC
-  
-  16/10 = 1.6 BJets/event in BJet MC
-  2/10 = 0.2 BJets/event in QCD MC
-  
-  1.6/0.2 = 8
-  
-  BJet MC weight = xSec / (10 QCD Events + (10 BJet Events * 8))
-  QCD MC weight = xSec / 10 QCD Events
-  
-  20 jets in BJet MC * xSec / 90 = 2/9 xSec
-  20 jets in QCD MC * xSec / 10 = 2 xSec
-  
-  Total integral = (2 * 2/9) * xSec
-  
-  So the effect of the heavy jet weighting is to decrease
-  the weight for the BJet MC jets -> better statistics/error bars
-  and still have a similar spectrum
-  
-  It seems like it works, but I still donk't completely understand why we scale by BJets/Event.
-*/
-
 static void heavyJetWeights(double *pthatEntries)
 {
   // Add heavy flavor MC files to chain
@@ -520,12 +479,12 @@ static void heavyJetWeights(double *pthatEntries)
   string fileList;
   int heavyFlavor;				 						 
 
-  if (dataType == 2) 
+  if (dataType == 2) //b
     {
       fileList = BJetFileList;
       heavyFlavor = 5;
     }
-  else if (dataType == 3) 
+  else if (dataType == 3) //c
     {
       fileList = CJetFileList;
       heavyFlavor = 4;
@@ -577,7 +536,7 @@ static void heavyJetWeights(double *pthatEntries)
   for (int i=0; i<QCDBins+1; i++) 
     {
       // Count (indirectly) number of b jets
-      sprintf(HFJetsCut, "%s&&abs(jteta)<2&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
+      sprintf(HFJetsCut, "%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
       HFCh->Draw("jtpt>>HFJetHist", HFJetsCut, "goff");
       QCDCh->Draw("jtpt>>QCDJetHist", HFJetsCut, "goff");
       
@@ -625,28 +584,46 @@ static void heavyJetWeights(double *pthatEntries)
 // Create the branches for the new tree
 static inline void newBranches(TTree *newTree) 
 {
+  //jet variables
   newTree->Branch("jtpt", &nJtpt, "jtpt/D");
   newTree->Branch("jteta", &nJteta, "jteta/D");
   newTree->Branch("jtphi", &nJtphi, "jtphi/D");
+  
+  //track variables
   newTree->Branch("trackMax", &nTrackMax, "trackMax/D");
+  
+  //muon variables
   newTree->Branch("mupt", &nMupt, "mupt/D");
   newTree->Branch("muN", &nMuN, "muN/I");
   newTree->Branch("mueta", &nMueta, "mueta/D");
   newTree->Branch("muphi", &nMuphi, "muphi/D");
   newTree->Branch("mudr", &nMudr, "mudr/D");
+  newTree->Branch("muptrel", &nMuptrel, "muptrel/D");
+  
+  //ssv discriminator values
   newTree->Branch("discr_ssvHighEff", &nDiscr_ssvHighEff, "discr_ssvHighEff/D");
   newTree->Branch("discr_ssvHighPur", &nDiscr_ssvHighPur, "discr_ssvHighPur/D");
+  
+  //secondary vertex
   newTree->Branch("nsvtx", &nNsvtx, "nsvtx/I");
   newTree->Branch("svtxntrk", &nSvtxntrk, "svtxntrk/I");
   newTree->Branch("svtxdl", &nSvtxdl, "svtxdl/D");
   newTree->Branch("svtxdls", &nSvtxdls, "svtxdls/D");
   newTree->Branch("svtxm", &nSvtxm, "svtxm/D");
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");
-  newTree->Branch("weight", &nWeight, "weight/D");
+  
+  //impact parameter
+  newTree->Branch("ip3d" ,&nIp3d  , "ip3d");
+  newTree->Branch("ip3ds",&nIp3ds , "ip3ds");
+  newTree->Branch("ip2d" ,&nIp2d  ," ip2d");
+  newTree->Branch("ip2ds",&nIp2ds , "ip2ds");
+
+  //event specific
+  newTree->Branch("weight", &nWeight, "weight/D");  
   newTree->Branch("vz", &nVz ,"vz/D");
 
+  //data/mc specific
   newTree->Branch("rawpt", &nRawpt, "rawpt/D");
-
   if (dataType >=1) 
     {
       newTree->Branch("pthat", &nPthat, "pthat/D"); // TEMPORARY
@@ -654,8 +631,10 @@ static inline void newBranches(TTree *newTree)
       newTree->Branch("refparton_flavorForB", &nRefparton_flavorForB, "refparton_flavorForB/I");
     }
   
+  //HLT
   newTree->Branch("HLT_PAMu3_v1", &HLT_PAMu3_v1, "HLT_PAMu3_v1/I");
   newTree->Branch("HLT_PAMu7_v1", &HLT_PAMu7_v1, "HLT_PAMu7_v1/I");
+  newTree->Branch("HLT_PAMu12_v1", &HLT_PAMu12_v1, "HLT_PAMu12_v1/I");
   newTree->Branch("HLT_PAMu3PFJet40_v1", &HLT_PAMu3PFJet40_v1, "HLT_PAMu3PFJet40_v1/I");
   
   return;
@@ -665,24 +644,38 @@ static inline void newBranches(TTree *newTree)
 static inline void branchAddresses(TTree *akPu3) 
 {
   akPu3->SetBranchAddress("nref", &nref);
-  akPu3->SetBranchAddress("rawpt", &rawpt);
-  akPu3->SetBranchAddress("jtpt", &jtpt);
-  akPu3->SetBranchAddress("jteta", &jteta);
-  akPu3->SetBranchAddress("jtphi", &jtphi);
+  
+
+  akPu3->SetBranchAddress("jtpt" , &jtpt  );
+  akPu3->SetBranchAddress("jteta", &jteta );
+  akPu3->SetBranchAddress("jtphi", &jtphi );
+  
   akPu3->SetBranchAddress("trackMax", &trackMax);
-  akPu3->SetBranchAddress("mupt", &mupt);
-  akPu3->SetBranchAddress("muN", &muN);
-  akPu3->SetBranchAddress("mueta", &mueta);
-  akPu3->SetBranchAddress("muphi", &muphi);
-  akPu3->SetBranchAddress("mudr", &mudr);
+  
+  akPu3->SetBranchAddress("mupt"   , &mupt   );
+  akPu3->SetBranchAddress("muN"    , &muN    );
+  akPu3->SetBranchAddress("mueta"  , &mueta  );
+  akPu3->SetBranchAddress("muphi"  , &muphi  );
+  akPu3->SetBranchAddress("mudr"   , &mudr   );
+  akPu3->SetBranchAddress("muptrel", &muptrel);
+  
   akPu3->SetBranchAddress("discr_ssvHighEff", &discr_ssvHighEff);
   akPu3->SetBranchAddress("discr_ssvHighPur", &discr_ssvHighPur);
-  akPu3->SetBranchAddress("nsvtx", &nsvtx);
+  
+  akPu3->SetBranchAddress("nsvtx"   , &nsvtx   );
   akPu3->SetBranchAddress("svtxntrk", &svtxntrk);
-  akPu3->SetBranchAddress("svtxdl", &svtxdl);
-  akPu3->SetBranchAddress("svtxdls", &svtxdls);
-  akPu3->SetBranchAddress("svtxm", &svtxm);
-  akPu3->SetBranchAddress("svtxpt", &svtxpt);
+  akPu3->SetBranchAddress("svtxdl"  , &svtxdl  );
+  akPu3->SetBranchAddress("svtxdls" , &svtxdls );
+  akPu3->SetBranchAddress("svtxm"   , &svtxm   );
+  akPu3->SetBranchAddress("svtxpt"  , &svtxpt  );
+  
+  akPu3->SetBranchAddress("ip3d" , &ip3d  );
+  akPu3->SetBranchAddress("ip3ds", &ip3ds );
+  akPu3->SetBranchAddress("ip2d" , &ip2d  );
+  akPu3->SetBranchAddress("ip2ds", &ip2ds );
+
+  akPu3->SetBranchAddress("rawpt", &rawpt);
+  
   if (dataType >= 1) 
     {
       akPu3->SetBranchAddress("pthat", &pthat);
@@ -692,6 +685,7 @@ static inline void branchAddresses(TTree *akPu3)
 
   akPu3->SetBranchAddress("HLT_PAMu3_v1", &HLT_PAMu3_v1);
   akPu3->SetBranchAddress("HLT_PAMu7_v1", &HLT_PAMu7_v1);
+  akPu3->SetBranchAddress("HLT_PAMu12_v1", &HLT_PAMu12_v1);
   akPu3->SetBranchAddress("HLT_PAMu3PFJet40_v1", &HLT_PAMu3PFJet40_v1);
 
   akPu3->SetBranchAddress("vz", &vz);
@@ -703,135 +697,154 @@ static inline void branchAddresses(TTree *akPu3)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//////OLDERCODE
-
-
-
-// Merges the QCD, BJet, and CJet MC ntuples into a single file
-int mergeMCSamples()
-{
-
-  TFile *QCD  = TFile::Open( Form("%s",  QCDOutFile ) );
-  TFile *BJet = TFile::Open( Form("%s", BJetOutFile ) );
-  TFile *CJet = TFile::Open( Form("%s", CJetOutFile ) );
-
-  if (!QCD || !BJet || !CJet) 
-    {
-      cerr << "mergeMCSamples() requires QCD.root, QCD_2.root, BJet.root, and CJet.root to run." << endl;
-      return -1;
-    }
-
-  // Add MC files to chain
-  TChain *ch = new TChain("nt");
-  ch->Add(Form("%s",  QCDOutFile ) );
-  ch->Add(Form("%s", BJetOutFile ) );
-  ch->Add(Form("%s", CJetOutFile ) );
-
-  // Merge chain and output to new file
-  TFile *outFile = new TFile(Form("%s", mergedOutFile), "RECREATE");
-  outFile->cd();
-  ch->Merge(outFile, 0, "keep");
-
-  // Cleanup
-  QCD->Close();
-  BJet->Close();
-  CJet->Close();
-  outFile->Close();
-  delete ch;
-  delete outFile;
-
-  return 0;
-}
-
-int calculateWeights(int type)
-{
-  TTree newTree("nt","nt");
-  newBranches(&newTree);
-  MCWeights(pthat);
-  return 0;
+//Leo's Old Notes about Jet Reweighting
+/* 
+  Heavy jet weighting
+  Helper method for MCWeights when the MC is BJet or CJet
+  Takes in QCD pthatEntries and augments them w/ weighted HF pthatEntries
+  Kurt Jung: counting QCD B-Jets per event
+  Kurt Jung: and then counting B-Jets per event in the HF MC
+  Kurt Jung: and scaling back the HF such that the number of b-jets per event matches the QCD jet MC
+  Kurt Jung: so you have high statistics b-jets without biasing the sample"
   
-}
-
-int forestStatistics(int type)
-{
-  int totalCount = 0;
-  int numFile = 0;
-  if (type <= 4 && type >= 1) fileList = QCDFileList; 
-  ifstream inStr(fileList.c_str(), ifstream::in);
-  string fileName;
+  ex.
+  10 events in BJet MC, 20 jets
+  10 events in QCD MC, 20 jets
   
-  inStr >> fileName;
+  16 BJets in BJet MC
+  2 BJets in QCD MC
   
-  TFile *file = TFile::Open(fileName.c_str());
- 
-  TTree *srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
-
-  while (!inStr.eof()) 
-    {
-      if (type == 0 )//data isn't generated in pt bins, just spit out the total number of entries
-	{
-	  numFile += 1;
-	  totalCount += srctree->GetEntries();
-	  if (numFile%50==0) 
-	    {
-	      cout << "Number of Events for file #"<<numFile << " : " << srctree->GetEntries() << endl;
-	      
-	    }
-	  
-	  inStr >> fileName;
-	  
-	  file = TFile::Open(fileName.c_str());
-	  srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
-	}
-      else//MC Case, spit out Entries by the file, which also corresponds to pt bins
-	{
-	  numFile += 1;
-	  totalCount += srctree->GetEntries();
-	  
-	  cout << "Number of Events for "<< fileName.c_str() << endl;
-	  cout << "is: "<< srctree->GetEntries() << endl;
-
-	  if (!inStr.eof()) cout <<"not the end of the file"<<endl;
-	  else
-	    {
-	      cout << "the end of the file is nigh!" <<endl;
-	      cout << fileName.c_str() << endl;
-	    }
-	  inStr >> fileName;
-	  if (!inStr.eof()) cout <<"not the end of the file"<<endl;
-	  else
-	    {
-	      cout << "the end of the file is nigh!" <<endl;
-	      cout << fileName.c_str() << endl;
-	    }
-	  file = TFile::Open(fileName.c_str());
-	  srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
-	}
-      
-     
-    }
-
-  cout << "Done counting data Events" << endl;
-  cout << "final count = " << totalCount << endl;
-
+  16/10 = 1.6 BJets/event in BJet MC
+  2/10 = 0.2 BJets/event in QCD MC
   
-  return 0;
-}
+  1.6/0.2 = 8
+  
+  BJet MC weight = xSec / (10 QCD Events + (10 BJet Events * 8))
+  QCD MC weight = xSec / 10 QCD Events
+  
+  20 jets in BJet MC * xSec / 90 = 2/9 xSec
+  20 jets in QCD MC * xSec / 10 = 2 xSec
+  
+  Total integral = (2 * 2/9) * xSec
+  
+  So the effect of the heavy jet weighting is to decrease
+  the weight for the BJet MC jets -> better statistics/error bars
+  and still have a similar spectrum
+  
+  It seems like it works, but I still donk't completely understand why we scale by BJets/Event.
+*/
+
+////////OLDERCODE
+//
+//
+//
+//// Merges the QCD, BJet, and CJet MC ntuples into a single file
+//int mergeMCSamples()
+//{
+//
+//  TFile *QCD  = TFile::Open( Form("%s",  QCDOutFile ) );
+//  TFile *BJet = TFile::Open( Form("%s", BJetOutFile ) );
+//  TFile *CJet = TFile::Open( Form("%s", CJetOutFile ) );
+//
+//  if (!QCD || !BJet || !CJet) 
+//    {
+//      cerr << "mergeMCSamples() requires QCD.root, QCD_2.root, BJet.root, and CJet.root to run." << endl;
+//      return -1;
+//    }
+//
+//  // Add MC files to chain
+//  TChain *ch = new TChain("nt");
+//  ch->Add(Form("%s",  QCDOutFile ) );
+//  ch->Add(Form("%s", BJetOutFile ) );
+//  ch->Add(Form("%s", CJetOutFile ) );
+//
+//  // Merge chain and output to new file
+//  TFile *outFile = new TFile(Form("%s", mergedOutFile), "RECREATE");
+//  outFile->cd();
+//  ch->Merge(outFile, 0, "keep");
+//
+//  // Cleanup
+//  QCD->Close();
+//  BJet->Close();
+//  CJet->Close();
+//  outFile->Close();
+//  delete ch;
+//  delete outFile;
+//
+//  return 0;
+//}
+//
+//int calculateWeights(int type)
+//{
+//  TTree newTree("nt","nt");
+//  newBranches(&newTree);
+//  MCWeights(pthat);
+//  return 0;
+//  
+//}
+//
+//int forestStatistics(int type)
+//{
+//  int totalCount = 0;
+//  int numFile = 0;
+//  if (type <= 4 && type >= 1) fileList = QCDFileList; 
+//  ifstream inStr(fileList.c_str(), ifstream::in);
+//  string fileName;
+//  
+//  inStr >> fileName;
+//  
+//  TFile *file = TFile::Open(fileName.c_str());
+// 
+//  TTree *srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
+//
+//  while (!inStr.eof()) 
+//    {
+//      if (type == 0 )//data isn't generated in pt bins, just spit out the total number of entries
+//	{
+//	  numFile += 1;
+//	  totalCount += srctree->GetEntries();
+//	  if (numFile%50==0) 
+//	    {
+//	      cout << "Number of Events for file #"<<numFile << " : " << srctree->GetEntries() << endl;
+//	      
+//	    }
+//	  
+//	  inStr >> fileName;
+//	  
+//	  file = TFile::Open(fileName.c_str());
+//	  srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
+//	}
+//      else//MC Case, spit out Entries by the file, which also corresponds to pt bins
+//	{
+//	  numFile += 1;
+//	  totalCount += srctree->GetEntries();
+//	  
+//	  cout << "Number of Events for "<< fileName.c_str() << endl;
+//	  cout << "is: "<< srctree->GetEntries() << endl;
+//
+//	  if (!inStr.eof()) cout <<"not the end of the file"<<endl;
+//	  else
+//	    {
+//	      cout << "the end of the file is nigh!" <<endl;
+//	      cout << fileName.c_str() << endl;
+//	    }
+//	  inStr >> fileName;
+//	  if (!inStr.eof()) cout <<"not the end of the file"<<endl;
+//	  else
+//	    {
+//	      cout << "the end of the file is nigh!" <<endl;
+//	      cout << fileName.c_str() << endl;
+//	    }
+//	  file = TFile::Open(fileName.c_str());
+//	  srctree = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
+//	}
+//      
+//     
+//    }
+//
+//  cout << "Done counting data Events" << endl;
+//  cout << "final count = " << totalCount << endl;
+//
+//  
+//  return 0;
+//}
