@@ -149,9 +149,9 @@ float svtxdls[1000];
 float svtxm[1000];
 float svtxpt[1000];
 float ip3d[1000];
-float ip3ds[1000];
+float ip3dSig[1000];
 float ip2d[1000];
-float ip2ds[1000];
+float ip2dSig[1000];
 float pthat;                      // MC
 float refpt[1000];                // MC
 int   refparton_flavorForB[1000]; // MC
@@ -188,9 +188,9 @@ double nDiscr_ssvHighEff;
 double nDiscr_ssvHighPur;
 
 double nIp3d;
-double nIp3ds;
+double nIp3dsig;
 double nIp2d;
-double nIp2ds;
+double nIp2dsig;
 
 int    nNsvtx;
 int    nSvtxntrk;
@@ -218,7 +218,7 @@ int dataType;
 // Mode: 0-makeNTuple(), 1-mergeMCSamples()
 // Type: 0-data, 1-QCD, 2-BJet, 3-CJet
 
-int bTagNTuple_Original(int type=0)
+int bTagNTuple_Original(int type)
 {
   switch (type) 
     {
@@ -261,15 +261,21 @@ int makeNTuple(int type)
   //outFile->cd();
 
   ifstream fileStream(fileList.c_str(), ifstream::in);
-  char fileName[200];      
-  getline(fileStream, fileName);
+  string fileName;      
+  fileStream >> fileName;
+  
+  //getline(fileStream, fileName);
+  
+  
+
+  
   
   // For every file in file list, process trees
   while (!fileStream.eof()) 
     {
       // Open input file
-      printf("\n Opening File: %s \n",fileName);
-      TFile *inFile = TFile::Open(fileName.c_str());
+      printf("\n Opening File: %s \n",fileName.c_str());
+      TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
       
       // Open trees
       cout << "Opening Trees..." << endl;
@@ -297,7 +303,7 @@ int makeNTuple(int type)
 	  //else continue;// (dataType >= 1) 
 	    	  
 	  // Set weight
-	  if (dataType == 0) nWeights=1.0;
+	  if (dataType == 0) nWeight = 1.0;
 	  else nWeight = MCWeights(pthat);
 	    	  
 	  // Process every jet
@@ -334,9 +340,9 @@ int makeNTuple(int type)
 
 	      //impact parameter, 2d, 3d, significances
 	      nIp3d  = ip3d[j] ;
-	      nIp3ds = ip3ds[j];
+	      nIp3dsig = ip3dSig[j];
 	      nIp2d  = ip2d[j] ;
-	      nIp2ds = ip2ds[j];
+	      nIp2dsig = ip2dSig[j];
 
 	      //secondary vertex variables
 	      nNsvtx = nsvtx[j];
@@ -365,7 +371,8 @@ int makeNTuple(int type)
       // Cleanup
       cout << "closing " << fileName << endl;
       inFile->Close();
-      getline(fileStream, fileName);
+      fileStream >> fileName;
+      //getline(fileStream, fileName);
     }
   
   // Write to output file
@@ -428,6 +435,7 @@ static double MCWeights(double MCPthat)
           heavyJetWeights(pthatEntries);
 	}
       
+
       // Calculate weights
       for (int i=0; i<QCDBins+1; i++) 
 	{
@@ -612,9 +620,9 @@ static inline void newBranches(TTree *newTree)
   
   //impact parameter
   newTree->Branch("ip3d" ,&nIp3d  , "ip3d");
-  newTree->Branch("ip3ds",&nIp3ds , "ip3ds");
+  newTree->Branch("ip3dSig",&nIp3dsig , "ip3dSig");
   newTree->Branch("ip2d" ,&nIp2d  ," ip2d");
-  newTree->Branch("ip2ds",&nIp2ds , "ip2ds");
+  newTree->Branch("ip2dSig",&nIp2dsig , "ip2dSig");
 
   //event specific
   newTree->Branch("weight", &nWeight, "weight/D");  
@@ -668,9 +676,9 @@ static inline void branchAddresses(TTree *akPu3)
   akPu3->SetBranchAddress("svtxpt"  , &svtxpt  );
   
   akPu3->SetBranchAddress("ip3d" , &ip3d  );
-  akPu3->SetBranchAddress("ip3ds", &ip3ds );
+  akPu3->SetBranchAddress("ip3dSig", &ip3dSig );
   akPu3->SetBranchAddress("ip2d" , &ip2d  );
-  akPu3->SetBranchAddress("ip2ds", &ip2ds );
+  akPu3->SetBranchAddress("ip2dSig", &ip2dSig );
 
   akPu3->SetBranchAddress("rawpt", &rawpt);
   
