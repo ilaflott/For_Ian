@@ -75,17 +75,17 @@ const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_
 
 //Weight Files
 const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
-const string dataWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/weights_data_noCuts.txt";			 
-const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_noCuts.txt";		 
-const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_noCuts_schemeA.txt";
-const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_noCuts_schemeA.txt";
+const string dataWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/weights_data_updated.txt";			 
+const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated.txt";		 
+const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_schemeA.txt";
+const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_updated_schemeA.txt";
 
 //Output Files
 const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
-const char* dataOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/data_noCuts_withvz.root";
-const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_noCuts_withvz_noHFJets.root";
-const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_noCuts_withvz_schemeA.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_noCuts_withvz_schemeA.Root";
+const char* dataOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/data_updated.root";
+const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated.root";
+const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_schemeA.root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_schemeA.Root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -199,9 +199,11 @@ double nSvtxdls;
 double nSvtxm;
 double nSvtxpt;
 
-double nPthat; // TEMPORARY
 
-double nVz;
+
+double nVz; //Event info
+
+double nPthat; //MC
 double nRefpt;                // MC
 int    nRefparton_flavorForB; // MC
 
@@ -259,7 +261,7 @@ int makeNTuple(int type)
   //outFile->cd();
 
   ifstream fileStream(fileList.c_str(), ifstream::in);
-  string fileName;      
+  char fileName[200];      
   getline(fileStream, fileName);
   
   // For every file in file list, process trees
@@ -292,7 +294,7 @@ int makeNTuple(int type)
 
 	  // Event Selection
 	  if ((dataType == 0) && (0 || !pPAcollisionEventSelectionPA || !pHBHENoiseFilter)) continue;
-	  else continue;// (dataType >= 1) 
+	  //else continue;// (dataType >= 1) 
 	    	  
 	  // Set weight
 	  if (dataType == 0) nWeights=1.0;
@@ -305,12 +307,12 @@ int makeNTuple(int type)
 	      switch(dataType)
 		{
 		case 0: break;
-		case 1: /*if ( fabs(refparton_flavorForB[j]) == 4 || fabs(refparton_flavorForB[j]) == 5  ) continue;*/ break;
-		case 2:  if (fabs(refparton_flavorForB[j])!=5) continue; break;
-		case 3:  if (fabs(refparton_flavorForB[j])!=4) continue; break;
+		case 1: /*if ( fabs(refparton_flavorForB[j]) == 4 || fabs(refparton_flavorForB[j]) == 5  ) continue;*/ break;//want all flavors from QCD file
+		case 2:  if (fabs(refparton_flavorForB[j])!=5) continue; break;//want only bs from b file
+		case 3:  if (fabs(refparton_flavorForB[j])!=4) continue; break;//want only cs from c file
 		}
 	      
-	      //jet branches
+	      //jet parameters
 	      nJtpt = jtpt[j];
 	      nJteta = jteta[j];
 	      nJtphi = jtphi[j];
@@ -355,7 +357,7 @@ int makeNTuple(int type)
 		  nRefpt = refpt[j];
 		  nRefparton_flavorForB = refparton_flavorForB[j];
 		}
-	      // Fill new tree
+	      
 	      newTree.Fill();
 	    }
 	}
@@ -415,10 +417,8 @@ static double MCWeights(double MCPthat)
       double pthatEntries[QCDBins+1];
       for (int i=0; i<QCDBins+1; i++) 
 	{
-	  char JetsCut[200];
-	  sprintf(JetsCut, "%s&&abs(jteta)<2&&abs(vz)<15", pthatCut[i].c_str());
-          pthatEntries[i] = ch->GetEntries(pthatCut[i].c_str());
-          cout << "\tQCD pthatEntries with " << pthatCut[i] << ": " << pthatEntries[i] << endl;
+	  pthatEntries[i] = ch->GetEntries( pthatCut[i].c_str() );
+	  cout << "\tQCD pthatEntries with " << pthatCut[i] << ": " << pthatEntries[i] << endl;
 	}
 
       // Modify event count for HF MC files
@@ -551,10 +551,8 @@ static void heavyJetWeights(double *pthatEntries)
       cout << "\tQCD MC b/cJets/Event: " << QCDJetsPerEvent << endl;
       
       // Check for NaN (IEEE method) and calculate HF weight
-      if (HFJetsPerEvent != HFJetsPerEvent || QCDJetsPerEvent != QCDJetsPerEvent)
-	HFWeight[i] = 0;
-      else
-	HFWeight[i] = HFJetsPerEvent/QCDJetsPerEvent;
+      if (HFJetsPerEvent != HFJetsPerEvent || QCDJetsPerEvent != QCDJetsPerEvent) HFWeight[i] = 0;
+      else HFWeight[i] = HFJetsPerEvent/QCDJetsPerEvent;
       
       cout << "HFWeight for " << pthatCut[i] << ": " << HFWeight[i] << endl;
       
