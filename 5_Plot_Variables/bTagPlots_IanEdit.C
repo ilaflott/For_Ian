@@ -1,16 +1,7 @@
 /*
-  LAST EDITED: 01.17.2014
-
-    DESCRIPTION:
-        Outputs plots of the basic jet parameters and the b-tag discriminators of data and MC.
-        Makes a ratio plot of data/MC for each parameter as well.
-
-        Input: b-tag data and MC ntuples produced from bTagNTuple.C
-        Output: histograms in a .root file
-
-    Plots are NOT scaled by cross_section/n_events
-        For data, it is done in this macro after the histogram is created
-        For MC, scaling is already accounted for in the weight branch
+Plot maker+formatter. Written for muon-tagged b-jet RpA + RAA
+Inherited from: Leo Yu
+Heavily Modified/Edited: Ian Laflotte
 */
 
 #include <iostream>
@@ -38,12 +29,18 @@ static void formatHist(TH1 *, const char *, const char *);
 
 // File parameters
 const char *data_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/";
-const char *data_file_name = "data_noCuts";
+const char *data_file_name = "data_updated";
 
-const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
-const char *MC_file_name = "MC_HFaugmented_halfOfficial_noCuts_schemeA";
+//const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
+//const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/"
+const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/";
+//const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_schemeA";
+//const char *MC_file_name = "MC_HFaugmented_halfOfficial_noCuts_schemeA";
+//const char *MC_file_name = "BJet_halfOfficial_updated_schemeA";
+const char *MC_file_name = "CJet_halfOfficial_updated_schemeA";
 
-const char* QCD_file_name = "QCD_noCuts";
+
+const char* QCD_file_name = "QCD_updated";
 const char* QCD_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/";
 
 const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/";
@@ -54,39 +51,49 @@ const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_for
 const char *version = "HFaugmented_halfOfficial_debugDebug_data_MC";
 
 // Histogram parameters
-const int n_vars = 13; // Number of variables to plot
-//const int n_vars = 3; /*debug*/
+const int n_vars = 18; // Number of variables to plot
+//const int n_vars = 1; /*debug*/
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 
 const char *y_label[] =
   {
     "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)",
     "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)",
+    "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)",
     "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)"
   };
 
 const char *x_label[] =
   {
-    "jtpt (GeV)",    "jteta",  "jtphi (rad)",             "mupt (Gev)",
-    "mueta",    "muphi (rad)",   "mudr", "discr_ssvHighEff", "discr_ssvHighPur",
-    "nsvtx", "svtxntrk", "svtxdl (cm?)",          "svtxdls"
+    "jtpt (GeV)",    "jteta",  "jtphi (rad)",         
+    "mupt (Gev)", "mueta",    "muphi (rad)",   "mudr", "muptrel",
+    "discr_ssvHighEff", "discr_ssvHighPur",
+    "nsvtx", "svtxntrk", "svtxdl (cm?)",  "svtxdls",
+    "ip2d","ip2dSig","ip3d","ip3dSig"
   };
 
 const char *var[] =
   {
-    "jtpt",    "jteta",  "jtphi",             "mupt",
-    "mueta",    "muphi",   "mudr", "discr_ssvHighEff", "discr_ssvHighPur",
-    "nsvtx", "svtxntrk", "svtxdl",          "svtxdls"
+    "jtpt",    "jteta",  "jtphi",                       //jets
+    "mupt", "mueta",    "muphi",   "mudr","muptrel",     //muons
+    "discr_ssvHighEff", "discr_ssvHighPur",             //discriminators
+    "nsvtx", "svtxntrk", "svtxdl", "svtxdls",            //secondary vertex
+    "ip2d","ip2dSig","ip3d","ip3dSig"                 //impact parameter
+  };
+
+const char *particle_cut[] = 
+  { 
+    "1",         // Data
+    "1",         // Total MC
+    "abs(refparton_flavorForB)==5",//b
+    "abs(refparton_flavorForB)==4",//c
+    "(abs(refparton_flavorForB)==1 || abs(refparton_flavorForB)==2 || abs(refparton_flavorForB)==3 || abs(refparton_flavorForB)==21)"//udsg
   };
                                                                                            
-const int   nbinsX[] = {  30, 15,       15, 15, /**/ 15,       15,  15, 10, 10, /**/   10,    10,  10,   10 };
-const double  lowX[] = {   0, -3, -3.14159,  0, /**/ -3, -3.14159,   0,  0,  0, /**/ -0.5, -0.5,  0,   0 };
-const double highX[] = { 600,  3,  3.14159, 50, /**/  3,  3.14159, 0.5,  6,  6, /**/  4.5, 14.5, 10, 150 };
-
-
-const double  highY[] = { 100000 ,40000 , 3500 ,300000 , /**/ 300000,5000 ,90000 ,90000,50000 , 20000, /**/500000 ,500000 , 500000,500000 };
-// const double  lowY[]
-const bool  doLogy[] = {   1,  1,        0,  1, /**/  1, 0,   1,  1, 1,/**/    1,    1,  1,   1 };
+const int   nbinsX[] = {  30, 15,       15, /**/ 20,  15,       15,   15, 10, /**/  6,  6, /**/  5, 12, 8,  14, /**/  20,  20,  20,  20 };
+const double  lowX[] = {   0, -3, -3.14159, /**/  0,  -3, -3.14159,    0,  0, /**/  0,  0, /**/  0,  0, 0,   0, /**/   0,   0,   0,   0 };
+const double highX[] = { 300,  3,  3.14159, /**/ 80,   3,  3.14159,  0.5, 40, /**/  6,  6, /**/  5, 12, 4, 210, /**/ 100, 100, 100, 100 };
+const bool  doLogy[] = {   1,  1,        0, /**/  1,   1,        0,    1,  1, /**/  1,  1, /**/  1,  1, 1,   1, /**/   1,   1,   1,   1 };
 
 const float int_lumi = 4209000000;//inverse millibarns of data. according to lumiCalc2.py, golden lumimask for HLT_PAMu3_v1, 4.209 pb of data.
 
@@ -96,17 +103,8 @@ const char *event_cut = "HLT_PAMu3_v1";
 //const char *event_cut = "HLT_PAMu12_v1";
 //const char *event_cut = "HLT_PAMu3PFJet40_v1";
 
-const char *mu_cut = "muN != 0";
-const char *W_cut = "mupt/rawpt<0.95";
-const char *svtx_cut = "svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.5";
-
-const char *particle_cut[] = { 
-                               "1",         // Data
-                               "1",         // Total MC
-                               "abs(refparton_flavorForB)==5",//b
-                               "abs(refparton_flavorForB)==4",//c
-                               "(abs(refparton_flavorForB)==1 || abs(refparton_flavorForB)==2 || abs(refparton_flavorForB)==3 || abs(refparton_flavorForB)==21)"//udsg
-                             };
+const char *default_cut = "vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.5";
+const char *default_version = "vz15_jteta2_jtpt40_HLTPAMu3v1_muCut_WCut_svtxCut";
 
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};
 const int    lineColor[] = { kBlack, kWhite, kRed-7, kGreen-6, kBlue-7};
@@ -115,7 +113,11 @@ const char *leg_label[]  = { "Data pp", "MC", "b", "c", "udsg" };
 //MAIN FUNCTIONS
 //stackOption == 0 -> Overlaid flavor curves
 //stackOption == 1 -> stacked flavor curves
-void bTagPlots_IanEdit(int option,int stackOption, const char* cuts, const char* cutsVersion)
+//NOTE fields which arent specified default to the values here. If one only wants to change one or two of the parameters,
+//then they must be submitted in order and one after the other. Ex. you want to change the cuts, but because of the order
+//of the arguments and the ambiguity inherent, one must also specify a version and an option. Just specifying one string as an input will
+// be taken in as an input value to cutsVersion, even if what you really wanted to change is the cuts 
+void bTagPlots_IanEdit(const char* cutsVersion = default_version, int option = 0, const char* cuts = default_cut , int stackOption = 1)
 {
   
   printf("\nYour cuts are:\n %s\n",cuts);
@@ -197,7 +199,7 @@ void makePlots(const char* cuts, const char* outputFile)
 	  else /*i_type!=0*/ MC_tree->Draw(Form("%s>>hist_%d_%d",var[i_var],i_var,i_type), Form("weight*(%s&&%s)", particle_cut[i_type],cuts), "goff");
 	    
 	  integrals[i_var][i_type]=hist[i_var][i_type]->Integral();
-
+	  //printf("DEBUG %i %i, %f\n",i_var,i_type,integrals[i_var][i_type]);
 	  if(i_type == 2 || i_type == 3)//if doing b or c contributions to MC, have to renomalize the b and c contributions 
 	    {
 	      QCDhist[i_var][i_type] = new TH1D(Form("QCDhist_%d_%d",i_var,i_type), Form("QCDhist_%d_%d",i_var,i_type), nbinsX[i_var], lowX[i_var], highX[i_var]);
@@ -291,8 +293,8 @@ static void formatPlots(const char* input_file_name, int stackOption)
 	  
 	  hist[i_var][i_type]->SetMarkerColor(color[i_type]);
 	  //hist[i_var][i_type]->SetLineColor(lineColor[i_type]);//if not stacked
-	  hist[i_var][i_type]->SetLineColor(kBlack+3);//if stacked
-	  hist[i_var][i_type]->SetLineWidth(1);
+	  hist[i_var][i_type]->SetLineColor(kBlack);//if stacked
+	  //hist[i_var][i_type]->SetLineWidth(1);
 	  
 	  if (i_type==0 )
 	    {
@@ -324,10 +326,14 @@ static void formatPlots(const char* input_file_name, int stackOption)
 	}
       
       canv[i_var]->cd(1);
-                  
-      //trying to get the range right	
-      if (doLogy[i_var]) hist[i_var][0]->GetYaxis()->SetRange(1/int_lumi,hist[i_var][0]->GetBinContent(hist[i_var][0]->GetMaximumBin()) );
-      else hist[i_var][0]->GetYaxis()->SetRange(0 , hist[i_var][0]->GetBinContent(hist[i_var][0]->GetMaximumBin() ));
+      
+      //trying to get the y-axis ranges right	
+      //double yMax = 1.1*hist[i_var][0]->GetBinContent(hist[i_var][0]->GetMaximumBin());
+      double yMax = 1.1*hist[i_var][0]->GetBinContent(hist[i_var][0]->GetMaximumBin());
+      if(i_var==0) yMax = 1.0*hist[i_var][0]->GetBinContent(hist[i_var][0]->GetMaximumBin());
+
+      if (doLogy[i_var]) hist[i_var][0]->GetYaxis()->SetRange(1/int_lumi, yMax);
+      else hist[i_var][0]->GetYaxis()->SetRange(0 , yMax);
       
       printf("%s,i_var = %i, \nmax bin height = %f \n", var[i_var], i_var,  hist[i_var][0]->GetBinContent(hist[i_var][0]->GetMaximumBin()) );
 
@@ -343,11 +349,11 @@ static void formatPlots(const char* input_file_name, int stackOption)
       else//stackOption==1
 	{
 	  //hist[i_var][1]->Draw("HIST E");//MC Total
-	  stacked_hist[i_var]->Draw("HIST E");
-	  hist[i_var][0]->Draw("SAME SCAT E1");
+	  hist[i_var][0]->Draw("SCAT E1");
+	  stacked_hist[i_var]->Draw("SAME HIST E");
 	}
 
-      leg[i_var] = new TLegend(0.5,0.78,0.65,0.93); // (xmin,ymin,xmax,ymax)
+      leg[i_var] = new TLegend(0.8,0.78,0.95,0.93); // (xmin,ymin,xmax,ymax)
       formatLeg(leg[i_var]);
 
       //add entries to legend

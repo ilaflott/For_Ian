@@ -462,7 +462,11 @@ static double MCWeights(double MCPthat)
     }
   else
     {
-      if(!initialized) cout << "weights file detected. using previously calculated weights..." << endl;
+      if(!initialized) 
+	{
+	  cout << "weights file detected. using previously calculated weights..." << endl;
+	  cout << "using file: " << weights_file.c_str() << endl;
+	}
       ifstream inWeights(weights_file.c_str(), ifstream::in);
       for(int i=0; i<QCDBins+1; i++) 
 	{
