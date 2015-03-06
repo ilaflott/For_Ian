@@ -54,8 +54,8 @@ const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_for
 const char *version = "HFaugmented_halfOfficial_debugDebug_data_MC";
 
 // Histogram parameters
-//const int n_vars = 13; // Number of variables to plot
-const int n_vars = 1; /*debug*/
+const int n_vars = 13; // Number of variables to plot
+//const int n_vars = 3; /*debug*/
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 
 const char *y_label[] =
@@ -290,8 +290,8 @@ static void formatPlots(const char* input_file_name, int stackOption)
 	  formatHist(hist[i_var][i_type], x_label[i_var], y_label[i_var]);
 	  
 	  hist[i_var][i_type]->SetMarkerColor(color[i_type]);
-	  hist[i_var][i_type]->SetLineColor(lineColor[i_type]);
-	  //hist[i_var][i_type]->SetLineColor(kBlack+3);
+	  //hist[i_var][i_type]->SetLineColor(lineColor[i_type]);//if not stacked
+	  hist[i_var][i_type]->SetLineColor(kBlack+3);//if stacked
 	  hist[i_var][i_type]->SetLineWidth(1);
 	  
 	  if (i_type==0 )
@@ -538,7 +538,7 @@ void formatPlots()
     // Set histogram style
     gStyle->SetOptStat(1101);
     gROOT->ForceStyle();
-
+    
     // Open file
     TFile *hist_file = TFile::Open(Form("%s%s_%s.root",pdf_file_path,hist_file_name,version));
     printf("Formatting %s%s_%s.root\n", pdf_file_path, hist_file_name,version);
