@@ -251,6 +251,7 @@ int makeNTuple(int type)
     case 1: outFile = new TFile( Form("%s",QCDOutFile ) , "RECREATE" ); break;
     case 2: outFile = new TFile( Form("%s",BJetOutFile) , "RECREATE" ); break;
     case 3: outFile = new TFile( Form("%s",CJetOutFile) , "RECREATE" ); break;
+    default:cerr<<"dataType not found"<<endl; return -1;
     }
 
   // New tree, new branches
@@ -265,10 +266,6 @@ int makeNTuple(int type)
   fileStream >> fileName;
   
   //getline(fileStream, fileName);
-  
-  
-
-  
   
   // For every file in file list, process trees
   while (!fileStream.eof()) 
@@ -298,9 +295,9 @@ int makeNTuple(int type)
 	  
 	  akPu3->GetEntry(i);
 
-	  // Event Selection
-	  if ((dataType == 0) && (0 || !pPAcollisionEventSelectionPA || !pHBHENoiseFilter)) continue;
-	  //else continue;// (dataType >= 1) 
+	  // Event Level Selection
+	  if ((dataType == 0) && (0 || !pPAcollisionEventSelectionPA || !pHBHENoiseFilter || abs(vz)>15)) continue;
+	  else if(abs(vz)>15)continue;// (dataType >= 1) 
 	    	  
 	  // Set weight
 	  if (dataType == 0) nWeight = 1.0;
@@ -407,6 +404,7 @@ static double MCWeights(double MCPthat)
       
       // Add QCD MC files to chain
       TChain *ch = new TChain("ak3PFJetAnalyzer/t");
+
       ifstream inStr(QCDFileList.c_str(), ifstream::in);
       string fileName;
       ofstream weightFile(weights_file.c_str(), ofstream::out);
@@ -415,13 +413,16 @@ static double MCWeights(double MCPthat)
       while (!inStr.eof()) 
 	{
           ch->Add(fileName.c_str());
+
           cout << "Added " << fileName << " to chain." << endl;
 	  inStr >> fileName;
 	}
       cout << "Done adding files to chain." << endl;
+      
 
       // Count events across all files
       double pthatEntries[QCDBins+1];
+      
       for (int i=0; i<QCDBins+1; i++) 
 	{
 	  pthatEntries[i] = ch->GetEntries( pthatCut[i].c_str() );
@@ -488,43 +489,46 @@ static void heavyJetWeights(double *pthatEntries)
 {
   // Add heavy flavor MC files to chain
   TChain *HFCh = new TChain("akPu3PFJetAnalyzer/t");
-  string fileList;
-  int heavyFlavor;				 						 
-
-  if (dataType == 2) //b
-    {
-      fileList = BJetFileList;
-      heavyFlavor = 5;
-    }
-  else if (dataType == 3) //c
-    {
-      fileList = CJetFileList;
-      heavyFlavor = 4;
-    }
-
-  ifstream HFInStr(fileList.c_str(), ifstream::in);
-  string HFFileName;
-
-   HFInStr >> HFFileName;
-   while (!HFInStr.eof())
-     {
-       HFCh->Add(HFFileName.c_str());
-       cout << "Added " << HFFileName << " to chain." << endl;
-       HFInStr >> HFFileName;
-     }
+  TChain *HFCh_hiEvt = new TChain("hiEvtAnalyzer/HiTree");
   
-    cout << "Done adding files to chain." << endl;
-
+  string HFfileList;
+  int heavyFlavor;				 						 
+  
+  switch(dataType)
+    {
+    case 2: HFfileList=BJetFileList;heavyFlavor=5;break;
+    case 3: HFfileList=CJetFileList;heavyFlavor=4;break;
+    default: heavyFlavor=-1;break;
+    }
+  
+  ifstream HFInStr(HFfileList.c_str(), ifstream::in);
+  string HFFileName;
+  
+  HFInStr >> HFFileName;
+  while (!HFInStr.eof())
+    {
+      HFCh->Add(HFFileName.c_str());
+      HFCh_hiEvt->Add(HFFileName.c_str());
+      cout << "Added " << HFFileName << " to chain." << endl;
+      HFInStr >> HFFileName;
+    }
+  
+  HFCh->AddFriend(HFCh_hiEvt);
+  
+  cout << "Done adding files to chain." << endl;
+  
   // Count HF events across all files
   int HFPthatEntries[QCDBins+1];
   for (int i=0; i<QCDBins+1; i++) 
     {
-      HFPthatEntries[i] = HFCh->GetEntries(pthatCut[i].c_str());
+      HFPthatEntries[i] = HFCh->GetEntries( pthatCut[i].c_str() );
       cout << "\tHFPthatEntries with " << pthatCut[i] << ": " << HFPthatEntries[i] << endl;
     }
-
+  
   // Add QCD MC files to chain
   TChain *QCDCh = new TChain("akPu3PFJetAnalyzer/t");
+  TChain *QCDCh_hiEvt = new TChain("hiEvtAnalyzer/HiTree");
+  
   ifstream QCDInStr(QCDFileList.c_str(), ifstream::in);
   string QCDFileName;
   
@@ -532,12 +536,15 @@ static void heavyJetWeights(double *pthatEntries)
   while  (!QCDInStr.eof()) 
     {
       QCDCh->Add(QCDFileName.c_str());
+      QCDCh_hiEvt->Add(QCDFileName.c_str());
       cout << "Added " << QCDFileName << " to chain." << endl;
       QCDInStr >> QCDFileName;
     }
+  QCDCh->AddFriend(QCDCh_hiEvt);
   
   cout << "Done adding files to chain." << endl;
-
+  
+  
   // Calculate HF weight for each pthat bin
   double HFWeight[QCDBins+1];
   char HFJetsCut[200];
@@ -547,8 +554,12 @@ static void heavyJetWeights(double *pthatEntries)
   
   for (int i=0; i<QCDBins+1; i++) 
     {
+      
       // Count (indirectly) number of b jets
       sprintf(HFJetsCut, "%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
+      //sprintf(HFJetsCut, "%s&&abs(jteta)<2&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
+      //printf("%s\n",HFJetsCut);
+      
       HFCh->Draw("jtpt>>HFJetHist", HFJetsCut, "goff");
       QCDCh->Draw("jtpt>>QCDJetHist", HFJetsCut, "goff");
       
@@ -570,6 +581,7 @@ static void heavyJetWeights(double *pthatEntries)
       
       HFJetHist->Reset();
       QCDJetHist->Reset();
+      
     }
 
   // Weigh HF events by HF weight for each pthat bin, add to QCD events
@@ -623,10 +635,10 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");
   
   //impact parameter
-  newTree->Branch("ip3d" ,&nIp3d  , "ip3d");
-  newTree->Branch("ip3dSig",&nIp3dsig , "ip3dSig");
-  newTree->Branch("ip2d" ,&nIp2d  ," ip2d");
-  newTree->Branch("ip2dSig",&nIp2dsig , "ip2dSig");
+  newTree->Branch("ip3d" ,&nIp3d  , "ip3d/D");
+  newTree->Branch("ip3dSig",&nIp3dsig , "ip3dSig/D");
+  newTree->Branch("ip2d" ,&nIp2d  ," ip2d/D");
+  newTree->Branch("ip2dSig",&nIp2dsig , "ip2dSig/D");
 
   //event specific
   newTree->Branch("weight", &nWeight, "weight/D");  
@@ -672,16 +684,16 @@ static inline void branchAddresses(TTree *akPu3)
   akPu3->SetBranchAddress("discr_ssvHighEff", &discr_ssvHighEff);
   akPu3->SetBranchAddress("discr_ssvHighPur", &discr_ssvHighPur);
   
-  akPu3->SetBranchAddress("nsvtx"   , &nsvtx   );
-  akPu3->SetBranchAddress("svtxntrk", &svtxntrk);
-  akPu3->SetBranchAddress("svtxdl"  , &svtxdl  );
-  akPu3->SetBranchAddress("svtxdls" , &svtxdls );
-  akPu3->SetBranchAddress("svtxm"   , &svtxm   );
-  akPu3->SetBranchAddress("svtxpt"  , &svtxpt  );
+  akPu3->SetBranchAddress("nsvtx"   , & nsvtx   );
+  akPu3->SetBranchAddress("svtxntrk", &svtxntrk );
+  akPu3->SetBranchAddress("svtxdl"  , &svtxdl   );
+  akPu3->SetBranchAddress("svtxdls" , &svtxdls  );
+  akPu3->SetBranchAddress("svtxm"   , &svtxm    );
+  akPu3->SetBranchAddress("svtxpt"  , &svtxpt   );
   
-  akPu3->SetBranchAddress("ip3d" , &ip3d  );
+  akPu3->SetBranchAddress("ip3d"   , &ip3d    );
   akPu3->SetBranchAddress("ip3dSig", &ip3dSig );
-  akPu3->SetBranchAddress("ip2d" , &ip2d  );
+  akPu3->SetBranchAddress("ip2d"   , &ip2d    );
   akPu3->SetBranchAddress("ip2dSig", &ip2dSig );
 
   akPu3->SetBranchAddress("rawpt", &rawpt);

@@ -31,14 +31,13 @@ static void formatHist(TH1 *, const char *, const char *);
 const char *data_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/";
 const char *data_file_name = "data_updated";
 
-//const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
+const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/"
-const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/";
-//const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_schemeA";
+//const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/";
+const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_schemeA";
 //const char *MC_file_name = "MC_HFaugmented_halfOfficial_noCuts_schemeA";
 //const char *MC_file_name = "BJet_halfOfficial_updated_schemeA";
-const char *MC_file_name = "CJet_halfOfficial_updated_schemeA";
-
+//const char *MC_file_name = "CJet_halfOfficial_updated_schemeA";
 
 const char* QCD_file_name = "QCD_updated";
 const char* QCD_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/";
@@ -47,8 +46,6 @@ const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_fo
 const char *hist_file_name = "bTagPlots_PAMu3_pp";
 
 const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/";
-
-const char *version = "HFaugmented_halfOfficial_debugDebug_data_MC";
 
 // Histogram parameters
 const int n_vars = 18; // Number of variables to plot
@@ -69,13 +66,13 @@ const char *x_label[] =
     "mupt (Gev)", "mueta",    "muphi (rad)",   "mudr", "muptrel",
     "discr_ssvHighEff", "discr_ssvHighPur",
     "nsvtx", "svtxntrk", "svtxdl (cm?)",  "svtxdls",
-    "ip2d","ip2dSig","ip3d","ip3dSig"
+    "ip2d (cm)","ip2dSig","ip3d (cm)","ip3dSig"
   };
 
 const char *var[] =
   {
     "jtpt",    "jteta",  "jtphi",                       //jets
-    "mupt", "mueta",    "muphi",   "mudr","muptrel",     //muons
+    "mupt", "muptrel","mueta",    "muphi",   "mudr",     //muons
     "discr_ssvHighEff", "discr_ssvHighPur",             //discriminators
     "nsvtx", "svtxntrk", "svtxdl", "svtxdls",            //secondary vertex
     "ip2d","ip2dSig","ip3d","ip3dSig"                 //impact parameter
@@ -90,10 +87,10 @@ const char *particle_cut[] =
     "(abs(refparton_flavorForB)==1 || abs(refparton_flavorForB)==2 || abs(refparton_flavorForB)==3 || abs(refparton_flavorForB)==21)"//udsg
   };
                                                                                            
-const int   nbinsX[] = {  30, 15,       15, /**/ 20,  15,       15,   15, 10, /**/  6,  6, /**/  5, 12, 8,  14, /**/  20,  20,  20,  20 };
-const double  lowX[] = {   0, -3, -3.14159, /**/  0,  -3, -3.14159,    0,  0, /**/  0,  0, /**/  0,  0, 0,   0, /**/   0,   0,   0,   0 };
-const double highX[] = { 300,  3,  3.14159, /**/ 80,   3,  3.14159,  0.5, 40, /**/  6,  6, /**/  5, 12, 4, 210, /**/ 100, 100, 100, 100 };
-const bool  doLogy[] = {   1,  1,        0, /**/  1,   1,        0,    1,  1, /**/  1,  1, /**/  1,  1, 1,   1, /**/   1,   1,   1,   1 };
+const int   nbinsX[] = {   16, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   32,  32,  32,  32 };
+const double  lowX[] = {   30, -3, -3.14159, /**/  0,  0, -3, -3.14159,    0,  /**/  0,  0, /**/  0,  0, 0,   0, /**/   -4,  -4,  -4,  -4 };
+const double highX[] = {  270,  3,  3.14159, /**/ 80, 10,  3,  3.14159,  0.5,  /**/  6,  6, /**/  5, 12, 4, 240, /**/    4,   4,   4,   4 };
+const bool  doLogy[] = {    1,  1,        0, /**/  1,  0,  1,        0,    1,  /**/  1,  1, /**/  1,  1, 1,   1, /**/    0,   0,   0,   0 };
 
 const float int_lumi = 4209000000;//inverse millibarns of data. according to lumiCalc2.py, golden lumimask for HLT_PAMu3_v1, 4.209 pb of data.
 
@@ -200,7 +197,7 @@ void makePlots(const char* cuts, const char* outputFile)
 	    
 	  integrals[i_var][i_type]=hist[i_var][i_type]->Integral();
 	  //printf("DEBUG %i %i, %f\n",i_var,i_type,integrals[i_var][i_type]);
-	  if(i_type == 2 || i_type == 3)//if doing b or c contributions to MC, have to renomalize the b and c contributions 
+	  if(i_type == 2 || i_type == 3)//if doing b or c contributions to MC, have to renomalize the  and c contributions 
 	    {
 	      QCDhist[i_var][i_type] = new TH1D(Form("QCDhist_%d_%d",i_var,i_type), Form("QCDhist_%d_%d",i_var,i_type), nbinsX[i_var], lowX[i_var], highX[i_var]);
 	      QCDhist[i_var][i_type]->Sumw2();
@@ -246,7 +243,7 @@ static void formatPlots(const char* input_file_name, int stackOption)
 {
   //Set histogram style
   //gStyle->SetOptStat(1101);
-  gStyle->SetOptStat("iourMe");
+  gStyle->SetOptStat("irMe");
   gROOT->ForceStyle();
   
   // Open file
@@ -259,8 +256,6 @@ static void formatPlots(const char* input_file_name, int stackOption)
   //const char* out_file_name;
   //sprintf(out_file_name, "%s.pdf", input_file_name);
   printf("out_file_name = %s.pdf\n", input_file_name);
-
-  
 
   TCanvas *canv[n_vars];
   TLegend *leg[n_vars];
@@ -348,9 +343,11 @@ static void formatPlots(const char* input_file_name, int stackOption)
 	}
       else//stackOption==1
 	{
+	  hist[i_var][1]->SetStats(0);
+	  
 	  //hist[i_var][1]->Draw("HIST E");//MC Total
-	  hist[i_var][0]->Draw("SCAT E1");
-	  stacked_hist[i_var]->Draw("SAME HIST E");
+	  stacked_hist[i_var]->Draw("HIST E");	  
+	  hist[i_var][0]->Draw("SAME SCAT E1");	  
 	}
 
       leg[i_var] = new TLegend(0.8,0.78,0.95,0.93); // (xmin,ymin,xmax,ymax)
