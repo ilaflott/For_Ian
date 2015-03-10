@@ -43,7 +43,7 @@ const char* QCD_file_name = "QCD_updated";
 const char* QCD_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/";
 
 const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/";
-const char *hist_file_name = "bTagPlots_PAMu3_pp";
+const char *hist_file_name = "bTagPlots_pp";
 
 const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/";
 
@@ -63,9 +63,9 @@ const char *y_label[] =
 const char *x_label[] =
   {
     "jtpt (GeV)",    "jteta",  "jtphi (rad)",         
-    "mupt (Gev)", "mueta",    "muphi (rad)",   "mudr", "muptrel",
+    "mupt (Gev)", "muptrel (GeV)",    "muphi (rad)",   "mudr", "mueta",
     "discr_ssvHighEff", "discr_ssvHighPur",
-    "nsvtx", "svtxntrk", "svtxdl (cm?)",  "svtxdls",
+    "nsvtx", "svtxntrk", "svtxdl (cm)",  "svtxdls",
     "ip2d (cm)","ip2dSig","ip3d (cm)","ip3dSig"
   };
 
@@ -87,8 +87,8 @@ const char *particle_cut[] =
     "(abs(refparton_flavorForB)==1 || abs(refparton_flavorForB)==2 || abs(refparton_flavorForB)==3 || abs(refparton_flavorForB)==21)"//udsg
   };
                                                                                            
-const int   nbinsX[] = {   16, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   32,  32,  32,  32 };
-const double  lowX[] = {   30, -3, -3.14159, /**/  0,  0, -3, -3.14159,    0,  /**/  0,  0, /**/  0,  0, 0,   0, /**/   -4,  -4,  -4,  -4 };
+const int   nbinsX[] = {   25, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   32,  32,  32,  32 };
+const double  lowX[] = {   20, -3, -3.14159, /**/  0,  0, -3, -3.14159,    0,  /**/  0,  0, /**/  0,  0, 0,   0, /**/   -4,  -4,  -4,  -4 };
 const double highX[] = {  270,  3,  3.14159, /**/ 80, 10,  3,  3.14159,  0.5,  /**/  6,  6, /**/  5, 12, 4, 240, /**/    4,   4,   4,   4 };
 const bool  doLogy[] = {    1,  1,        0, /**/  1,  0,  1,        0,    1,  /**/  1,  1, /**/  1,  1, 1,   1, /**/    0,   0,   0,   0 };
 
@@ -121,7 +121,7 @@ void bTagPlots_IanEdit(const char* cutsVersion = default_version, int option = 0
   printf("\nYour version is:\n %s\n",cutsVersion);
   
   char outputFile[1000];
-  sprintf(outputFile,"%s%s_HFaugmented_halfOfficial_%s_data_MC",hist_file_path,hist_file_name,cutsVersion);
+  sprintf(outputFile,"%s%s_HFaugmented_halfOfficial_%s",hist_file_path,hist_file_name,cutsVersion);
   
   switch(stackOption)
     {
@@ -415,16 +415,17 @@ static void formatLeg(TLegend *l)
     l->SetFillColor(0);
     l->SetTextSize(0.03);
     l->SetBorderSize(0.01);
+    l->SetFillStyle(0);
 }
 
 static void formatHist(TH1 *h, const char *x_label1, const char *y_label1)
 {
   //h->Sumw2();
 
-  h->GetXaxis()->SetTitle(x_label1);
+  h->GetXaxis()->SetTitle(Form("%s",x_label1));
   //h->GetXaxis()->CenterTitle();
 
-  h->GetYaxis()->SetTitle(y_label1);
+  h->GetYaxis()->SetTitle(Form("%s",y_label1);
   //h->GetYaxis()->CenterTitle();
 }
 

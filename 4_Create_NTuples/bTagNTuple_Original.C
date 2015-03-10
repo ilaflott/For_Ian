@@ -68,24 +68,24 @@ string weights_file;
 // Macro settings/constants
 //FileLists
 const string fileListPath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
-const string dataFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppMuon_data_filelist.txt";
+const string dataFileList = "/afs/cern.ch/user/i/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppMuon_data_filelist.txt";
 const string QCDFileList  = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_QCD_filelist.txt";
 const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_BJet_2760GeV_halfOfficial_filelist.txt";
 const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_CJet_2760GeV_halfOfficial_filelist.txt";
 
 //Weight Files
 const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
-const string dataWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/weights_data_updated.txt";			 
+const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data_updated.txt";			 
 const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated.txt";		 
 const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_schemeA.txt";
 const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_updated_schemeA.txt";
 
 //Output Files
 const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
-const char* dataOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/data_updated.root";
+const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_updated.root";
 const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated.root";
 const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_schemeA.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_schemeA.Root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_schemeA.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
