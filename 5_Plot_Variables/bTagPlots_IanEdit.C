@@ -425,7 +425,7 @@ static void formatHist(TH1 *h, const char *x_label1, const char *y_label1)
   h->GetXaxis()->SetTitle(Form("%s",x_label1));
   //h->GetXaxis()->CenterTitle();
 
-  h->GetYaxis()->SetTitle(Form("%s",y_label1);
+  h->GetYaxis()->SetTitle(Form("%s",y_label1));
   //h->GetYaxis()->CenterTitle();
 }
 
