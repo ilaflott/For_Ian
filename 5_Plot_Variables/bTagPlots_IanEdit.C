@@ -49,7 +49,7 @@ const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_for
 
 // Histogram parameters
 const int n_vars = 18; // Number of variables to plot
-//const int n_vars = 4; /*debug*/
+//const int n_vars = 1; /*debug*/
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 
 const char *y_label[] =
