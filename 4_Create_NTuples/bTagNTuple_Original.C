@@ -75,17 +75,17 @@ const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_
 
 //Weight Files
 const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
-const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data_updated.txt";			 
-const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated.txt";		 
-const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_schemeA.txt";
-const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_updated_schemeA.txt";
+const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data_updated_4.5.15.txt";			 
+const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated_4.5.15.txt";		 
+const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_4.5.15_schemeA.txt";
+const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_updated_4.5.15_schemeA.txt";
 
 //Output Files
 const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
-const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_updated.root";
-const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated.root";
-const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_schemeA.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_schemeA.root";
+const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_updated_4.5.15.root";
+const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated_4.5.15.root";
+const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_4.5.15_schemeA.root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_4.5.15_schemeA.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -133,7 +133,7 @@ float rawpt[1000];
 float jtpt[1000];
 float jteta[1000];
 float jtphi[1000];
-0float trackMax[1000];
+float trackMax[1000];
 float mupt[1000];
 int   muN[1000];
 float mueta[1000];
@@ -149,10 +149,10 @@ float svtxdls[1000];
 float svtxm[1000];
 float svtxpt[1000];
 
-int nIPtrk[1000];
-int nselIPtrk[1000];
-int nIP;
-int ipJetIndex[10000];
+int nIPtrk[1000];//per jet
+int nselIPtrk[1000];//per jet
+int nIP;//per event
+int ipJetIndex[10000];//per track
 float ipPt[10000];
 float ipProb0[10000];
 float ipProb1[10000];
@@ -202,17 +202,17 @@ double nDiscr_ssvHighPur;
 int nNIPtrk;
 int nNselIPtrk;
 int nNIP;
-int nNIPJetIndex;
-double nIPPt;
-double nIPProb0;
-double nIPProb1;
-double nIP2d;
-double nIP2dsig;
-double nIP3d;
-double nIP3dsig;
-double nIPDist2Jet;
-double nIPDist2JetSig;
-double nIPClosest2Jet;
+int nIPJetIndex[10000];
+double nIPPt[10000];
+double nIPProb0[10000];
+//double nIPProb1[10000];
+double nIP2d[10000];
+double nIP2dsig[10000];
+double nIP3d[10000];
+double nIP3dsig[10000];
+double nIPDist2Jet[10000];
+//double nIPDist2JetSig[10000];
+double nIPClosest2Jet[10000];
 
 int    nNsvtx;
 int    nSvtxntrk;
@@ -221,10 +221,8 @@ double nSvtxdls;
 double nSvtxm;
 double nSvtxpt;
 
-
-
-double nVz; //Event info
-
+//double nVz; //Event info
+double nVz;
 double nPthat; //MC
 double nRefpt;                // MC
 int    nRefparton_flavorForB; // MC
@@ -309,7 +307,7 @@ int makeNTuple(int type)
       // Process every event
       int nEvents = akPu3->GetEntries();
       cout << nEvents << " events to loop over in " << fileName << endl;
-      
+      //int totNumTracks=0;
       //nEvents = 100;
       for (int i=0; i<nEvents; i++) 
 	{
@@ -326,20 +324,18 @@ int makeNTuple(int type)
 	  if (dataType == 0) nWeight = 1.0;
 	  else nWeight = MCWeights(pthat);
 	  
+	  
 	  //Event Info
 	  nVz    = vz;
 	  nNIP   = nIP;
 	  nPthat = pthat; 
-
-	  newTree.Fill(nNIP  );
-	  newTree.Fill(nVz   );
-	  newTree.Fill(nPthat);
-
+	  
 	  int trackPosition=0;
 	  //Jet Processing
 	  for (int j=0; j<nref; j++) 
 	    {
-	      trackPosition+=nselIPtrk[j];
+	      
+	      trackPosition+=nselIPtrk[j];//at end of loop, this is number of tracks in our event
 	      switch(dataType)
 		{
 		case 0: break;//no particle level selection for data
@@ -359,13 +355,6 @@ int makeNTuple(int type)
 	      if(dataType>=1) nRefpt                = refpt[j];
 	      if(dataType>=1) nRefparton_flavorForB = refparton_flavorForB[j];
 	      
-	      newTree.Fill(nJtpt  );
-	      newTree.Fill(nJteta );
-	      newTree.Fill(nJtphi );
-	      newTree.Fill(nRawpt );
-	      if(dataType>=1)newTree.Fill(nRefpt               );
-	      if(dataType>=1)newTree.Fill(nRefparton_flavorForB);
-	      
 	      //muons associated w/ jet
 	      nMuN     = muN[j];
 	      nMupt    = mupt[j];
@@ -374,31 +363,16 @@ int makeNTuple(int type)
 	      nMudr    = mudr[j];
 	      nMuptrel = muptrel[j];
 	      
-	      newTree.Fill(nMuN    );
-	      newTree.Fill(nMupt   );
-	      newTree.Fill(nMueta  );
-	      newTree.Fill(nMuphi  );
-	      newTree.Fill(nMudr   );
-	      newTree.Fill(nMuptrel);
-
 	      //ssv discriminator values for jet
 	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
 	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
 	     
-	      newTree.Fill(nDiscr_ssvHighEff);
-	      newTree.Fill(nDiscr_ssvHighPur);
-
 	      //what is this variable?
 	      nTrackMax = trackMax[j];
-
-	      newTree.Fill(nTrackMax);\	      
-
+	      
 	      //jet-track variables
 	      nNIPtrk    =nIPtrk[j];
 	      nNselIPtrk =nselIPtrk[j];
-	      
-	      newTree.Fill(nNIPtrk   );
-	      newTree.Fill(nNselIPtrk);
 	      
 	      //secondary vertex variables
 	      nNsvtx    = nsvtx[j];
@@ -407,49 +381,41 @@ int makeNTuple(int type)
 	      nSvtxdls  = svtxdls[j];
 	      nSvtxm    = svtxm[j];
 	      nSvtxpt   = svtxpt[j];               
-
-	      newTree.Fill(nNsvtx   );
-	      newTree.Fill(nSvtxntrk);
-	      newTree.Fill(nSvtxdl  );
-	      newTree.Fill(nSvtxdls );
-	      newTree.Fill(nSvtxm   );
-	      newTree.Fill(nSvtxpt  );  
 	      
 	      //track based variables
 	      if(doTracks)
 		{
-		  for(int it = trackPosition-nseltrkIP[it];it<trackPosition;it++)
+		  int counter=0;
+		  for(int it = trackPosition-nselIPtrk[j];it<trackPosition;it++)
 		    {
-		      nIPJetIndex   =ipJetIndex[it];//this number reflects the index of the jet that the ip belongs to
-		      nIPPt         =ipPt[it];
-		      nIPProb0      =ipProb0[it];
-		      nIPProb1      =ipProb1[it];
-		      nIP2d         = ip2d[it] ;
-		      nIP2dsig      = ip2dSig[it];
-		      nIP3d         = ip3d[it] ;
-		      nIP3dsig      = ip3dSig[it];
-		      nIPDist2Jet   =ipDist2Jet[it];
-		      nIPDist2JetSig=ipDist2JetSig[it];
-		      nIPClosest2Jet=ipClosest2Jet[it];
-		      newTree.Fill(nIPJetIndex   );
-		      newTree.Fill(nIPPt         );
-		      newTree.Fill(nIPProb0      );
-		      newTree.Fill(nIPProb1      );
-		      newTree.Fill(nIP2d         );
-		      newTree.Fill(nIP2dsig      );
-		      newTree.Fill(nIP3d         );
-		      newTree.Fill(nIP3dsig      );
-		      newTree.Fill(nIPDist2Jet   );
-		      newTree.Fill(nIPDist2JetSig);
-		      newTree.Fill(nIPClosest2Jet);
+
+		      nIPJetIndex[counter]    = ipJetIndex[it];//this number reflects the index of the jet that the ip belongs to
+		      nIPPt[counter]          = ipPt[it];
+		      nIPProb0[counter]       = ipProb0[it];
+		      //nIPProb1[counter]       = ipProb1[it];
+		      nIP2d[counter]          = ip2d[it] ;
+		      nIP2dsig[counter]       = ip2dSig[it];
+		      nIP3d[counter]          = ip3d[it] ;
+		      nIP3dsig[counter]       = ip3dSig[it];
+		      nIPDist2Jet[counter]    = ipDist2Jet[it];
+		      //nIPDist2JetSig[counter] = ipDist2JetSig[it];
+		      nIPClosest2Jet[counter] = ipClosest2Jet[it];
+		      counter++;	
+		      
 		    }
 		}
-	    }
-	}
+	      
+	    }//jetloop
+	  
+	  newTree.Fill();
+	  
+	}//eventloop
       
+
       // Cleanup
       cout << "closing " << fileName << endl;
       inFile->Close();
+
       fileStream >> fileName;
       //getline(fileStream, fileName);
     }
@@ -685,6 +651,7 @@ static void heavyJetWeights(double *pthatEntries)
   return;
 }
 
+
 // Create the branches for the new tree
 static inline void newBranches(TTree *newTree) 
 {
@@ -722,17 +689,17 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("nIP" ,&nNIP  , "nIP/I");
   if(doTracks)
     {
-      newTree->Branch("ipJetIndex" ,&nIPJetIndex  , "ipJetIndex/I");
-      newTree->Branch("ipPt" ,&nIPPt  , "ipPt/I");
-      newTree->Branch("ipProb0" ,&nIPProb0  , "ipProb0/I");
-      newTree->Branch("ipProb1" ,&nIPProb1  , "ipProb1/I");
-      newTree->Branch("ip2d" ,&nIP2d  ," ip2d/D");
-      newTree->Branch("ip2dSig",&nIP2dsig , "ip2dSig/D");
-      newTree->Branch("ip3d" ,&nIP3d  , "ip3d/D");
-      newTree->Branch("ip3dSig",&nIP3dsig , "ip3dSig/D");
-      newTree->Branch("ipDist2Jet",&nIPDist2Jet , "ipDist2Jet/D");
-      newTree->Branch("ipDist2JetSig",&nIPDist2JetSig , "ipDist2JetSig/D");
-      newTree->Branch("ipCloset2Jet",&nIPClosest2Jet , "ipClosest2Jet/D");
+      newTree->Branch("ipJetIndex" ,&nIPJetIndex  , "ipJetIndex[nIP]/I");
+      newTree->Branch("ipPt" ,&nIPPt  , "ipPt[nIP]/I");
+      newTree->Branch("ipProb0" ,&nIPProb0  , "ipProb0[nIP]/I");
+      //newTree->Branch("ipProb1" ,&nIPProb1  , "ipProb1[nIP]/I");
+      newTree->Branch("ip2d" ,&nIP2d  ," ip2d[nIP]/D");
+      newTree->Branch("ip2dSig",&nIP2dsig , "ip2dSig[nIP]/D");
+      newTree->Branch("ip3d" ,&nIP3d  , "ip3d[nIP]/D");
+      newTree->Branch("ip3dSig",&nIP3dsig , "ip3dSig[nIP]/D");
+      newTree->Branch("ipDist2Jet",&nIPDist2Jet , "ipDist2Jet[nIP]/D");
+      //newTree->Branch("ipDist2JetSig",&nIPDist2JetSig , "ipDist2JetSig[nIP]/D");
+      newTree->Branch("ipCloset2Jet",&nIPClosest2Jet , "ipClosest2Jet[nIP]/D");
   }  
 
   //event specific
@@ -794,14 +761,14 @@ static inline void branchAddresses(TTree *akPu3)
     {
       akPu3->SetBranchAddress("ipJetIndex",&ipJetIndex);
       akPu3->SetBranchAddress("ipProb0"   , &ipProb0    );
-      akPu3->SetBranchAddress("ipProb1"   , &ipProb1    );
+      //akPu3->SetBranchAddress("ipProb1"   , &ipProb1    );
       akPu3->SetBranchAddress("ipPt"   , &ipPt    );
       akPu3->SetBranchAddress("ip2d"   , &ip2d    );
       akPu3->SetBranchAddress("ip2dSig", &ip2dSig );
       akPu3->SetBranchAddress("ip3d"   , &ip3d    );
       akPu3->SetBranchAddress("ip3dSig", &ip3dSig );
       akPu3->SetBranchAddress("ipDist2Jet", &ipDist2Jet );
-      akPu3->SetBranchAddress("ipDist2JetSig", &ipDist2JetSig );
+      //akPu3->SetBranchAddress("ipDist2JetSig", &ipDist2JetSig );
       akPu3->SetBranchAddress("ipClosest2Jet", &ipClosest2Jet );
     }
   
