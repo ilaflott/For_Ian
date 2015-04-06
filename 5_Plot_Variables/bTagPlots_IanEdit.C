@@ -29,17 +29,18 @@ static void formatHist(TH1 *, const char *, const char *);
 
 // File parameters
 const char *data_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/";
-const char *data_file_name = "data_updated";
+const char *data_file_name = "data_updated_4.5.15";
 
 const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/"
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/";
-const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_schemeA";
+
+const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_4.5.15_schemeA";
 //const char *MC_file_name = "MC_HFaugmented_halfOfficial_noCuts_schemeA";
 //const char *MC_file_name = "BJet_halfOfficial_updated_schemeA";
 //const char *MC_file_name = "CJet_halfOfficial_updated_schemeA";
 
-const char* QCD_file_name = "QCD_updated";
+const char* QCD_file_name = "QCD_updated_4.5.15";
 const char* QCD_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/";
 
 const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/3.12.15_OvernightPlots/";
@@ -49,7 +50,7 @@ const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_for
 
 // Histogram parameters
 const int n_vars = 18; // Number of variables to plot
-//const int n_vars = 1; /*debug*/
+//const int n_vars = 4; /*debug*/
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 
 const char *y_label[] =
@@ -100,7 +101,7 @@ const char *event_cut = "HLT_PAMu3_v1";
 //const char *event_cut = "HLT_PAMu12_v1";
 //const char *event_cut = "HLT_PAMu3PFJet40_v1";
 
-const char *default_cut = "vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>30&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.5";
+const char *default_cut = "vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.5";
 const char *default_version = "vz15_jteta2_jtpt40_HLTPAMu3v1_muCut_WCut_svtxCut";
 
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};
@@ -113,7 +114,7 @@ const char *leg_label[]  = { "Data pp", "MC", "b", "c", "udsg" };
 //NOTE fields which arent specified default to the values here. If one only wants to change one or two of the parameters,
 //then they must be submitted in order and one after the other. Ex. you want to change the cuts, but because of the order
 //of the arguments and the ambiguity inherent, one must also specify a version and an option. Just specifying one string as an input will
-// be taken in as an input value to cutsVersion, even if what you really wanted to change is the cuts 
+//be taken in as an input value to cutsVersion, even if what you really wanted to change is the cuts 
 void bTagPlots_IanEdit(const char* cutsVersion = default_version, int option = 0, const char* cuts = default_cut , int stackOption = 1)
 {
   
@@ -179,8 +180,8 @@ void makePlots(const char* cuts, const char* outputFile)
   
   double QCD_HFintegral = 0;
   int numEntries = 0;
-  //for (int i_var = 16; i_var < n_vars; i_var++)/*DEBUG*/
-  for (int i_var = 0; i_var < n_vars; i_var++)
+  for (int i_var = 14; i_var < n_vars; i_var++)/*DEBUG*/
+    //for (int i_var = 0; i_var < n_vars; i_var++)
     {
       printf("\ni_var:  %d\n\nvariable:  %s\n\n", i_var, var[i_var]);
 
@@ -279,8 +280,8 @@ static void formatPlots(const char* input_file_name, int stackOption)
   TCanvas *temp_canv = new TCanvas("temp", "temp", 1200, 600);
   
   temp_canv->Print(Form("%s.pdf(",input_file_name));
-  //for (int i_var=16; i_var<n_vars; i_var++)/*DEBUG*/
-  for (int i_var=0; i_var<n_vars; i_var++)
+  for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
+    //for (int i_var=0; i_var<n_vars; i_var++)
     {
       printf("Formatting %s\n", var[i_var]);
 
@@ -584,8 +585,8 @@ void formatPlots()
     //          FORMAT HISTOGRAMS
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
     for (int i_var=0; i_var<n_vars; i_var++)
+    //for (int i_var=0; i_var<n_vars; i_var++)
       {
         printf("Formatting %s\n", var[i_var]);
 	canv[i_var] = new TCanvas(Form("canv_%d",i_var),Form("canv_%d",i_var),1200,600);
