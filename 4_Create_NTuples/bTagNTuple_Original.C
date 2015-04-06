@@ -64,7 +64,7 @@ static inline void branchAddresses(TTree *akPu3);
 // Switches
 //int dataType = 0;
 string weights_file;
-
+const bool doTracks=true;
 // Macro settings/constants
 //FileLists
 const string fileListPath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
@@ -133,7 +133,7 @@ float rawpt[1000];
 float jtpt[1000];
 float jteta[1000];
 float jtphi[1000];
-float trackMax[1000];
+0float trackMax[1000];
 float mupt[1000];
 int   muN[1000];
 float mueta[1000];
@@ -148,10 +148,22 @@ float svtxdl[1000];
 float svtxdls[1000];
 float svtxm[1000];
 float svtxpt[1000];
-float ip3d[1000];
-float ip3dSig[1000];
-float ip2d[1000];
-float ip2dSig[1000];
+
+int nIPtrk[1000];
+int nselIPtrk[1000];
+int nIP;
+int ipJetIndex[10000];
+float ipPt[10000];
+float ipProb0[10000];
+float ipProb1[10000];
+float ip2d[10000];
+float ip2dSig[10000];
+float ip3d[10000];
+float ip3dSig[10000];
+float ipDist2Jet[10000];
+float ipDist2JetSig[10000];
+float ipClosest2Jet[10000];
+
 float pthat;                      // MC
 float refpt[1000];                // MC
 int   refparton_flavorForB[1000]; // MC
@@ -187,10 +199,20 @@ double nMuptrel;
 double nDiscr_ssvHighEff;
 double nDiscr_ssvHighPur;
 
-double nIp3d;
-double nIp3dsig;
-double nIp2d;
-double nIp2dsig;
+int nNIPtrk;
+int nNselIPtrk;
+int nNIP;
+int nNIPJetIndex;
+double nIPPt;
+double nIPProb0;
+double nIPProb1;
+double nIP2d;
+double nIP2dsig;
+double nIP3d;
+double nIP3dsig;
+double nIPDist2Jet;
+double nIPDist2JetSig;
+double nIPClosest2Jet;
 
 int    nNsvtx;
 int    nSvtxntrk;
@@ -287,10 +309,11 @@ int makeNTuple(int type)
       // Process every event
       int nEvents = akPu3->GetEntries();
       cout << nEvents << " events to loop over in " << fileName << endl;
-
+      
       //nEvents = 100;
       for (int i=0; i<nEvents; i++) 
 	{
+	  
 	  if (i%10000 == 0 ) cout << "Processing Event " << i << endl;
 	  
 	  akPu3->GetEntry(i);
@@ -302,66 +325,125 @@ int makeNTuple(int type)
 	  // Set weight
 	  if (dataType == 0) nWeight = 1.0;
 	  else nWeight = MCWeights(pthat);
-	    	  
-	  // Process every jet
+	  
+	  //Event Info
+	  nVz    = vz;
+	  nNIP   = nIP;
+	  nPthat = pthat; 
+
+	  newTree.Fill(nNIP  );
+	  newTree.Fill(nVz   );
+	  newTree.Fill(nPthat);
+
+	  int trackPosition=0;
+	  //Jet Processing
 	  for (int j=0; j<nref; j++) 
 	    {
-	      
+	      trackPosition+=nselIPtrk[j];
 	      switch(dataType)
 		{
-		case 0: break;
-		case 1: /*if ( fabs(refparton_flavorForB[j]) == 4 || fabs(refparton_flavorForB[j]) == 5  ) continue;*/ break;//want all flavors from QCD file
+		case 0: break;//no particle level selection for data
+		case 1: break;//want all parton flavors from QCD file
 		case 2:  if (fabs(refparton_flavorForB[j])!=5) continue; break;//want only bs from b file
 		case 3:  if (fabs(refparton_flavorForB[j])!=4) continue; break;//want only cs from c file
 		}
 	      
+	      ////jet level selection, might never apply it at this level...
+	      //if(abs(jteta[j])<2.0||jtpt<40)continue;
+
 	      //jet parameters
-	      nJtpt = jtpt[j];
+	      nJtpt  = jtpt[j];
 	      nJteta = jteta[j];
 	      nJtphi = jtphi[j];
-
-	      //tracks
-	      nTrackMax = trackMax[j];
-
-	      //muons
-	      nMuN  = muN[j];
-	      nMupt = mupt[j];
-	      nMueta = mueta[j];
-	      nMuphi = muphi[j];
-	      nMudr = mudr[j];
+	      nRawpt = rawpt[j];
+	      if(dataType>=1) nRefpt                = refpt[j];
+	      if(dataType>=1) nRefparton_flavorForB = refparton_flavorForB[j];
+	      
+	      newTree.Fill(nJtpt  );
+	      newTree.Fill(nJteta );
+	      newTree.Fill(nJtphi );
+	      newTree.Fill(nRawpt );
+	      if(dataType>=1)newTree.Fill(nRefpt               );
+	      if(dataType>=1)newTree.Fill(nRefparton_flavorForB);
+	      
+	      //muons associated w/ jet
+	      nMuN     = muN[j];
+	      nMupt    = mupt[j];
+	      nMueta   = mueta[j];
+	      nMuphi   = muphi[j];
+	      nMudr    = mudr[j];
 	      nMuptrel = muptrel[j];
 	      
-	      //ssv discriminator values
+	      newTree.Fill(nMuN    );
+	      newTree.Fill(nMupt   );
+	      newTree.Fill(nMueta  );
+	      newTree.Fill(nMuphi  );
+	      newTree.Fill(nMudr   );
+	      newTree.Fill(nMuptrel);
+
+	      //ssv discriminator values for jet
 	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
 	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
+	     
+	      newTree.Fill(nDiscr_ssvHighEff);
+	      newTree.Fill(nDiscr_ssvHighPur);
 
-	      //impact parameter, 2d, 3d, significances
-	      nIp3d  = ip3d[j] ;
-	      nIp3dsig = ip3dSig[j];
-	      nIp2d  = ip2d[j] ;
-	      nIp2dsig = ip2dSig[j];
+	      //what is this variable?
+	      nTrackMax = trackMax[j];
 
-	      //secondary vertex variables
-	      nNsvtx = nsvtx[j];
-	      nSvtxntrk = svtxntrk[j];
-	      nSvtxdl = svtxdl[j];
-	      nSvtxdls = svtxdls[j];
-	      nSvtxm = svtxm[j];
-	      nSvtxpt = svtxpt[j];
+	      newTree.Fill(nTrackMax);\	      
 
-	      //event information
-	      nVz=vz;
-
-	      nRawpt = rawpt[j];
-
-	      if(dataType>=1)
-		{
-		  nPthat = pthat; // TEMPORARY
-		  nRefpt = refpt[j];
-		  nRefparton_flavorForB = refparton_flavorForB[j];
-		}
+	      //jet-track variables
+	      nNIPtrk    =nIPtrk[j];
+	      nNselIPtrk =nselIPtrk[j];
 	      
-	      newTree.Fill();
+	      newTree.Fill(nNIPtrk   );
+	      newTree.Fill(nNselIPtrk);
+	      
+	      //secondary vertex variables
+	      nNsvtx    = nsvtx[j];
+	      nSvtxntrk = svtxntrk[j];
+	      nSvtxdl   = svtxdl[j];
+	      nSvtxdls  = svtxdls[j];
+	      nSvtxm    = svtxm[j];
+	      nSvtxpt   = svtxpt[j];               
+
+	      newTree.Fill(nNsvtx   );
+	      newTree.Fill(nSvtxntrk);
+	      newTree.Fill(nSvtxdl  );
+	      newTree.Fill(nSvtxdls );
+	      newTree.Fill(nSvtxm   );
+	      newTree.Fill(nSvtxpt  );  
+	      
+	      //track based variables
+	      if(doTracks)
+		{
+		  for(int it = trackPosition-nseltrkIP[it];it<trackPosition;it++)
+		    {
+		      nIPJetIndex   =ipJetIndex[it];//this number reflects the index of the jet that the ip belongs to
+		      nIPPt         =ipPt[it];
+		      nIPProb0      =ipProb0[it];
+		      nIPProb1      =ipProb1[it];
+		      nIP2d         = ip2d[it] ;
+		      nIP2dsig      = ip2dSig[it];
+		      nIP3d         = ip3d[it] ;
+		      nIP3dsig      = ip3dSig[it];
+		      nIPDist2Jet   =ipDist2Jet[it];
+		      nIPDist2JetSig=ipDist2JetSig[it];
+		      nIPClosest2Jet=ipClosest2Jet[it];
+		      newTree.Fill(nIPJetIndex   );
+		      newTree.Fill(nIPPt         );
+		      newTree.Fill(nIPProb0      );
+		      newTree.Fill(nIPProb1      );
+		      newTree.Fill(nIP2d         );
+		      newTree.Fill(nIP2dsig      );
+		      newTree.Fill(nIP3d         );
+		      newTree.Fill(nIP3dsig      );
+		      newTree.Fill(nIPDist2Jet   );
+		      newTree.Fill(nIPDist2JetSig);
+		      newTree.Fill(nIPClosest2Jet);
+		    }
+		}
 	    }
 	}
       
@@ -634,11 +716,24 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtxm", &nSvtxm, "svtxm/D");
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");
   
-  //impact parameter
-  newTree->Branch("ip3d" ,&nIp3d  , "ip3d/D");
-  newTree->Branch("ip3dSig",&nIp3dsig , "ip3dSig/D");
-  newTree->Branch("ip2d" ,&nIp2d  ," ip2d/D");
-  newTree->Branch("ip2dSig",&nIp2dsig , "ip2dSig/D");
+  //tracks
+  newTree->Branch("nIPtrk" ,&nNIPtrk  , "nIPtrk/I");
+  newTree->Branch("nselIPtrk" ,&nNselIPtrk  , "nselIPtrk/I");
+  newTree->Branch("nIP" ,&nNIP  , "nIP/I");
+  if(doTracks)
+    {
+      newTree->Branch("ipJetIndex" ,&nIPJetIndex  , "ipJetIndex/I");
+      newTree->Branch("ipPt" ,&nIPPt  , "ipPt/I");
+      newTree->Branch("ipProb0" ,&nIPProb0  , "ipProb0/I");
+      newTree->Branch("ipProb1" ,&nIPProb1  , "ipProb1/I");
+      newTree->Branch("ip2d" ,&nIP2d  ," ip2d/D");
+      newTree->Branch("ip2dSig",&nIP2dsig , "ip2dSig/D");
+      newTree->Branch("ip3d" ,&nIP3d  , "ip3d/D");
+      newTree->Branch("ip3dSig",&nIP3dsig , "ip3dSig/D");
+      newTree->Branch("ipDist2Jet",&nIPDist2Jet , "ipDist2Jet/D");
+      newTree->Branch("ipDist2JetSig",&nIPDist2JetSig , "ipDist2JetSig/D");
+      newTree->Branch("ipCloset2Jet",&nIPClosest2Jet , "ipClosest2Jet/D");
+  }  
 
   //event specific
   newTree->Branch("weight", &nWeight, "weight/D");  
@@ -684,18 +779,32 @@ static inline void branchAddresses(TTree *akPu3)
   akPu3->SetBranchAddress("discr_ssvHighEff", &discr_ssvHighEff);
   akPu3->SetBranchAddress("discr_ssvHighPur", &discr_ssvHighPur);
   
-  akPu3->SetBranchAddress("nsvtx"   , & nsvtx   );
+  akPu3->SetBranchAddress("nsvtx"   , &nsvtx   );
   akPu3->SetBranchAddress("svtxntrk", &svtxntrk );
   akPu3->SetBranchAddress("svtxdl"  , &svtxdl   );
   akPu3->SetBranchAddress("svtxdls" , &svtxdls  );
   akPu3->SetBranchAddress("svtxm"   , &svtxm    );
   akPu3->SetBranchAddress("svtxpt"  , &svtxpt   );
   
-  akPu3->SetBranchAddress("ip3d"   , &ip3d    );
-  akPu3->SetBranchAddress("ip3dSig", &ip3dSig );
-  akPu3->SetBranchAddress("ip2d"   , &ip2d    );
-  akPu3->SetBranchAddress("ip2dSig", &ip2dSig );
 
+  akPu3->SetBranchAddress("nIPtrk"    ,&nIPtrk);
+  akPu3->SetBranchAddress("nselIPtrk" ,&nselIPtrk);
+  akPu3->SetBranchAddress("nIP"       ,&nIP);
+  if(doTracks)
+    {
+      akPu3->SetBranchAddress("ipJetIndex",&ipJetIndex);
+      akPu3->SetBranchAddress("ipProb0"   , &ipProb0    );
+      akPu3->SetBranchAddress("ipProb1"   , &ipProb1    );
+      akPu3->SetBranchAddress("ipPt"   , &ipPt    );
+      akPu3->SetBranchAddress("ip2d"   , &ip2d    );
+      akPu3->SetBranchAddress("ip2dSig", &ip2dSig );
+      akPu3->SetBranchAddress("ip3d"   , &ip3d    );
+      akPu3->SetBranchAddress("ip3dSig", &ip3dSig );
+      akPu3->SetBranchAddress("ipDist2Jet", &ipDist2Jet );
+      akPu3->SetBranchAddress("ipDist2JetSig", &ipDist2JetSig );
+      akPu3->SetBranchAddress("ipClosest2Jet", &ipClosest2Jet );
+    }
+  
   akPu3->SetBranchAddress("rawpt", &rawpt);
   
   if (dataType >= 1) 
