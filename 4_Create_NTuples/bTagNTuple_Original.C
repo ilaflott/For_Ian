@@ -65,6 +65,7 @@ static inline void branchAddresses(TTree *akPu3);
 //int dataType = 0;
 string weights_file;
 const bool doTracks=true;
+
 // Macro settings/constants
 //FileLists
 const string fileListPath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
@@ -75,17 +76,17 @@ const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_
 
 //Weight Files
 const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
-const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data_updated_4.5.15.txt";			 
-const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated_4.5.15.txt";		 
-const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_4.5.15_schemeA.txt";
-const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_updated_4.5.15_schemeA.txt";
+const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data_updated_4.13.15.txt";			 
+const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated_4.13.15.txt";		 
+const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_4.13.15_schemeA.txt";
+const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_updated_4.13.15_schemeA.txt";
 
 //Output Files
 const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
-const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_updated_4.5.15.root";
-const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated_4.5.15.root";
-const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_4.5.15_schemeA.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_4.5.15_schemeA.root";
+const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_updated_4.13.15.root";
+const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated_4.13.15.root";
+const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_4.13.15_schemeA.root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_4.13.15_schemeA.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -163,6 +164,10 @@ float ip3dSig[10000];
 float ipDist2Jet[10000];
 float ipDist2JetSig[10000];
 float ipClosest2Jet[10000];
+float trkChi2[10000];
+float trkPt[10000];
+float trkEta[10000];
+float trkPhi[10000];
 
 float pthat;                      // MC
 float refpt[1000];                // MC
@@ -213,6 +218,10 @@ double nIP3dsig[10000];
 double nIPDist2Jet[10000];
 //double nIPDist2JetSig[10000];
 double nIPClosest2Jet[10000];
+double nTrkChi2[10000];
+double nTrkPt[10000];
+double nTrkEta[10000];
+double nTrkPhi[10000];
 
 int    nNsvtx;
 int    nSvtxntrk;
@@ -300,6 +309,7 @@ int makeNTuple(int type)
       akPu3->AddFriend("hlt=hltanalysis/HltTree");
       akPu3->AddFriend("hiEvt=hiEvtAnalyzer/HiTree");
       akPu3->AddFriend("skim=skimanalysis/HltTree");
+      akPu3->AddFriend("trk=ppTrack/trackTree");
       
       // Set branch addresses
       branchAddresses(akPu3);
@@ -400,6 +410,10 @@ int makeNTuple(int type)
 		      nIPDist2Jet[counter]    = ipDist2Jet[it];
 		      //nIPDist2JetSig[counter] = ipDist2JetSig[it];
 		      nIPClosest2Jet[counter] = ipClosest2Jet[it];
+		      nTrkChi2[counter]       =trkChi2[it];
+		      nTrkPt[counter]         =trkPt[it];
+		      nTrkEta[counter]        =trkEta[it];
+		      nTrkPhi[counter]        =trkPhi[it];
 		      counter++;	
 		      
 		    }
@@ -436,6 +450,7 @@ int makeNTuple(int type)
   return 0;
 }
 
+//static basically means set once and then not again
 // Return the corresponding weight for an event based on pthat
 static double MCWeights(double MCPthat)
 {
@@ -602,7 +617,6 @@ static void heavyJetWeights(double *pthatEntries)
   
   for (int i=0; i<QCDBins+1; i++) 
     {
-      
       // Count (indirectly) number of b jets
       sprintf(HFJetsCut, "%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
       //sprintf(HFJetsCut, "%s&&abs(jteta)<2&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
@@ -655,13 +669,18 @@ static void heavyJetWeights(double *pthatEntries)
 // Create the branches for the new tree
 static inline void newBranches(TTree *newTree) 
 {
+  //event specific
+  newTree->Branch("weight", &nWeight, "weight/D");  
+  newTree->Branch("vz", &nVz ,"vz/D");
+  if(dataType>=1)newTree->Branch("pthat", &nPthat, "pthat/D"); // TEMPORARY
+  
   //jet variables
   newTree->Branch("jtpt", &nJtpt, "jtpt/D");
   newTree->Branch("jteta", &nJteta, "jteta/D");
   newTree->Branch("jtphi", &nJtphi, "jtphi/D");
-  
-  //track variables
-  newTree->Branch("trackMax", &nTrackMax, "trackMax/D");
+  if(dataType>=1)newTree->Branch("rawpt", &nRawpt, "rawpt/D");
+  if(dataType>=1)newTree->Branch("refpt", &nRefpt, "refpt/D");
+  if(dataType>=1)newTree->Branch("refparton_flavorForB", &nRefparton_flavorForB, "refparton_flavorForB/I");
   
   //muon variables
   newTree->Branch("mupt", &nMupt, "mupt/D");
@@ -684,6 +703,7 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");
   
   //tracks
+  newTree->Branch("trackMax", &nTrackMax, "trackMax/D");
   newTree->Branch("nIPtrk" ,&nNIPtrk  , "nIPtrk/I");
   newTree->Branch("nselIPtrk" ,&nNselIPtrk  , "nselIPtrk/I");
   newTree->Branch("nIP" ,&nNIP  , "nIP/I");
@@ -700,21 +720,13 @@ static inline void newBranches(TTree *newTree)
       newTree->Branch("ipDist2Jet",&nIPDist2Jet , "ipDist2Jet[nIP]/D");
       //newTree->Branch("ipDist2JetSig",&nIPDist2JetSig , "ipDist2JetSig[nIP]/D");
       newTree->Branch("ipCloset2Jet",&nIPClosest2Jet , "ipClosest2Jet[nIP]/D");
+      //new track variables from ppTrack tree
+      newTree->Branch("trkChi2",&nTrkChi2,"trkChi2[nIP]/D");
+      newTree->Branch("trkPt"  ,&nTrkPt  ,"trkPt[nIP]/D");
+      newTree->Branch("trkEta" ,&nTrkEta ,"trkEta[nIP]/D");
+      newTree->Branch("trkPhi" ,&nTrkPhi ,"trkPhi[nIP]/D");
   }  
 
-  //event specific
-  newTree->Branch("weight", &nWeight, "weight/D");  
-  newTree->Branch("vz", &nVz ,"vz/D");
-
-  //data/mc specific
-  newTree->Branch("rawpt", &nRawpt, "rawpt/D");
-  if (dataType >=1) 
-    {
-      newTree->Branch("pthat", &nPthat, "pthat/D"); // TEMPORARY
-      newTree->Branch("refpt", &nRefpt, "refpt/D");
-      newTree->Branch("refparton_flavorForB", &nRefparton_flavorForB, "refparton_flavorForB/I");
-    }
-  
   //HLT
   newTree->Branch("HLT_PAMu3_v1", &HLT_PAMu3_v1, "HLT_PAMu3_v1/I");
   newTree->Branch("HLT_PAMu7_v1", &HLT_PAMu7_v1, "HLT_PAMu7_v1/I");
@@ -727,33 +739,25 @@ static inline void newBranches(TTree *newTree)
 // Set all the input branch addresses
 static inline void branchAddresses(TTree *akPu3) 
 {
-  akPu3->SetBranchAddress("nref", &nref);
-  
 
+
+  //EVENT INFO
+  akPu3->SetBranchAddress("nref", &nref);
+  akPu3->SetBranchAddress("vz", &vz);
+  akPu3->SetBranchAddress("pPAcollisionEventSelectionPA", &pPAcollisionEventSelectionPA);
+  akPu3->SetBranchAddress("pHBHENoiseFilter", &pHBHENoiseFilter);
+  if(dataType>=1)akPu3->SetBranchAddress("pthat", &pthat);
+
+  //JET
   akPu3->SetBranchAddress("jtpt" , &jtpt  );
   akPu3->SetBranchAddress("jteta", &jteta );
   akPu3->SetBranchAddress("jtphi", &jtphi );
+  akPu3->SetBranchAddress("rawpt", &rawpt);
+  if(dataType>=1)akPu3->SetBranchAddress("refpt", &refpt);
+  if(dataType>=1)akPu3->SetBranchAddress("refparton_flavorForB", &refparton_flavorForB);
   
+  //TRACK
   akPu3->SetBranchAddress("trackMax", &trackMax);
-  
-  akPu3->SetBranchAddress("mupt"   , &mupt   );
-  akPu3->SetBranchAddress("muN"    , &muN    );
-  akPu3->SetBranchAddress("mueta"  , &mueta  );
-  akPu3->SetBranchAddress("muphi"  , &muphi  );
-  akPu3->SetBranchAddress("mudr"   , &mudr   );
-  akPu3->SetBranchAddress("muptrel", &muptrel);
-  
-  akPu3->SetBranchAddress("discr_ssvHighEff", &discr_ssvHighEff);
-  akPu3->SetBranchAddress("discr_ssvHighPur", &discr_ssvHighPur);
-  
-  akPu3->SetBranchAddress("nsvtx"   , &nsvtx   );
-  akPu3->SetBranchAddress("svtxntrk", &svtxntrk );
-  akPu3->SetBranchAddress("svtxdl"  , &svtxdl   );
-  akPu3->SetBranchAddress("svtxdls" , &svtxdls  );
-  akPu3->SetBranchAddress("svtxm"   , &svtxm    );
-  akPu3->SetBranchAddress("svtxpt"  , &svtxpt   );
-  
-
   akPu3->SetBranchAddress("nIPtrk"    ,&nIPtrk);
   akPu3->SetBranchAddress("nselIPtrk" ,&nselIPtrk);
   akPu3->SetBranchAddress("nIP"       ,&nIP);
@@ -770,27 +774,39 @@ static inline void branchAddresses(TTree *akPu3)
       akPu3->SetBranchAddress("ipDist2Jet", &ipDist2Jet );
       //akPu3->SetBranchAddress("ipDist2JetSig", &ipDist2JetSig );
       akPu3->SetBranchAddress("ipClosest2Jet", &ipClosest2Jet );
-    }
-  
-  akPu3->SetBranchAddress("rawpt", &rawpt);
-  
-  if (dataType >= 1) 
-    {
-      akPu3->SetBranchAddress("pthat", &pthat);
-      akPu3->SetBranchAddress("refpt", &refpt);
-      akPu3->SetBranchAddress("refparton_flavorForB", &refparton_flavorForB);
+      //new track variables from ppTree
+      akPu3->SetBranchAddress("trkChi2",&trkChi2);
+      akPu3->SetBranchAddress("trkPt"  ,&trkPt  );
+      akPu3->SetBranchAddress("trkEta" ,&trkEta );
+      akPu3->SetBranchAddress("trkPhi" ,&trkPhi );
     }
 
+  //HLT
   akPu3->SetBranchAddress("HLT_PAMu3_v1", &HLT_PAMu3_v1);
   akPu3->SetBranchAddress("HLT_PAMu7_v1", &HLT_PAMu7_v1);
   akPu3->SetBranchAddress("HLT_PAMu12_v1", &HLT_PAMu12_v1);
   akPu3->SetBranchAddress("HLT_PAMu3PFJet40_v1", &HLT_PAMu3PFJet40_v1);
-
-  akPu3->SetBranchAddress("vz", &vz);
-
-  akPu3->SetBranchAddress("pPAcollisionEventSelectionPA", &pPAcollisionEventSelectionPA);
-  akPu3->SetBranchAddress("pHBHENoiseFilter", &pHBHENoiseFilter);
-
+    
+  //MUON
+  akPu3->SetBranchAddress("mupt"   , &mupt   );
+  akPu3->SetBranchAddress("muN"    , &muN    );
+  akPu3->SetBranchAddress("mueta"  , &mueta  );
+  akPu3->SetBranchAddress("muphi"  , &muphi  );
+  akPu3->SetBranchAddress("mudr"   , &mudr   );
+  akPu3->SetBranchAddress("muptrel", &muptrel);
+  
+  //DISCRIMINATORS
+  akPu3->SetBranchAddress("discr_ssvHighEff", &discr_ssvHighEff);
+  akPu3->SetBranchAddress("discr_ssvHighPur", &discr_ssvHighPur);
+  
+  //SVTX
+  akPu3->SetBranchAddress("nsvtx"   , &nsvtx   );
+  akPu3->SetBranchAddress("svtxntrk", &svtxntrk );
+  akPu3->SetBranchAddress("svtxdl"  , &svtxdl   );
+  akPu3->SetBranchAddress("svtxdls" , &svtxdls  );
+  akPu3->SetBranchAddress("svtxm"   , &svtxm    );
+  akPu3->SetBranchAddress("svtxpt"  , &svtxpt   );
+  
   return;
 }
 

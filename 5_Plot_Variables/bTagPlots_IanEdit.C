@@ -88,9 +88,9 @@ const char *particle_cut[] =
     "(abs(refparton_flavorForB)==1 || abs(refparton_flavorForB)==2 || abs(refparton_flavorForB)==3 || abs(refparton_flavorForB)==21)"//udsg
   };
                                                                                            
-const int   nbinsX[] = {   25, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   40,   40,   40,   40 };
-const double  lowX[] = {   20, -3, -3.14159, /**/  0,  0, -3, -3.14159,    0,  /**/  0,  0, /**/  0,  0, 0,   0, /**/ -0.1, -0.1, -0.1, -0.1 };
-const double highX[] = {  270,  3,  3.14159, /**/ 80, 10,  3,  3.14159,  0.5,  /**/  6,  6, /**/  5, 12, 4, 240, /**/  0.1,  0.1,  0.1,  0.1 };
+const int   nbinsX[] = {   25, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   20,   20,   20,   20 };
+const double  lowX[] = {   20, -3, -3.14159, /**/  0,  0, -3, -3.14159,    0,  /**/  0,  0, /**/  0,  0, 0,   0, /**/ -0.1, -30,  -0.1,  -30 };
+const double highX[] = {  270,  3,  3.14159, /**/ 80, 10,  3,  3.14159,  0.5,  /**/  6,  6, /**/  5, 12, 4, 240, /**/  0.1,  30,   0.1,   30 };
 const bool  doLogy[] = {    1,  1,        0, /**/  1,  1,  1,        0,    1,  /**/  1,  1, /**/  1,  1, 1,   1, /**/    0,    0,    0,    0 };
 
 const float int_lumi = 4209000000;//inverse millibarns of data. according to lumiCalc2.py, golden lumimask for HLT_PAMu3_v1, 4.209 pb of data.
@@ -180,8 +180,8 @@ void makePlots(const char* cuts, const char* outputFile)
   
   double QCD_HFintegral = 0;
   int numEntries = 0;
-  for (int i_var = 14; i_var < n_vars; i_var++)/*DEBUG*/
-    //for (int i_var = 0; i_var < n_vars; i_var++)
+  //for (int i_var = 14; i_var < n_vars; i_var++)/*DEBUG*/
+  for (int i_var = 0; i_var < n_vars; i_var++)
     {
       printf("\ni_var:  %d\n\nvariable:  %s\n\n", i_var, var[i_var]);
 
@@ -280,8 +280,9 @@ static void formatPlots(const char* input_file_name, int stackOption)
   TCanvas *temp_canv = new TCanvas("temp", "temp", 1200, 600);
   
   temp_canv->Print(Form("%s.pdf(",input_file_name));
-  for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
-    //for (int i_var=0; i_var<n_vars; i_var++)
+  
+  //for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
+  for (int i_var=0; i_var<n_vars; i_var++)
     {
       printf("Formatting %s\n", var[i_var]);
 
