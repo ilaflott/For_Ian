@@ -29,18 +29,18 @@ static void formatHist(TH1 *, const char *, const char *);
 
 // File parameters
 const char *data_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/";
-const char *data_file_name = "data_updated_4.5.15";
+const char *data_file_name = "data_updated_4.13.15";
 
 const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/"
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/";
 
-const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_4.5.15_schemeA";
+const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_4.13.15_schemeA";
 //const char *MC_file_name = "MC_HFaugmented_halfOfficial_noCuts_schemeA";
 //const char *MC_file_name = "BJet_halfOfficial_updated_schemeA";
 //const char *MC_file_name = "CJet_halfOfficial_updated_schemeA";
 
-const char* QCD_file_name = "QCD_updated_4.5.15";
+const char* QCD_file_name = "QCD_updated_4.13.15";
 const char* QCD_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/";
 
 const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/3.12.15_OvernightPlots/";
@@ -101,8 +101,8 @@ const char *event_cut = "HLT_PAMu3_v1";
 //const char *event_cut = "HLT_PAMu12_v1";
 //const char *event_cut = "HLT_PAMu3PFJet40_v1";
 
-const char *default_cut = "vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.5";
-const char *default_version = "vz15_jteta2_jtpt40_HLTPAMu3v1_muCut_WCut_svtxCut";
+const char *default_cut = "vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.5&&trkPt>1.0&&trkChi2<5";
+const char *default_version = "vz15_jteta2_jtpt40_HLTPAMu3v1_muCut_WCut_svtxCut_trkCuts";
 
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};
 const int    lineColor[] = { kBlack, kWhite, kRed-7, kGreen-6, kBlue-7};
@@ -180,8 +180,8 @@ void makePlots(const char* cuts, const char* outputFile)
   
   double QCD_HFintegral = 0;
   int numEntries = 0;
-  //for (int i_var = 14; i_var < n_vars; i_var++)/*DEBUG*/
-  for (int i_var = 0; i_var < n_vars; i_var++)
+  for (int i_var = 14; i_var < n_vars; i_var++)/*DEBUG*/
+  //for (int i_var = 0; i_var < n_vars; i_var++)
     {
       printf("\ni_var:  %d\n\nvariable:  %s\n\n", i_var, var[i_var]);
 
@@ -281,8 +281,8 @@ static void formatPlots(const char* input_file_name, int stackOption)
   
   temp_canv->Print(Form("%s.pdf(",input_file_name));
   
-  //for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
-  for (int i_var=0; i_var<n_vars; i_var++)
+  for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
+    //for (int i_var=0; i_var<n_vars; i_var++)
     {
       printf("Formatting %s\n", var[i_var]);
 

@@ -678,7 +678,7 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("jtpt", &nJtpt, "jtpt/D");
   newTree->Branch("jteta", &nJteta, "jteta/D");
   newTree->Branch("jtphi", &nJtphi, "jtphi/D");
-  if(dataType>=1)newTree->Branch("rawpt", &nRawpt, "rawpt/D");
+  newTree->Branch("rawpt", &nRawpt, "rawpt/D");
   if(dataType>=1)newTree->Branch("refpt", &nRefpt, "refpt/D");
   if(dataType>=1)newTree->Branch("refparton_flavorForB", &nRefparton_flavorForB, "refparton_flavorForB/I");
   
