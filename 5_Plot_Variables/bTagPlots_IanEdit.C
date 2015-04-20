@@ -473,7 +473,7 @@ void makePlots()
   printf("Opened files.\n");
 
     // For each variable:
-    for (int i_var = 0; i_var < n_vars; i_var++)
+    for (int i_var = 14; i_var < n_vars; i_var++)
       {
         printf("\ni_var:  %d\nvariable:  %s\n", i_var, var[i_var]);
 
@@ -586,7 +586,7 @@ void formatPlots()
     //          FORMAT HISTOGRAMS
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    for (int i_var=0; i_var<n_vars; i_var++)
+    for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
     //for (int i_var=0; i_var<n_vars; i_var++)
       {
         printf("Formatting %s\n", var[i_var]);
