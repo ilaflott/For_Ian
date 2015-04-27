@@ -65,7 +65,7 @@ static inline void branchAddresses(TTree *akPu3);
 //int dataType = 0;
 string weights_file;
 const bool doTracks=true;
-
+const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // Macro settings/constants
 //FileLists
 const string fileListPath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
@@ -76,17 +76,17 @@ const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_
 
 //Weight Files
 const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
-const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data_updated_4.13.15.txt";			 
-const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated_4.13.15.txt";		 
-const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_4.13.15_schemeA.txt";
-const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_updated_4.13.15_schemeA.txt";
+const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data_updated_4.23.15.txt";			 
+const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated_4.23.15.txt";		 
+const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_4.23.15_schemeA.txt";
+const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial_updated_4.23.15_schemeA.txt";
 
 //Output Files
 const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
-const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_updated_4.13.15.root";
-const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated_4.13.15.root";
-const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_4.13.15_schemeA.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_4.13.15_schemeA.root";
+const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_updated_4.23.15.root";
+const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated_4.23.15.root";
+const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_4.23.15_schemeA.root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_4.23.15_schemeA.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -149,7 +149,6 @@ float svtxdl[1000];
 float svtxdls[1000];
 float svtxm[1000];
 float svtxpt[1000];
-
 int nIPtrk[1000];//per jet
 int nselIPtrk[1000];//per jet
 int nIP;//per event
@@ -168,31 +167,27 @@ float trkChi2[10000];
 float trkPt[10000];
 float trkEta[10000];
 float trkPhi[10000];
-
+float trkDz1[10000];
+float trkDxy1[10000];
+float deltaRtrk2Jet[10000];
 float pthat;                      // MC
 float refpt[1000];                // MC
 int   refparton_flavorForB[1000]; // MC
-
 // hltanalysis/HltTree
 int HLT_PAMu3_v1;
 int HLT_PAMu7_v1;
 int HLT_PAMu12_v1;
 int HLT_PAMu3PFJet40_v1;
-
 // hiEvtAnalyzer/HiTree
 float vz;
-
 // skimanalysis/HltTree
 int pPAcollisionEventSelectionPA;
 int pHBHENoiseFilter;
-
 // New data storage vars
 double nJtpt;
 double nJteta;
 double nJtphi;
-
 double nTrackMax;
-
 double nMupt;
 double nRawpt;
 double nMueta;
@@ -200,10 +195,8 @@ double nMuphi;
 int    nMuN;
 double nMudr;
 double nMuptrel;
-
 double nDiscr_ssvHighEff;
 double nDiscr_ssvHighPur;
-
 int nNIPtrk;
 int nNselIPtrk;
 int nNIP;
@@ -222,31 +215,28 @@ double nTrkChi2[10000];
 double nTrkPt[10000];
 double nTrkEta[10000];
 double nTrkPhi[10000];
-
+double nTrkDxy[10000];
+double nTrkDz[10000];
+double nDeltaRtrk2Jet[10000];
 int    nNsvtx;
 int    nSvtxntrk;
 double nSvtxdl;
 double nSvtxdls;
 double nSvtxm;
 double nSvtxpt;
-
 //double nVz; //Event info
 double nVz;
 double nPthat; //MC
 double nRefpt;                // MC
 int    nRefparton_flavorForB; // MC
-
 double nWeight;
-
 string fileList; 
-
 int result;
 int dataType;
 
 // Main functions
 // Mode: 0-makeNTuple(), 1-mergeMCSamples()
 // Type: 0-data, 1-QCD, 2-BJet, 3-CJet
-
 int bTagNTuple_Original(int type)
 {
   switch (type) 
@@ -390,15 +380,27 @@ int makeNTuple(int type)
 	      nSvtxdl   = svtxdl[j];
 	      nSvtxdls  = svtxdls[j];
 	      nSvtxm    = svtxm[j];
-	      nSvtxpt   = svtxpt[j];               
-	      
+	      nSvtxpt   = svtxpt[j];           
+    
 	      //track based variables
-	      if(doTracks)
+	      if(doTracks)//tracks take awhile to run, may want to turn it off in the future?
 		{
 		  int counter=0;
 		  for(int it = trackPosition-nselIPtrk[j];it<trackPosition;it++)
 		    {
-
+		      //basic track selection
+		      if( abs(trkDz1[it]) > 0.2 || trkDxy1[it] > 17 || trkPt[it] < 1 || trkChi2[it] > 5) continue;
+		      
+		      //"phi matching"
+		      float deltaPhi = jtphi[j] - trkPhi[it];
+		      if(fabs(deltaPhi)>pi)deltaPhi=2*pi-fabs(deltaPhi);
+		      else deltaPhi=fabs(deltaPhi);
+		      
+		      //deltaRcut
+		      float deltaEta = jteta[j] - trkEta[it];
+		      deltaRtrk2Jet[it]=sqrt(deltaPhi*deltaPhi+deltaEta*deltaEta); 
+		      if(deltaRtrk2Jet[it]>0.5)continue;
+		      
 		      nIPJetIndex[counter]    = ipJetIndex[it];//this number reflects the index of the jet that the ip belongs to
 		      nIPPt[counter]          = ipPt[it];
 		      nIPProb0[counter]       = ipProb0[it];
@@ -410,22 +412,21 @@ int makeNTuple(int type)
 		      nIPDist2Jet[counter]    = ipDist2Jet[it];
 		      //nIPDist2JetSig[counter] = ipDist2JetSig[it];
 		      nIPClosest2Jet[counter] = ipClosest2Jet[it];
-		      nTrkChi2[counter]       =trkChi2[it];
-		      nTrkPt[counter]         =trkPt[it];
-		      nTrkEta[counter]        =trkEta[it];
-		      nTrkPhi[counter]        =trkPhi[it];
-		      counter++;	
+		      nTrkChi2[counter]       = trkChi2[it];
+		      nTrkPt[counter]         = trkPt[it];
+		      nTrkEta[counter]        = trkEta[it];
+		      nTrkPhi[counter]        = trkPhi[it];
+		      nTrkDz[counter]         = trkDz1[it];
+		      nTrkDxy[counter]        = trkDxy1[it];
+		      nDeltaRtrk2Jet[counter] = deltaRtrk2Jet[it];
 		      
-		    }
-		}
-	      
+		      counter++;	
+		    }//track loop
+		}//doTracks
+	      newTree.Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
 	    }//jetloop
-	  
-	  newTree.Fill();
-	  
 	}//eventloop
       
-
       // Cleanup
       cout << "closing " << fileName << endl;
       inFile->Close();
@@ -721,11 +722,14 @@ static inline void newBranches(TTree *newTree)
       //newTree->Branch("ipDist2JetSig",&nIPDist2JetSig , "ipDist2JetSig[nIP]/D");
       newTree->Branch("ipCloset2Jet",&nIPClosest2Jet , "ipClosest2Jet[nIP]/D");
       //new track variables from ppTrack tree
-      newTree->Branch("trkChi2",&nTrkChi2,"trkChi2[nIP]/D");
-      newTree->Branch("trkPt"  ,&nTrkPt  ,"trkPt[nIP]/D");
-      newTree->Branch("trkEta" ,&nTrkEta ,"trkEta[nIP]/D");
-      newTree->Branch("trkPhi" ,&nTrkPhi ,"trkPhi[nIP]/D");
-  }  
+      newTree->Branch( "trkChi2" , &nTrkChi2, "trkChi2[nIP]/D" );
+      newTree->Branch( "trkPt"   , &nTrkPt  , "trkPt[nIP]/D"   );
+      newTree->Branch( "trkEta"  , &nTrkEta , "trkEta[nIP]/D"  );
+      newTree->Branch( "trkPhi"  , &nTrkPhi , "trkPhi[nIP]/D"  );
+      newTree->Branch( "trkDz1"  , &nTrkDz  , "trkDz1[nIP]/D"  );
+      newTree->Branch( "trkDxy1" , &nTrkDz  , "trkDxy1[nIP]/D" );
+      newTree->Branch( "deltaRtrk2Jet" , &nDeltaRtrk2Jet  , "deltaRtrk2Jet[nIP]/D" );
+  } 
 
   //HLT
   newTree->Branch("HLT_PAMu3_v1", &HLT_PAMu3_v1, "HLT_PAMu3_v1/I");
