@@ -43,10 +43,10 @@ const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_4.13.15_schemeA"
 const char* QCD_file_name = "QCD_updated_4.13.15";
 const char* QCD_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/";
 
-const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/3.12.15_OvernightPlots/";
+const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/4.23.15_muTagbJetRpA_pp_QAplots/";
 const char *hist_file_name = "bTagPlots_pp";
 
-const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/3.12.15_OvernightPlots/";
+const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/4.23.15_muTagbJetRpA_pp_QAplots/";
 
 // Histogram parameters
 const int n_vars = 18; // Number of variables to plot
@@ -173,13 +173,14 @@ void makePlots(const char* cuts, const char* outputFile)
   out_file->cd();
   
   // Declare histograms arrays
-  TH1D     *hist[n_vars][n_types];;      // Data and MC histograms
+  TH1D     *hist[n_vars][n_types];      // Data and MC histograms
   TH1D     *QCDhist[n_vars][n_types];
   TH1D     *ratio[n_vars];              // Data/MC ratio plots
   double    integrals[n_vars][n_types]; // Integral of hists for stacking
   
   double QCD_HFintegral = 0;
   int numEntries = 0;
+
   for (int i_var = 14; i_var < n_vars; i_var++)/*DEBUG*/
   //for (int i_var = 0; i_var < n_vars; i_var++)
     {
@@ -443,10 +444,10 @@ static void formatHist(TH1 *h, const char *x_label1, const char *y_label1)
 //OLDER makePlots() and formatPlots()//
 ///////////////////////////////////////
 /*
-void makePlots()
-{
+  void makePlots()
+  {
   //SETUP
-
+  
   // Open files and trees
   cout << "opening input data files and trees" << endl;
   TFile *data_file = TFile::Open(Form("%s%s.root",data_file_path,data_file_name));
@@ -556,7 +557,7 @@ void formatPlots()
     // Open file
     TFile *hist_file = TFile::Open(Form("%s%s_%s.root",pdf_file_path,hist_file_name,version));
     printf("Formatting %s%s_%s.root\n", pdf_file_path, hist_file_name,version);
-
+    
     // Output file
     //double version = -1;
     //char version[200] = "";
@@ -565,9 +566,9 @@ void formatPlots()
     //scanf("%s", &version);
     char out_file_name[200];
     sprintf(out_file_name, "%s%s_%s.pdf", pdf_file_path, hist_file_name, version);
-
+    
     //const int       color[] = { data,MC,B,C,usdg/QCD };
-
+    
     // const int       color[] = { kPink+6, kGray+3, kCyan+4, kCyan+3, kCyan+2, kCyan+1 };
     // const char *leg_label[] = { "Data pp", "MC", "b", "c", "uds", "gluon" };
 
@@ -586,7 +587,7 @@ void formatPlots()
     //          FORMAT HISTOGRAMS
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
+    for (int i_var=14; i_var<n_vars; i_var++)
     //for (int i_var=0; i_var<n_vars; i_var++)
       {
         printf("Formatting %s\n", var[i_var]);
