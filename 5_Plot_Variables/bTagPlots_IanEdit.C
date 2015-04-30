@@ -29,18 +29,18 @@ static void formatHist(TH1 *, const char *, const char *);
 
 // File parameters
 const char *data_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/";
-const char *data_file_name = "data_updated_4.13.15";
+const char *data_file_name = "data_updated_4.27.15";
 
 const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/"
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/";
 
-const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_4.13.15_schemeA";
+const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_4.27.15_schemeA";
 //const char *MC_file_name = "MC_HFaugmented_halfOfficial_noCuts_schemeA";
 //const char *MC_file_name = "BJet_halfOfficial_updated_schemeA";
 //const char *MC_file_name = "CJet_halfOfficial_updated_schemeA";
 
-const char* QCD_file_name = "QCD_updated_4.13.15";
+const char* QCD_file_name = "QCD_updated_4.27.15";
 const char* QCD_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/";
 
 const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/4.23.15_muTagbJetRpA_pp_QAplots/";
@@ -49,8 +49,8 @@ const char *hist_file_name = "bTagPlots_pp";
 const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/4.23.15_muTagbJetRpA_pp_QAplots/";
 
 // Histogram parameters
-const int n_vars = 18; // Number of variables to plot
-//const int n_vars = 4; /*debug*/
+const int n_vars = 19; // Number of variables to plot
+//const int n_vars = 1; /*debug*/
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 
 const char *y_label[] =
@@ -58,7 +58,7 @@ const char *y_label[] =
     "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)",
     "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)",
     "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)",
-    "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)"
+    "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)", "xsec (mb)","xsec(mb)"
   };
 
 const char *x_label[] =
@@ -67,7 +67,7 @@ const char *x_label[] =
     "mupt (Gev)", "muptrel (GeV)",    "muphi (rad)",   "mudr", "mueta",
     "discr_ssvHighEff", "discr_ssvHighPur",
     "nsvtx", "svtxntrk", "svtxdl (cm)",  "svtxdls",
-    "ip2d (cm)","ip2dSig","ip3d (cm)","ip3dSig"
+    "ip2d (cm)","ip2dSig","ip3d (cm)","ip3dSig","deltaRtrk2Jet"
   };
 
 const char *var[] =
@@ -76,7 +76,7 @@ const char *var[] =
     "mupt", "muptrel","mueta",    "muphi",   "mudr",     //muons
     "discr_ssvHighEff", "discr_ssvHighPur",             //discriminators
     "nsvtx", "svtxntrk", "svtxdl", "svtxdls",            //secondary vertex
-    "ip2d","ip2dSig","ip3d","ip3dSig"                 //impact parameter
+    "ip2d","ip2dSig","ip3d","ip3dSig","deltaRtrk2Jet"                 //impact parameter
   };
 
 const char *particle_cut[] = 
@@ -88,10 +88,10 @@ const char *particle_cut[] =
     "(abs(refparton_flavorForB)==1 || abs(refparton_flavorForB)==2 || abs(refparton_flavorForB)==3 || abs(refparton_flavorForB)==21)"//udsg
   };
                                                                                            
-const int   nbinsX[] = {   25, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   20,   20,   20,   20 };
-const double  lowX[] = {   20, -3, -3.14159, /**/  0,  0, -3, -3.14159,    0,  /**/  0,  0, /**/  0,  0, 0,   0, /**/ -0.1, -30,  -0.1,  -30 };
-const double highX[] = {  270,  3,  3.14159, /**/ 80, 10,  3,  3.14159,  0.5,  /**/  6,  6, /**/  5, 12, 4, 240, /**/  0.1,  30,   0.1,   30 };
-const bool  doLogy[] = {    1,  1,        0, /**/  1,  1,  1,        0,    1,  /**/  1,  1, /**/  1,  1, 1,   1, /**/    0,    0,    0,    0 };
+const int   nbinsX[] = {   25, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   20,   20,   20,   20, 20  };
+const double  lowX[] = {   20, -3, -3.14159, /**/  0,  0, -3, -3.14159,    0,  /**/  0,  0, /**/  0,  0, 0,   0, /**/ -0.1, -30,  -0.1,  -30, 0   };
+const double highX[] = {  270,  3,  3.14159, /**/ 80, 10,  3,  3.14159,  0.5,  /**/  6,  6, /**/  5, 12, 4, 240, /**/  0.1,  30,   0.1,   30, 0.7 };
+const bool  doLogy[] = {    1,  1,        0, /**/  1,  1,  1,        0,    1,  /**/  1,  1, /**/  1,  1, 1,   1, /**/    0,    0,    0,    0, 1   };
 
 const float int_lumi = 4209000000;//inverse millibarns of data. according to lumiCalc2.py, golden lumimask for HLT_PAMu3_v1, 4.209 pb of data.
 
@@ -102,7 +102,7 @@ const char *event_cut = "HLT_PAMu3_v1";
 //const char *event_cut = "HLT_PAMu3PFJet40_v1";
 
 const char *default_cut = "vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.5&&trkPt>1.0&&trkChi2<5";
-const char *default_version = "vz15_jteta2_jtpt40_HLTPAMu3v1_muCut_WCut_svtxCut_trkCuts";
+const char *default_version = "vz15_jteta2_jtpt40_HLTPAMu3v1_muCut_WCut_svtxCut_trkCut";
 
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};
 const int    lineColor[] = { kBlack, kWhite, kRed-7, kGreen-6, kBlue-7};
@@ -181,7 +181,7 @@ void makePlots(const char* cuts, const char* outputFile)
   double QCD_HFintegral = 0;
   int numEntries = 0;
 
-  for (int i_var = 14; i_var < n_vars; i_var++)/*DEBUG*/
+  for (int i_var = 18; i_var < n_vars; i_var++)/*DEBUG*/
   //for (int i_var = 0; i_var < n_vars; i_var++)
     {
       printf("\ni_var:  %d\n\nvariable:  %s\n\n", i_var, var[i_var]);
@@ -282,7 +282,7 @@ static void formatPlots(const char* input_file_name, int stackOption)
   
   temp_canv->Print(Form("%s.pdf(",input_file_name));
   
-  for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
+  for (int i_var=18; i_var<n_vars; i_var++)/*DEBUG*/
     //for (int i_var=0; i_var<n_vars; i_var++)
     {
       printf("Formatting %s\n", var[i_var]);
