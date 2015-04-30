@@ -308,7 +308,7 @@ int makeNTuple(int type)
       int nEvents = akPu3->GetEntries();
       cout << nEvents << " events to loop over in " << fileName << endl;
       //int totNumTracks=0;
-      nEvents = 10000;/*debug*/
+      //nEvents = 10000;/*debug*/
       for (int i=0; i<nEvents; i++) 
 	{
 	  
