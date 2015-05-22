@@ -29,24 +29,24 @@ static void formatHist(TH1 *, const char *, const char *);
 
 // File parameters
 const char *data_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/";
-const char *data_file_name = "data_updated_4.27.15";
+const char *data_file_name = "data_updated_4.30.15";
 
 const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/"
 //const char *MC_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/";
 
-const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_4.27.15_schemeA";
+const char *MC_file_name = "MC_HFaugmented_halfOfficial_updated_4.30.15_schemeA";
 //const char *MC_file_name = "MC_HFaugmented_halfOfficial_noCuts_schemeA";
 //const char *MC_file_name = "BJet_halfOfficial_updated_schemeA";
 //const char *MC_file_name = "CJet_halfOfficial_updated_schemeA";
 
-const char* QCD_file_name = "QCD_updated_4.27.15";
+const char* QCD_file_name = "QCD_updated_4.30.15";
 const char* QCD_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/";
 
-const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/4.23.15_muTagbJetRpA_pp_QAplots/";
+const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/4.30.15_muTagbJetRpA_pp_QAplots/";
 const char *hist_file_name = "bTagPlots_pp";
 
-const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/4.23.15_muTagbJetRpA_pp_QAplots/";
+const char *pdf_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/sevil_debug_plots/4.30.15_muTagbJetRpA_pp_QAplots/";
 
 // Histogram parameters
 const int n_vars = 19; // Number of variables to plot
@@ -88,7 +88,7 @@ const char *particle_cut[] =
     "(abs(refparton_flavorForB)==1 || abs(refparton_flavorForB)==2 || abs(refparton_flavorForB)==3 || abs(refparton_flavorForB)==21)"//udsg
   };
                                                                                            
-const int   nbinsX[] = {   25, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   20,   20,   20,   20, 20  };
+const int   nbinsX[] = {   25, 15,       15, /**/ 20, 25, 15,       15,   15,  /**/  6,  6, /**/  5, 12, 8,  16, /**/   20,   20,   20,   20, 7  };
 const double  lowX[] = {   20, -3, -3.14159, /**/  0,  0, -3, -3.14159,    0,  /**/  0,  0, /**/  0,  0, 0,   0, /**/ -0.1, -30,  -0.1,  -30, 0   };
 const double highX[] = {  270,  3,  3.14159, /**/ 80, 10,  3,  3.14159,  0.5,  /**/  6,  6, /**/  5, 12, 4, 240, /**/  0.1,  30,   0.1,   30, 0.7 };
 const bool  doLogy[] = {    1,  1,        0, /**/  1,  1,  1,        0,    1,  /**/  1,  1, /**/  1,  1, 1,   1, /**/    0,    0,    0,    0, 1   };
@@ -132,7 +132,6 @@ void bTagPlots_IanEdit(const char* cutsVersion = default_version, int option = 0
       printf("\nnot stacking, not NOT stacking... what are you doing?!\n"); 
       break;
     }
-
   switch(option)
     {
     case 0:  
@@ -140,13 +139,15 @@ void bTagPlots_IanEdit(const char* cutsVersion = default_version, int option = 0
       makePlots(cuts,(const char*)outputFile);
       formatPlots((const char*)outputFile,stackOption); break;
     case 1:
+      printf("Only making plots.\n");
+      makePlots(cuts,(const char*)outputFile); break;
+    case 2:
       printf("Only formatting plots.\n");
       formatPlots((const char*)outputFile,stackOption); break;
     default:
       printf("ERROR: 0 for making+formatting plots, 1 for formating only, what are you doing?!\n");
       break;
     }
-
 }
 
 void makePlots(const char* cuts, const char* outputFile)
@@ -181,7 +182,7 @@ void makePlots(const char* cuts, const char* outputFile)
   double QCD_HFintegral = 0;
   int numEntries = 0;
 
-  for (int i_var = 18; i_var < n_vars; i_var++)/*DEBUG*/
+  for (int i_var = 14; i_var < n_vars; i_var++)/*DEBUG*/
   //for (int i_var = 0; i_var < n_vars; i_var++)
     {
       printf("\ni_var:  %d\n\nvariable:  %s\n\n", i_var, var[i_var]);
@@ -282,7 +283,7 @@ static void formatPlots(const char* input_file_name, int stackOption)
   
   temp_canv->Print(Form("%s.pdf(",input_file_name));
   
-  for (int i_var=18; i_var<n_vars; i_var++)/*DEBUG*/
+  for (int i_var=14; i_var<n_vars; i_var++)/*DEBUG*/
     //for (int i_var=0; i_var<n_vars; i_var++)
     {
       printf("Formatting %s\n", var[i_var]);
@@ -439,337 +440,3 @@ static void formatHist(TH1 *h, const char *x_label1, const char *y_label1)
   h->GetYaxis()->SetTitle(Form("%s",y_label1));
   //h->GetYaxis()->CenterTitle();
 }
-
-///////////////////////////////////////
-//OLDER makePlots() and formatPlots()//
-///////////////////////////////////////
-/*
-  void makePlots()
-  {
-  //SETUP
-  
-  // Open files and trees
-  cout << "opening input data files and trees" << endl;
-  TFile *data_file = TFile::Open(Form("%s%s.root",data_file_path,data_file_name));
-  TTree *data_tree = (TTree *)data_file->Get("nt");
-  data_tree->SetMakeClass(1);
-
-  cout << "opening input MC files and trees" << endl;
-  TFile *MC_file = TFile::Open(Form("%s%s.root",MC_file_path,MC_file_name));
-  TTree *MC_tree = (TTree *)MC_file->Get("nt");
-  MC_tree->SetMakeClass(1);
-
-  // Output file
-  cout << "opening outputfile" << endl;
-  TFile *out_file = new TFile(Form("%s%s_%s.root",hist_file_path,hist_file_name,version), "RECREATE");
-  out_file->cd();
-
-  // Declare histograms arrays
-  TH1D     *hist[n_vars][n_types];      // Data and MC histograms
-  TH1D     *ratio[n_vars];              // Data/MC ratio plots
-  double    integrals[n_vars][n_types]; // Integral of hists for stacking
-
-  //CREATE HISTOGRAMS
-
-  printf("Opened files.\n");
-
-    // For each variable:
-    for (int i_var = 14; i_var < n_vars; i_var++)
-      {
-        printf("\ni_var:  %d\nvariable:  %s\n", i_var, var[i_var]);
-
-        // Fill histograms for data and each MC jet flavor
-        for (int i_type = 0; i_type < n_types; i_type++)
-	  //for (int i_type = 0; i_type < n_1; i_type++)
-	  {
-	    
-            // Initialize histogram
-            hist[i_var][i_type] = new TH1D( Form("hist_%d_%d",i_var,i_type), Form("hist_%d_%d",i_var,i_type), nbinsX[i_var], lowX[i_var], highX[i_var]);
-	    hist[i_var][i_type]->Sumw2();
-	    
-            // Fill/draw histogram
-            if (i_type == 0) data_tree->Draw(Form("%s>>hist_%d_%d",var[i_var],i_var,i_type), Form("weight*(%s&&%s&&%s)",event_cut,mu_cut,svtx_cut), "goff");
-	    else MC_tree->Draw(Form("%s>>hist_%d_%d",var[i_var],i_var,i_type), Form("weight*(%s&&%s&&%s&&%s)", event_cut, particle_cut[i_type],mu_cut,svtx_cut), "goff");
-		      
-            // Calc integral of hist
-            integrals[i_var][i_type] = hist[i_var][i_type]->Integral();
-            printf("\t %s Integral = %e\n", leg_label[i_type], integrals[i_var][i_type]);
-	  }
-
-        // Scale MC to data
-        hist[i_var][1]->Scale(integrals[i_var][0]/integrals[i_var][1]);
-        printf("\n\t MC scale factor = %e\n", integrals[i_var][0]/integrals[i_var][1]);
-
-        // Scale the quark flavor hists for creating the stacked MC histogram w/
-        // fractional flavor contributions
-        double stacked_int = integrals[i_var][2] + integrals[i_var][3] + integrals[i_var][4]// + integrals[i_var][5];
-        double data_int = integrals[i_var][0];
-        for (int i_type=2; i_type<n_types; i_type++)
-	  {
-	    // See notes for how I got scale factor
-	    double scale_factor = data_int/stacked_int;
-	    hist[i_var][i_type]->Scale(scale_factor);
-	    if (i_type==2) printf("\t stack scale factor = %e\n", scale_factor);
-	  }
-
-        // Ratio plot
-        ratio[i_var] = new TH1D(Form("ratio_%d",i_var), Form("data/MC"), nbinsX[i_var], lowX[i_var], highX[i_var]);
-	ratio[i_var]->Sumw2();
-	if (i_var != 13) ratio[i_var]->Divide(hist[i_var][0],hist[i_var][1],1,1,"b");
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        //
-        //          OUTPUT TO ROOT FIL
-        //
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-
-        // Output to .root file
-        for (int i_type=0; i_type<n_types; i_type++)
-	  {
-	    hist[i_var][i_type]->Write();
-	  }
-        ratio[i_var]->Write();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //          CLEANUP
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    data_file->Close();
-    MC_file->Close();
-    out_file->Close();
-}
-
-void formatPlots()
-{
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //          SETUP
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Set histogram style
-    gStyle->SetOptStat(1101);
-    gROOT->ForceStyle();
-    
-    // Open file
-    TFile *hist_file = TFile::Open(Form("%s%s_%s.root",pdf_file_path,hist_file_name,version));
-    printf("Formatting %s%s_%s.root\n", pdf_file_path, hist_file_name,version);
-    
-    // Output file
-    //double version = -1;
-    //char version[200] = "";
-    //printf("Enter a version number ");
-    //printf("Enter a version title ");
-    //scanf("%s", &version);
-    char out_file_name[200];
-    sprintf(out_file_name, "%s%s_%s.pdf", pdf_file_path, hist_file_name, version);
-    
-    //const int       color[] = { data,MC,B,C,usdg/QCD };
-    
-    // const int       color[] = { kPink+6, kGray+3, kCyan+4, kCyan+3, kCyan+2, kCyan+1 };
-    // const char *leg_label[] = { "Data pp", "MC", "b", "c", "uds", "gluon" };
-
-    TCanvas *canv[n_vars];
-    TLegend *leg[n_vars];
-    TH1D    *hist[n_vars][n_types];
-    TH1D    *ratio[n_vars];
-    THStack *stacked_hist[n_vars];
-    TLine   *one[n_vars];
-
-    TCanvas *temp_canv = new TCanvas("temp", "temp", 1200, 600);
-    temp_canv->Print(Form("%s(",out_file_name));
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //          FORMAT HISTOGRAMS
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    for (int i_var=14; i_var<n_vars; i_var++)
-    //for (int i_var=0; i_var<n_vars; i_var++)
-      {
-        printf("Formatting %s\n", var[i_var]);
-	canv[i_var] = new TCanvas(Form("canv_%d",i_var),Form("canv_%d",i_var),1200,600);
-        canv[i_var]->Divide(2,1);
-	//canv[i_var]->Divide(1,2);
-
-	if (doLogy[i_var]) canv[i_var]->cd(1)->SetLogy();
-
-        //Histograms
-        stacked_hist[i_var] = new THStack(Form("stacked_hist_%d",i_var), "Stacked MC");
-	//stacked_hist->Sumw2();
-
-        for (int i_type=0; i_type<n_types; i_type++)
-	  {
-	    hist[i_var][i_type] = (TH1D *)hist_file->Get(Form("hist_%d_%d",i_var,i_type));
-
-	    formatHist(hist[i_var][i_type], x_label[i_var], y_label[i_var]);
-
-	    hist[i_var][i_type]->SetMarkerColor(color[i_type]);
-	    hist[i_var][i_type]->SetLineColor(lineColor[i_type]);
-	    //hist[i_var][i_type]->SetLineColor(kBlack+3);
-	    hist[i_var][i_type]->SetLineWidth(1);
-
-	    if (i_type==0 )
-	      {
-		//hist[i_var][i_type]->SetLineWidth(2);
-		hist[i_var][i_type]->SetMarkerStyle(8);
-		hist[i_var][i_type]->SetMarkerSize(1.1);
-	      }
-
-	    //hist[i_var][i_type]->GetYaxis()->SetMaximum(highY[i_var]);
-	    //hist[i_var][i_type]->GetYaxis()->SetRangeUser(1,highY[i_var]);
-
-	    if (i_type>=1)
-	      {
-		hist[i_var][i_type]->SetFillColor(color[i_type]);
-		//hist[i_var][i_type]->SetFillStyle(3004 + i_type % 2); //various light stripes
-		hist[i_var][i_type]->SetFillStyle(1001);//solid fill
-	      }
-
-            if (!doLogy[i_var]) hist[i_var][i_type]->SetMinimum(0);
-            if (i_type>=2) stacked_hist[i_var]->Add(hist[i_var][i_type]);
-        }
-
-        canv[i_var]->cd(1);
-
-	////draw mc curve with error
-        hist[i_var][1]->Draw("HIST E1");
-
-	////draw stacked udsg+b+c curve with error
-        //stacked_hist[i_var]->Draw("HIST E SAME");
-	//stacked_hist[i_var]->Draw("E SAME");
-	//stacked_hist[i_var]->Draw("HIST SAME");
-	
-	//draw data curve
-        //hist[i_var][0]->Draw("HIST E SAME");
-	hist[i_var][0]->Draw("E SAME");
-
-        // Legend
-        //leg[i_var] = new TLegend(0.7,0.75,0.85,0.90); // (xmin,ymin,xmax,ymax)
-	leg[i_var] = new TLegend(0.5,0.78,0.65,0.93); // (xmin,ymin,xmax,ymax)
-
-	formatLeg(leg[i_var]);
-
-	//add entries to legend
-	for (int i_type = 0; i_type < n_types; i_type++)
-	  {
-	    if(i_type==0)
-	      {
-		leg[i_var]->AddEntry(hist[i_var][i_type], Form("%s",leg_label[i_type]), "lp");
-	      }
-	    else
-	      {
-		//if (i_type == 1) continue;
-		//leg[i_var]->AddEntry(hist[i_var][i_type], Form("%s",leg_label[i_type]), "f");
-		//if plotting mcOnly
-		if (i_type==1) leg[i_var]->AddEntry(hist[i_var][i_type], Form("%s",leg_label[i_type]), "f");
-		else continue;
-	      }
-	  }
-	leg[i_var]->Draw();
-
-        // Ratio plots
-        ratio[i_var] = (TH1D *)hist_file->Get(Form("ratio_%d",i_var));
-
-        formatHist(ratio[i_var], x_label[i_var], "data/MC");
-
-        ratio[i_var]->GetYaxis()->CenterTitle();
-	ratio[i_var]->SetMarkerColor(color[0]);
-	ratio[i_var]->SetMarkerStyle(8);
-        ratio[i_var]->SetMarkerSize(0.8);
-	ratio[i_var]->SetMinimum(0.5);
-        ratio[i_var]->SetMaximum(1.5);	
-
-        canv[i_var]->cd(2);
-
-        ratio[i_var]->Draw();
-
-	one[i_var] = new TLine(lowX[i_var],1,highX[i_var],1);
-        one[i_var]->SetLineColor(color[1]);
-        one[i_var]->Draw("SAME");
-
-	ratio[i_var]->SetLineColor(color[0]);
-        ratio[i_var]->Draw("SAME"); // Plot it again, over the line
-
-        //output pdf
-        canv[i_var]->Print(out_file_name);
-    }
-
-     //CLEAN UP
-    temp_canv->Print(Form("%s]",out_file_name));
-    hist_file->Close();
-}
-
-
-void fitDebugging()
-{
-
-  //TFile *_file3 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/data.root");
-  //TFile *_file2 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_schemeB.root");
-  //TFile *_file1 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_schemeB.root");
-  //TFile *_file0 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_sparecopy.root");
-
-  TFile *_file0 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/data_noCuts.root");
-  TFile *_file1 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/MC_HFaugmented_halfOfficial_noCuts_schemeA.root"); //an hadd of the three MC files
-  //TFile *_file2 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_noCuts_schemeA.root");
-  //TFile *_file1 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_noCuts_schemeA.root");
-  //TFile *_file0 = TFile::Open("/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_noCuts.root");
-
-  TTree* nt0 = (TTree*)_file0->Get("nt");
-  TTree* nt1 = (TTree*)_file1->Get("nt");
-
-  TH1F* htest0 = new TH1F("htest0","",30,0,600);
-  TH1F* htest1 = new TH1F("htest1","",30,0,600);
-
-  htest0->Sumw2();
-  htest1->Sumw2();
-
-  TCanvas* c1=  new TCanvas("c1","",600,600);
-
-  htest0->SetMarkerStyle(8);
-  htest0->SetMarkerStyle(8);
-  htest0->SetMarkerColor(kBlack);
-
-  htest0->SetLineColor(kBlack);
-  htest1->SetFillColor(kGray+1);
-
-  htest1->SetFillStyle(1001);//solid fill
-
-  nt0->Draw("jtpt>>htest0",Form(""),"goff");
-  nt1->Draw("jtpt>>htest1",Form("weight"),"goff");
-
-
-  htest0->Scale(1/int_lumi);
-
-  c1->cd(1)->SetLogy();
-
-  //printf("\n\t MC scale factor = %e\n", htest3->Integral()/MC_Integral);
-
-  TLegend* Legend = new TLegend(.5,0.78,0.65,0.93);
-
-  Legend->AddEntry(htest0,"data ntuple","lp");
-  Legend->AddEntry(htest1,"MC Curve","l");
-  //Legend->AddEntry(htest1,"c ntuple","l");
-  //Legend->AddEntry(htest0,"udsg ntuple","l");
-
-  htest0->GetXaxis()->SetTitle("jtpt (GeV), no Cuts");
-  htest0->GetXaxis()->SetTitleSize(0.03);
-  htest0->GetXaxis()->SetLabelSize(0.03);
-
-  htest0->GetYaxis()->SetTitle("#sigma (mb)");
-  htest0->GetYaxis()->SetTitleSize(0.03);
-  htest0->GetYaxis()->SetLabelSize(0.02);
-
-  htest0->Draw("SCAT E1");
-  htest1->Draw("HIST SAME E");
-
-  Legend->Draw("SAME");
-
-
-}*/
-
-
-

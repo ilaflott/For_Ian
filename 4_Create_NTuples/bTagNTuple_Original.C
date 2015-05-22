@@ -45,6 +45,7 @@ static double MCWeights(double pthat);
 static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
+int impactParameterExploration(int type);
 //int mergeMCSamples();
 //int calculateWeights(int type);
 //int forestStatistics(int type);
@@ -65,6 +66,7 @@ static inline void branchAddresses(TTree *akPu3);
 //int dataType = 0;
 string weights_file;
 const bool doTracks=true;
+const bool doMostSignificantTracks=true;
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // Macro settings/constants
 //FileLists
@@ -200,6 +202,18 @@ double nDiscr_ssvHighPur;
 int nNIPtrk;
 int nNselIPtrk;
 int nNIP;
+double n1stMost2dSigTrk =-997 ;  
+double n2ndMost2dSigTrk =-998 ;  
+double n3rdMost2dSigTrk =-999 ;  
+double n1stIP2dTrk	 ;  
+double n2ndIP2dTrk	 ;  
+double n3rdIP2dTrk	 ;  
+double n1stMost3dSigTrk =-997 ;  
+double n2ndMost3dSigTrk =-998 ;  
+double n3rdMost3dSigTrk =-999 ;  
+double n1stIP3dTrk       ;  
+double n2ndIP3dTrk       ;  
+double n3rdIP3dTrk       ;     
 int nIPJetIndex[10000];
 double nIPPt[10000];
 double nIPProb0[10000];
@@ -237,7 +251,7 @@ int dataType;
 // Main functions
 // Mode: 0-makeNTuple(), 1-mergeMCSamples()
 // Type: 0-data, 1-QCD, 2-BJet, 3-CJet
-int bTagNTuple_Original_shortTest(int type)
+int bTagNTuple_Original(int type)
 {
   switch (type) 
     {
@@ -245,13 +259,15 @@ int bTagNTuple_Original_shortTest(int type)
     case 1: fileList = QCDFileList  ; printf("\n you chose QCD") ; weights_file = QCDWeightsFile  ; break ;
     case 2: fileList = BJetFileList ; printf("\n you chose BJets"); weights_file = BJetWeightsFile ; break ;
     case 3: fileList = CJetFileList ; printf("\n you chose CJets"); weights_file = CJetWeightsFile ; break ;
+    case 4: fileList = QCDFileList;break;//other function
     default:
       cerr << "Type must be from {0,1,2,3}" << endl;
       return -1;
     }
 
-  result = makeNTuple(type);
-  
+  if(type<4)result = makeNTuple(type);
+  else result=impactParameterExploration(type);
+	 
   return result;
 }
 
@@ -308,7 +324,7 @@ int makeNTuple(int type)
       int nEvents = akPu3->GetEntries();
       cout << nEvents << " events to loop over in " << fileName << endl;
       //int totNumTracks=0;
-      //nEvents = 10000;/*debug*/
+      nEvents = 10000;/*debug*/
       for (int i=0; i<nEvents; i++) 
 	{
 	  
@@ -323,20 +339,19 @@ int makeNTuple(int type)
 	  // Set weight
 	  if (dataType == 0) nWeight = 1.0;
 	  else nWeight = MCWeights(pthat);
-	  
-	  
+	  	  
 	  //Event Info
 	  nVz    = vz;
 	  nNIP   = nIP;
 	  nPthat = pthat; 
 	  
 	  int trackPosition=0;
-	  //Jet Processing
-	  
+	  //Jet Processing	  
 	  for (int j=0; j<nref; j++) 
 	    {
 	      
 	      trackPosition+=nselIPtrk[j];//at end of loop, this is number of tracks in our event
+
 	      switch(dataType)
 		{
 		case 0: break;//no particle level selection for data
@@ -375,7 +390,7 @@ int makeNTuple(int type)
 	      nNIPtrk    =nIPtrk[j];
 	      nNselIPtrk =nselIPtrk[j];
 	      
-	      //secondary vertex variables
+	      //secondary vertex variables, not being filled correctly at all
 	      nNsvtx    = nsvtx[j];
 	      nSvtxntrk = svtxntrk[j];
 	      nSvtxdl   = svtxdl[j];
@@ -386,11 +401,19 @@ int makeNTuple(int type)
 	      //track based variables
 	      if(doTracks)//tracks take awhile to run, may want to turn it off in the future?
 		{
-		  int counter=0;
+		  int counter = 0;
+		  
 		  for(int it = trackPosition-nselIPtrk[j];it<trackPosition;it++)
 		    {
 		      //basic track selection
-		      if( abs(trkDz1[it]) > 0.2 || trkDxy1[it] > 17 || trkPt[it] < 1 || trkChi2[it] > 5) continue;
+		      //perhaps pixel/tracker hit selection was done at RECO step?
+		      if( abs(trkDz1[it]) > 0.02   || //some confusion with these cuts
+			  abs(trkDxy1[it]) > 17    || //
+			  trkPt[it] < 1            || 
+			  trkChi2[it] > 5          ||
+			  ipDist2Jet[it] > 0.07    || //shortest distance between track and jet axis
+			  ipClosest2Jet[it] > 5.0     // decay length
+			  ) continue;
 		      
 		      //"phi matching"
 		      float deltaPhi = jtphi[j] - trkPhi[it];
@@ -400,7 +423,7 @@ int makeNTuple(int type)
 		      //deltaRcut
 		      float deltaEta = jteta[j] - trkEta[it];
 		      deltaRtrk2Jet[it]=sqrt(deltaPhi*deltaPhi+deltaEta*deltaEta); 
-		      if(deltaRtrk2Jet[it]>0.5)continue;
+		      if(deltaRtrk2Jet[it]>0.3)continue;
 		      
 		      nIPJetIndex[counter]    = ipJetIndex[it];//this number reflects the index of the jet that the ip belongs to
 		      nIPPt[counter]          = ipPt[it];
@@ -420,10 +443,68 @@ int makeNTuple(int type)
 		      nTrkDz[counter]         = trkDz1[it];
 		      nTrkDxy[counter]        = trkDxy1[it];
 		      nDeltaRtrk2Jet[counter] = deltaRtrk2Jet[it];
+		     
+		      counter++;
 		      
-		      counter++;	
+		      if(doMostSignificantTracks&&(it==trackPosition-1))//The end of the track loop
+			{
+			  for(int ij =0;ij<counter;ij++)
+			    {
+			      //first 2d values								 
+			      if (nIP2dsig[ij]>=n1stMost2dSigTrk)					 
+			      	{									 
+			      	  n3rdMost2dSigTrk=n2ndMost2dSigTrk;					 
+			      	  n2ndMost2dSigTrk=n1stMost2dSigTrk;					 
+			      	  n1stMost2dSigTrk=nIP2dsig[ij];					 
+				  
+			      	  n3rdIP2dTrk=n2ndIP2dTrk;						 
+			      	  n2ndIP2dTrk=n1stIP2dTrk;						 
+			      	  n1stIP2dTrk=nIP2d[ij];						 
+			      	}									 
+			      else if (nIP2dsig[ij] <= n1stMost2dSigTrk && nIP2dsig[ij]>=n2ndMost2dSigTrk) 
+			      	{									 
+			      	  n3rdMost2dSigTrk=n2ndMost2dSigTrk;					 
+			      	  n2ndMost2dSigTrk=nIP2dsig[ij];					 
+			          
+			      	  n3rdIP2dTrk=n2ndIP2dTrk;						 
+			      	  n2ndIP2dTrk=nIP2d[ij];						 
+			      	}									 
+			      else if (nIP2dsig[ij] <= n2ndMost2dSigTrk && nIP2dsig[ij]>=n3rdMost2dSigTrk) 
+			      	{									 
+			      	  n3rdMost2dSigTrk=nIP2dsig[ij];					 
+			          
+			      	  n3rdIP2dTrk=nIP2d[ij];						 
+			      	}                                                                        
+			      
+			      //now 3d values
+			      if (nIP3dsig[ij]>n1stMost3dSigTrk)					 
+			      	{									 
+			      	  n3rdMost3dSigTrk=n2ndMost3dSigTrk;					 
+			      	  n2ndMost3dSigTrk=n1stMost3dSigTrk;					 
+			      	  n1stMost3dSigTrk=nIP3dsig[ij];					 
+				  
+			      	  n3rdIP3dTrk=n2ndIP3dTrk;						 
+			      	  n2ndIP3dTrk=n1stIP3dTrk;						 
+			      	  n1stIP3dTrk=nIP3d[ij];						 
+			      	}									 
+			      else if (nIP3dsig[ij] < n1stMost3dSigTrk && nIP3dsig[ij]>n2ndMost3dSigTrk) 
+			      	{									 
+			      	  n3rdMost3dSigTrk=n2ndMost3dSigTrk;					 
+			      	  n2ndMost3dSigTrk=nIP3dsig[ij];					 
+			                                                                                 
+			      	  n3rdIP3dTrk=n2ndIP3dTrk;						 
+			      	  n2ndIP3dTrk=nIP3d[ij];						 
+			      	}									 
+			      else if (nIP3dsig[ij] < n2ndMost3dSigTrk && nIP3dsig[ij]>n3rdMost3dSigTrk) 
+			      	{									 
+			      	  n3rdMost3dSigTrk=nIP3dsig[ij];					 
+			                                                                                 
+			      	  n3rdIP3dTrk=nIP3d[ij];						 
+			      	}                                                                        
+			    }//doMostSignificantTracks loop
+			}//doMostSignificanTracks Check
 		    }//track loop
-		}//doTracks
+		}//doTracks check
 	      newTree.Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
 	    }//jetloop
 	}//eventloop
@@ -609,7 +690,6 @@ static void heavyJetWeights(double *pthatEntries)
   
   cout << "Done adding files to chain." << endl;
   
-  
   // Calculate HF weight for each pthat bin
   double HFWeight[QCDBins+1];
   char HFJetsCut[200];
@@ -668,7 +748,7 @@ static void heavyJetWeights(double *pthatEntries)
 }
 
 
-// Create the branches for the new tree
+// Create the branches for the new output tree
 static inline void newBranches(TTree *newTree) 
 {
   //event specific
@@ -690,7 +770,8 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("mueta", &nMueta, "mueta/D");
   newTree->Branch("muphi", &nMuphi, "muphi/D");
   newTree->Branch("mudr", &nMudr, "mudr/D");
-  newTree->Branch("muptrel", &nMuptrel, "muptrel/D");
+  newTree->Branch("muptrel", &nMuptrel, "muptrel/D");//muon momentum, in the plane transverse to the jet axis
+                                                     //NOT muon transverse momentum projected onto the jet axis
   
   //ssv discriminator values
   newTree->Branch("discr_ssvHighEff", &nDiscr_ssvHighEff, "discr_ssvHighEff/D");
@@ -730,8 +811,22 @@ static inline void newBranches(TTree *newTree)
       newTree->Branch( "trkDz1"  , &nTrkDz  , "trkDz1[nIP]/D"  );
       newTree->Branch( "trkDxy1" , &nTrkDz  , "trkDxy1[nIP]/D" );
       newTree->Branch( "deltaRtrk2Jet" , &nDeltaRtrk2Jet  , "deltaRtrk2Jet[nIP]/D" );
+      if(doMostSignificantTracks)
+	{
+	  newTree->Branch("1stMost2dSigTrk",&n1stMost2dSigTrk ,"1stMost2dSigTrk/D");
+	  newTree->Branch("2ndMost2dSigTrk",&n2ndMost2dSigTrk ,"2ndMost2dSigTrk/D");
+	  newTree->Branch("3rdMost2dSigTrk",&n3rdMost2dSigTrk ,"3rdMost2dSigTrk/D");
+	  newTree->Branch("1stIP2dTrk"     ,&n1stIP2dTrk      ,"1stIP2dTrk/D"     );	
+	  newTree->Branch("2ndIP2dTrk"     ,&n2ndIP2dTrk      ,"2ndIP2dTrk/D"     );	
+	  newTree->Branch("3rdIP2dTrk"     ,&n3rdIP2dTrk      ,"3rdIP2dTrk/D"     );	
+	  newTree->Branch("1stMost3dSigTrk",&n1stMost3dSigTrk ,"1stMost3dSigTrk/D");
+	  newTree->Branch("2ndMost3dSigTrk",&n2ndMost3dSigTrk ,"2ndMost3dSigTrk/D");
+	  newTree->Branch("3rdMost3dSigTrk",&n3rdMost3dSigTrk ,"3rdMost3dSigTrk/D");
+	  newTree->Branch("1stIP3dTrk"     ,&n1stIP3dTrk      ,"1stIP3dTrk/D"     );
+	  newTree->Branch("2ndIP3dTrk"     ,&n2ndIP3dTrk      ,"2ndIP3dTrk/D"     );
+	  newTree->Branch("3rdIP3dTrk"     ,&n3rdIP3dTrk      ,"3rdIP3dTrk/D"     );
+	}
   } 
-
   //HLT
   newTree->Branch("HLT_PAMu3_v1", &HLT_PAMu3_v1, "HLT_PAMu3_v1/I");
   newTree->Branch("HLT_PAMu7_v1", &HLT_PAMu7_v1, "HLT_PAMu7_v1/I");
@@ -741,7 +836,7 @@ static inline void newBranches(TTree *newTree)
   return;
 }
 
-// Set all the input branch addresses
+// Set all the input branch addresses for the input files
 static inline void branchAddresses(TTree *akPu3) 
 {
 
@@ -786,6 +881,7 @@ static inline void branchAddresses(TTree *akPu3)
       akPu3->SetBranchAddress("trkPhi" ,&trkPhi );
       akPu3->SetBranchAddress("trkDz1" ,&trkDz1 );
       akPu3->SetBranchAddress("trkDxy1",&trkDxy1);
+      
     }
 
   //HLT
@@ -817,6 +913,51 @@ static inline void branchAddresses(TTree *akPu3)
   return;
 }
 
+int impactParameterExploration(int argument)
+{
+  double paranoiaCheck=0;
+  string fileName;
+  ifstream fileStream(fileList.c_str(), ifstream::in);
+  fileStream >> fileName;
+  
+  TFile *file = TFile::Open(fileName.c_str());//grab a single file, doesn't matter which one
+  cout << "Opening Trees..." << endl;
+  TTree *akPu3 = (TTree *)file->Get("akPu3PFJetAnalyzer/t");
+  //akPu3->AddFriend("hlt=hltanalysis/HltTree");
+  akPu3->AddFriend("hiEvt=hiEvtAnalyzer/HiTree");
+  akPu3->AddFriend("skim=skimanalysis/HltTree");
+  akPu3->AddFriend("trk=ppTrack/trackTree"); 
+  
+  branchAddresses(akPu3);
+  
+  // Process every event
+  int nEvents = akPu3->GetEntries();
+  cout << nEvents << " events to loop over in " << fileName << endl;
+  //int totNumTracks=0;
+  //nEvents = 10000;/*debug*/
+  for (int i=0; i<nEvents; i++) 
+	{
+	  akPu3->GetEntry(i);
+	  int trackPosition=0;
+	  //Jet Processing	  
+	  for (int j=0; j<nref; j++) 
+	    {
+	      if (nsvtx[j]>1)cout << "nsvtx=" << nsvtx[j]<<endl;
+	      //trackPosition+=nselIPtrk[j];
+	      //
+	      //for(int it = trackPosition-nselIPtrk[j];it<trackPosition;it++)
+	      //	{
+	      //	  //paranoiaCheck=trkDxy1[it]*trkDxy1[it] + trkDz1[it]*trkDz1[it];
+	      //	  //cout<<"trkDxy^2 + trkDz^2 = "<<paranoiaCheck<<endl;
+	      //	  //cout << "ip3d^2=" << ip3d[it]*ip3d[it]<<endl;
+	      //	  //cout << "ip2d=" << ip2d[it]<<endl;
+	      //	  
+	      //	  //cout << "trkDz1="<<trkDz1[it]<<endl;
+	      //}//trackloop
+	    }//jetloop
+	}//event loop
+  return 0;
+}
 
 //Leo's Old Notes about Jet Reweighting
 /* 
