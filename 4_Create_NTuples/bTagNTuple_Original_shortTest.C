@@ -285,10 +285,11 @@ int makeNTuple(int type)
   fileStream >> fileName;
   
   //getline(fileStream, fileName);
-  
+  int totalnEvents=0;
   // For every file in file list, process trees
   while (!fileStream.eof()) 
     {
+      if(totalnEvents>100000)break;/*debug*/
       // Open input file
       printf("\n Opening File: %s \n",fileName.c_str());
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
@@ -307,8 +308,10 @@ int makeNTuple(int type)
       // Process every event
       int nEvents = akPu3->GetEntries();
       cout << nEvents << " events to loop over in " << fileName << endl;
+      
       //int totNumTracks=0;
       nEvents = 10000;/*debug*/
+      totalnEvents+=nEvents;
       for (int i=0; i<nEvents; i++) 
 	{
 	  
