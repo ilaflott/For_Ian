@@ -78,6 +78,7 @@ const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_
 
 //Weight Files
 const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
+<<<<<<< HEAD
 const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data_updated_4.30.15_backUp.txt";			 
 const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD_updated_shortTest.txt";		 
 const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial_updated_shortTest_schemeA.txt";
@@ -89,6 +90,20 @@ const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760G
 const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_updated_shortTest.root";
 const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_updated_shortTest_schemeA.root";
 const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_updated_shortTest_schemeA.root";
+=======
+//the weights only change if i change the event selection, i.e. the weights i've already calculated should be fine for any NTuples i make in the future
+const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data.txt";			 
+const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD.txt";		 
+const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial.txt";
+const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial.txt";
+
+//Output Files
+const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
+const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_5.22.15.root";
+const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_5.22.15.root";
+const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_5.22.15.root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_5.22.15.root";
+>>>>>>> 1bc14ab3e04b88e8aba3801ae21683be4ba546cd
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -279,13 +294,13 @@ int makeNTuple(int type)
 
   // Initialize output file
   TFile *outFile;
-
+  //string outFileName;
   switch (dataType) 
     {
-    case 0: outFile = new TFile( Form("%s",dataOutFile) , "RECREATE" ); break;
-    case 1: outFile = new TFile( Form("%s",QCDOutFile ) , "RECREATE" ); break;
-    case 2: outFile = new TFile( Form("%s",BJetOutFile) , "RECREATE" ); break;
-    case 3: outFile = new TFile( Form("%s",CJetOutFile) , "RECREATE" ); break;
+    case 0: ;outFile = new TFile( Form("%s",dataOutFile) , "RECREATE" ); break;
+    case 1: ;outFile = new TFile( Form("%s",QCDOutFile ) , "RECREATE" ); break;
+    case 2: ;outFile = new TFile( Form("%s",BJetOutFile) , "RECREATE" ); break;
+    case 3: ;outFile = new TFile( Form("%s",CJetOutFile) , "RECREATE" ); break;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
 
@@ -324,7 +339,7 @@ int makeNTuple(int type)
       int nEvents = akPu3->GetEntries();
       cout << nEvents << " events to loop over in " << fileName << endl;
       //int totNumTracks=0;
-      nEvents = 10000;/*debug*/
+      //nEvents = 10;/*debug*/
       for (int i=0; i<nEvents; i++) 
 	{
 	  
@@ -339,6 +354,7 @@ int makeNTuple(int type)
 	  // Set weight
 	  if (dataType == 0) nWeight = 1.0;
 	  else nWeight = MCWeights(pthat);
+	  //else nWeight = 1;/*debug*/
 	  	  
 	  //Event Info
 	  nVz    = vz;
@@ -390,7 +406,7 @@ int makeNTuple(int type)
 	      nNIPtrk    =nIPtrk[j];
 	      nNselIPtrk =nselIPtrk[j];
 	      
-	      //secondary vertex variables, not being filled correctly at all
+	      //secondary vertex variables, not being filled correct
 	      nNsvtx    = nsvtx[j];
 	      nSvtxntrk = svtxntrk[j];
 	      nSvtxdl   = svtxdl[j];
@@ -520,7 +536,7 @@ int makeNTuple(int type)
   // Write to output file
   outFile->cd();
   cout << "writing tree..." << newTree.GetName() <<endl;
-
+  
   //kOverwrite overwrites backup/partially finished tree
   newTree.Write(newTree.GetName(), TObject::kOverwrite);
   
@@ -547,10 +563,8 @@ static double MCWeights(double MCPthat)
   if ( !(std::ifstream(weights_file.c_str())) )
     {
       if(!initialized) cout << "No weights_file found. Initializing weight function.\n";
-      
       // Add QCD MC files to chain
       TChain *ch = new TChain("ak3PFJetAnalyzer/t");
-
       ifstream inStr(QCDFileList.c_str(), ifstream::in);
       string fileName;
       ofstream weightFile(weights_file.c_str(), ofstream::out);
@@ -559,16 +573,13 @@ static double MCWeights(double MCPthat)
       while (!inStr.eof()) 
 	{
           ch->Add(fileName.c_str());
-
           cout << "Added " << fileName << " to chain." << endl;
 	  inStr >> fileName;
 	}
       cout << "Done adding files to chain." << endl;
       
-
       // Count events across all files
       double pthatEntries[QCDBins+1];
-      
       for (int i=0; i<QCDBins+1; i++) 
 	{
 	  pthatEntries[i] = ch->GetEntries( pthatCut[i].c_str() );
@@ -582,7 +593,6 @@ static double MCWeights(double MCPthat)
           heavyJetWeights(pthatEntries);
 	}
       
-
       // Calculate weights
       for (int i=0; i<QCDBins+1; i++) 
 	{
@@ -731,8 +741,9 @@ static void heavyJetWeights(double *pthatEntries)
   // Weigh HF events by HF weight for each pthat bin, add to QCD events
   for (int i=0; i<QCDBins+1; i++) 
     {
-      if(weightsMode == 1 ) pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
-      else pthatEntries[i] = HFWeight[i] * HFPthatEntries[i]; //schemeB
+      pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
+      //if(weightsMode == 1 ) pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
+      //else pthatEntries[i] = HFWeight[i] * HFPthatEntries[i]; //schemeB
       cout << "Effective pthat entries for pthat " << pthatCut[i] << ": " << pthatEntries[i] << endl;
     }
 
