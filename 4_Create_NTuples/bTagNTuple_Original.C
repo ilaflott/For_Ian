@@ -730,8 +730,6 @@ static void heavyJetWeights(double *pthatEntries)
     {
       // Count (indirectly) number of b jets
       sprintf(HFJetsCut, "%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
-      //sprintf(HFJetsCut, "%s&&abs(jteta)<2&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
-      //printf("%s\n",HFJetsCut);
       
       HFCh->Draw("jtpt>>HFJetHist", HFJetsCut, "goff");
       QCDCh->Draw("jtpt>>QCDJetHist", HFJetsCut, "goff");
@@ -761,6 +759,7 @@ static void heavyJetWeights(double *pthatEntries)
   for (int i=0; i<QCDBins+1; i++) 
     {
       pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
+      //old way the weights were dealt with, keeping here for posterity
       //if(weightsMode == 1 ) pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
       //else pthatEntries[i] = HFWeight[i] * HFPthatEntries[i]; //schemeB
       cout << "Effective pthat entries for pthat " << pthatCut[i] << ": " << pthatEntries[i] << endl;
