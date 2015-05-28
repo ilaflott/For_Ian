@@ -291,17 +291,13 @@ int makeNTuple(int type)
     }
 
   // New tree, new branches
-  //
   TTree newTree("nt","nt");
   newBranches(&newTree);
   
-  //outFile->cd();
-
+  //grab filename
   ifstream fileStream(fileList.c_str(), ifstream::in);
   string fileName;      
   fileStream >> fileName;
-  
-  //getline(fileStream, fileName);
   
   // For every file in file list, process trees
   while (!fileStream.eof()) 
