@@ -11,10 +11,10 @@ do
     cat > runfile_$counter <<EOF
 export SCRAM_ARCH=slc6_amd64_gcc472
 source /osg/app/cmssoft/cms/cmsset_default.sh
-cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/
+cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20/src/
 eval `scramv1 runtime -sh`
 declare \$( printenv | grep export/d00 | sed 's/export\/d00/cvmfs\/cvmfs.cmsaf.mit.edu\/hidsk0001/g' )
-cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/
+cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20/src/For_Ian/4_Create_NTuples/
 echo "Processing..."
 $LINE
 echo "Done!"
