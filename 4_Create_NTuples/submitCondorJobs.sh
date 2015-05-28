@@ -14,14 +14,13 @@ source /osg/app/cmssoft/cms/cmsset_default.sh
 cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/
 eval `scramv1 runtime -sh`
 declare \$( printenv | grep export/d00 | sed 's/export\/d00/cvmfs\/cvmfs.cmsaf.mit.edu\/hidsk0001/g' )
-cd -
 cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/
 echo "Processing..."
 $LINE
 echo "Done!"
 EOF
 
-chmod +x runfile_$counter
+chmod +x runfil_$counter
 
     cat > subfile_$counter <<EOF
 Universe       = vanilla
@@ -29,9 +28,9 @@ Initialdir     = $PWD/
 Executable     = $PWD/runfile_$counter
 +AccountingGroup = "group_cmshi.ilaflott"
 #Input          = /dev/null
-Error          = condor_$counter.stderr
-Output         = condor_$counter.output
-Log            = condor_$counter.log
+Error          = /net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/condor_$counter.stderr
+Output         = /net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/condor_$counter.output
+Log            = /net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/condor_$counter.log
 GetEnv         = True
 # prefer to run on fast computers
 Rank           = kflops
