@@ -20,7 +20,7 @@ $LINE
 echo "Done!"
 EOF
 
-chmod +x runfil_$counter
+chmod +x runfile_$counter
 
     cat > subfile_$counter <<EOF
 Universe       = vanilla
