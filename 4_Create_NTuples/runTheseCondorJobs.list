@@ -1,0 +1,3 @@
+root -b -q "bTagNTuple_Original.C+(1)"
+root -b -q "bTagNTuple_Original.C+(2)"
+root -b -q "bTagNTuple_Original.C+(3)"
