@@ -80,16 +80,16 @@ const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_
 const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
 //the weights only change if i change the event selection, i.e. the weights i've already calculated should be fine for any NTuples i make in the future
 const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data.txt";			 
-const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/weights_QCD.txt";		 
-const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_BJet_halfOfficial.txt";
-const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/weights_CJet_halfOfficial.txt";
+const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/weights_QCD.txt";		 
+const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/weights_BJet_halfOfficial.txt";
+const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/weights_CJet_halfOfficial.txt";
 
 //Output Files
 const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
-const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_5.22.15.root";
-const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/kurts_QCDMC/QCD_5.22.15.root";
-const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/BJet_halfOfficial_5.22.15.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/halfOfficial_HFMC/CJet_halfOfficial_5.22.15.root";
+const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_5.22.15debug.root";
+const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/QCD_5.22.15debug.root";
+const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/BJet_halfOfficial_5.22.15debug.root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/CJet_halfOfficial_5.22.15debug.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -351,7 +351,7 @@ int makeNTuple(int type)
 	  //Jet Processing	  
 	  for (int j=0; j<nref; j++) 
 	    {
-	      
+	      int counter = 0; //for counting the number of tracks in a jet after cuts
 	      trackPosition+=nselIPtrk[j];//at end of loop, this is number of tracks in our event
 
 	      switch(dataType)
@@ -399,11 +399,24 @@ int makeNTuple(int type)
 	      nSvtxdls  = svtxdls[j];
 	      nSvtxm    = svtxm[j];
 	      nSvtxpt   = svtxpt[j];           
-    
+	      
+	      //cout << "doing tracks for this jet" << endl;
 	      //track based variables
 	      if(doTracks)//tracks take awhile to run, may want to turn it off in the future?
 		{
-		  int counter = 0;
+		  counter = 0;
+		  n1stMost2dSigTrk =-999;//large negative value indicates that not enough tracks to do three most significant tracks
+		  n2ndMost2dSigTrk =-999;//kurt just stuck non-existant tracks in the 0 bin, i'm going to do it differently.
+		  n3rdMost2dSigTrk =-999;
+		  n1stMost3dSigTrk =-999;
+		  n2ndMost3dSigTrk =-999;
+		  n3rdMost3dSigTrk =-999;
+		  n1stIP2dTrk	=-999 ;  
+		  n2ndIP2dTrk	=-999 ;  
+		  n3rdIP2dTrk	=-999 ;  
+		  n1stIP3dTrk	=-999 ;  
+		  n2ndIP3dTrk	=-999 ;  
+		  n3rdIP3dTrk	=-999 ; 
 		  
 		  for(int it = trackPosition-nselIPtrk[j];it<trackPosition;it++)
 		    {
@@ -445,68 +458,92 @@ int makeNTuple(int type)
 		      nTrkDz[counter]         = trkDz1[it];
 		      nTrkDxy[counter]        = trkDxy1[it];
 		      nDeltaRtrk2Jet[counter] = deltaRtrk2Jet[it];
-		     
+		      
 		      counter++;
 		      
-		      if(doMostSignificantTracks&&(it==trackPosition-1))//The end of the track loop
-			{
-			  for(int ij =0;ij<counter;ij++)
-			    {
-			      //first 2d values								 
-			      if (nIP2dsig[ij]>=n1stMost2dSigTrk)					 
-			      	{									 
-			      	  n3rdMost2dSigTrk=n2ndMost2dSigTrk;					 
-			      	  n2ndMost2dSigTrk=n1stMost2dSigTrk;					 
-			      	  n1stMost2dSigTrk=nIP2dsig[ij];					 
-				  
-			      	  n3rdIP2dTrk=n2ndIP2dTrk;						 
-			      	  n2ndIP2dTrk=n1stIP2dTrk;						 
-			      	  n1stIP2dTrk=nIP2d[ij];						 
-			      	}									 
-			      else if (nIP2dsig[ij] <= n1stMost2dSigTrk && nIP2dsig[ij]>=n2ndMost2dSigTrk) 
-			      	{									 
-			      	  n3rdMost2dSigTrk=n2ndMost2dSigTrk;					 
-			      	  n2ndMost2dSigTrk=nIP2dsig[ij];					 
-			          
-			      	  n3rdIP2dTrk=n2ndIP2dTrk;						 
-			      	  n2ndIP2dTrk=nIP2d[ij];						 
-			      	}									 
-			      else if (nIP2dsig[ij] <= n2ndMost2dSigTrk && nIP2dsig[ij]>=n3rdMost2dSigTrk) 
-			      	{									 
-			      	  n3rdMost2dSigTrk=nIP2dsig[ij];					 
-			          
-			      	  n3rdIP2dTrk=nIP2d[ij];						 
-			      	}                                                                        
-			      
-			      //now 3d values
-			      if (nIP3dsig[ij]>n1stMost3dSigTrk)					 
-			      	{									 
-			      	  n3rdMost3dSigTrk=n2ndMost3dSigTrk;					 
-			      	  n2ndMost3dSigTrk=n1stMost3dSigTrk;					 
-			      	  n1stMost3dSigTrk=nIP3dsig[ij];					 
-				  
-			      	  n3rdIP3dTrk=n2ndIP3dTrk;						 
-			      	  n2ndIP3dTrk=n1stIP3dTrk;						 
-			      	  n1stIP3dTrk=nIP3d[ij];						 
-			      	}									 
-			      else if (nIP3dsig[ij] < n1stMost3dSigTrk && nIP3dsig[ij]>n2ndMost3dSigTrk) 
-			      	{									 
-			      	  n3rdMost3dSigTrk=n2ndMost3dSigTrk;					 
-			      	  n2ndMost3dSigTrk=nIP3dsig[ij];					 
-			                                                                                 
-			      	  n3rdIP3dTrk=n2ndIP3dTrk;						 
-			      	  n2ndIP3dTrk=nIP3d[ij];						 
-			      	}									 
-			      else if (nIP3dsig[ij] < n2ndMost3dSigTrk && nIP3dsig[ij]>n3rdMost3dSigTrk) 
-			      	{									 
-			      	  n3rdMost3dSigTrk=nIP3dsig[ij];					 
-			                                                                                 
-			      	  n3rdIP3dTrk=nIP3d[ij];						 
-			      	}                                                                        
-			    }//doMostSignificantTracks loop
-			}//doMostSignificanTracks Check
+		      //cout << "it = " << it << endl;
+		      //cout << "trackPosition = " << trackPosition << endl ;
+		      //cout << "counter = " << counter << endl;
+
 		    }//track loop
 		}//doTracks check
+	      
+	      //after we have done the tracks for the jet, NOW organize the tracks into top 3 most significant values
+	      if(doMostSignificantTracks)
+	      	{											
+	      	  if(counter>=3)cout<<"doing Most Significant Tracks"<<endl;						
+	      	  for(int ij =0;ij<counter;ij++)							
+	      	    {											
+	      	      //first 2d values								 	
+	      	      if (nIP2dsig[ij]>=n1stMost2dSigTrk)					 	
+	      	      	{									 	
+	      	      	  n3rdMost2dSigTrk = n2ndMost2dSigTrk;					 	
+	      	      	  n2ndMost2dSigTrk = n1stMost2dSigTrk;					 	
+	      	      	  n1stMost2dSigTrk = nIP2dsig[ij];					 	
+	      		  		     								
+	      	      	  n3rdIP2dTrk      = n2ndIP2dTrk;						
+	      	      	  n2ndIP2dTrk      = n1stIP2dTrk;						
+	      	      	  n1stIP2dTrk      = nIP2d[ij];						 	
+	      	      	}									 	
+	      	      else if (nIP2dsig[ij] <= n1stMost2dSigTrk && nIP2dsig[ij]>=n2ndMost2dSigTrk) 	
+	      	      	{									 	
+	      	      	  n3rdMost2dSigTrk=n2ndMost2dSigTrk;					 	
+	      	      	  n2ndMost2dSigTrk=nIP2dsig[ij];					 	
+	      	          										
+	      	      	  n3rdIP2dTrk=n2ndIP2dTrk;						 	
+	      	      	  n2ndIP2dTrk=nIP2d[ij];						 	
+	      	      	}									 	
+	      	      else if (nIP2dsig[ij] <= n2ndMost2dSigTrk && nIP2dsig[ij]>=n3rdMost2dSigTrk) 	
+	      	      	{									 	
+	      	      	  n3rdMost2dSigTrk=nIP2dsig[ij];					 	
+	      	          										
+	      	      	  n3rdIP2dTrk=nIP2d[ij];						 	
+	      	      	}                                                                        	
+	      	      											
+	      	      //now 3d values									
+	      	      if (nIP3dsig[ij]>n1stMost3dSigTrk)					 	
+	      	      	{									 	
+	      	      	  n3rdMost3dSigTrk=n2ndMost3dSigTrk;					 	
+	      	      	  n2ndMost3dSigTrk=n1stMost3dSigTrk;					 	
+	      	      	  n1stMost3dSigTrk=nIP3dsig[ij];					 	
+	      		  										
+	      	      	  n3rdIP3dTrk=n2ndIP3dTrk;						 	
+	      	      	  n2ndIP3dTrk=n1stIP3dTrk;						 	
+	      	      	  n1stIP3dTrk=nIP3d[ij];						 	
+	      	      	}									 	
+	      	      else if (nIP3dsig[ij] < n1stMost3dSigTrk && nIP3dsig[ij]>n2ndMost3dSigTrk) 	
+	      	      	{									 	
+	      	      	  n3rdMost3dSigTrk=n2ndMost3dSigTrk;					 	
+	      	      	  n2ndMost3dSigTrk=nIP3dsig[ij];					 	
+	      	                                                                                 	
+	      	      	  n3rdIP3dTrk=n2ndIP3dTrk;						 	
+	      	      	  n2ndIP3dTrk=nIP3d[ij];						 	
+	      	      	}									 	
+	      	      else if (nIP3dsig[ij] < n2ndMost3dSigTrk && nIP3dsig[ij]>n3rdMost3dSigTrk) 	
+	      	      	{									 	
+	      	      	  n3rdMost3dSigTrk=nIP3dsig[ij];					 	
+	      	                                                                                 	
+	      	      	  n3rdIP3dTrk=nIP3d[ij];						 	
+	      	      	}   										
+	      	      											
+	      	    }//doMostSignificantTracks loop							
+	      	  if(counter>=3){
+		  cout<<"n3rdMost2dSigTrk ="<<n3rdMost2dSigTrk << endl; 				
+	      	  cout<<"n2ndMost2dSigTrk ="<<n2ndMost2dSigTrk << endl; 				
+	      	  cout<<"n1stMost2dSigTrk ="<<n1stMost2dSigTrk << endl; 				
+	      	  cout<<"n3rdIP2dTrk      ="<<n3rdIP2dTrk      << endl; 				
+	      	  cout<<"n2ndIP2dTrk      ="<<n2ndIP2dTrk      << endl; 				
+	      	  cout<<"n1stIP2dTrk      ="<<n1stIP2dTrk      << endl; 				
+	      	  cout<<"n3rdMost3dSigTrk ="<<n3rdMost3dSigTrk << endl; 				
+	      	  cout<<"n2ndMost3dSigTrk ="<<n2ndMost3dSigTrk << endl; 				
+	      	  cout<<"n1stMost3dSigTrk ="<<n1stMost3dSigTrk << endl; 				
+	      	  cout<<"n3rdIP3dTrk      ="<<n3rdIP3dTrk      << endl; 				
+	      	  cout<<"n2ndIP3dTrk      ="<<n2ndIP3dTrk      << endl; 				
+	      	  cout<<"n1stIP3dTrk      ="<<n1stIP3dTrk      << endl; 				
+	                         
+		  }
+	      	}//doMostSignificanTracks Check                                                         
+
 	      newTree.Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
 	    }//jetloop
 	}//eventloop
