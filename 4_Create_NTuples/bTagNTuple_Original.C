@@ -579,7 +579,7 @@ static double MCWeights(double MCPthat)
     {
       if(!initialized) cout << "No weights_file found. Initializing weight function.\n";
       // Add QCD MC files to chain
-      TChain *ch = new TChain("ak3PuPFJetAnalyzer/t");
+      TChain *ch = new TChain("akPu3PFJetAnalyzer/t");
       ifstream inStr(QCDFileList.c_str(), ifstream::in);
       string fileName;
       ofstream weightFile(weights_file.c_str(), ofstream::out);
