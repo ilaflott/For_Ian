@@ -86,10 +86,10 @@ const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_
 
 //Output Files
 const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
-const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_5.22.15debug.root";
-const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/QCD_5.22.15debug.root";
-const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/BJet_halfOfficial_5.22.15debug.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/CJet_halfOfficial_5.22.15debug.root";
+const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_5.29.15.root";
+const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/QCD_5.29.15.root";
+const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/BJet_halfOfficial_5.29.15.root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/CJet_halfOfficial_5.29.15.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -203,18 +203,18 @@ double nDiscr_ssvHighPur;
 int nNIPtrk;
 int nNselIPtrk;
 int nNIP;
-double n1stMost2dSigTrk =-997 ;  
-double n2ndMost2dSigTrk =-998 ;  
-double n3rdMost2dSigTrk =-999 ;  
-double n1stIP2dTrk	 ;  
-double n2ndIP2dTrk	 ;  
-double n3rdIP2dTrk	 ;  
-double n1stMost3dSigTrk =-997 ;  
-double n2ndMost3dSigTrk =-998 ;  
-double n3rdMost3dSigTrk =-999 ;  
-double n1stIP3dTrk       ;  
-double n2ndIP3dTrk       ;  
-double n3rdIP3dTrk       ;     
+double n1stMost2dSigTrk;  
+double n2ndMost2dSigTrk;  
+double n3rdMost2dSigTrk;  
+double n1stIP2dTrk;  
+double n2ndIP2dTrk;  
+double n3rdIP2dTrk;  
+double n1stMost3dSigTrk;  
+double n2ndMost3dSigTrk;  
+double n3rdMost3dSigTrk;  
+double n1stIP3dTrk;  
+double n2ndIP3dTrk;  
+double n3rdIP3dTrk;     
 int nIPJetIndex[10000];
 double nIPPt[10000];
 double nIPProb0[10000];
@@ -320,13 +320,11 @@ int makeNTuple(int type)
       // Process every event
       int nEvents = akPu3->GetEntries();
       cout << nEvents << " events to loop over in " << fileName << endl;
-      //int totNumTracks=0;
+
       //nEvents = 10;/*debug*/
       for (int i=0; i<nEvents; i++) 
 	{
-	  
-	  if (i%10000 == 0 ) cout << "Processing Event " << i << endl;
-	  
+	  if (i%20000 == 0 ) cout << "Processing Event " << i << endl;
 	  akPu3->GetEntry(i);
 
 	  // Event Level Selection
@@ -467,7 +465,7 @@ int makeNTuple(int type)
 	      //after we have done the tracks for the jet, NOW organize the tracks into top 3 most significant values
 	      if(doMostSignificantTracks)
 	      	{											
-	      	  if(counter>=3)cout<<"doing Most Significant Tracks"<<endl;						
+		  //if(counter>=3)cout<<"doing Most Significant Tracks"<<endl;						
 	      	  for(int ij =0;ij<counter;ij++)							
 	      	    {											
 	      	      //first 2d values								 	
@@ -523,23 +521,21 @@ int makeNTuple(int type)
 	      	      	}   										
 	      	      											
 	      	    }//doMostSignificantTracks loop							
-	      	  if(counter>=3){
-		  cout<<"n3rdMost2dSigTrk ="<<n3rdMost2dSigTrk << endl; 				
-	      	  cout<<"n2ndMost2dSigTrk ="<<n2ndMost2dSigTrk << endl; 				
-	      	  cout<<"n1stMost2dSigTrk ="<<n1stMost2dSigTrk << endl; 				
-	      	  cout<<"n3rdIP2dTrk      ="<<n3rdIP2dTrk      << endl; 				
-	      	  cout<<"n2ndIP2dTrk      ="<<n2ndIP2dTrk      << endl; 				
-	      	  cout<<"n1stIP2dTrk      ="<<n1stIP2dTrk      << endl; 				
-	      	  cout<<"n3rdMost3dSigTrk ="<<n3rdMost3dSigTrk << endl; 				
-	      	  cout<<"n2ndMost3dSigTrk ="<<n2ndMost3dSigTrk << endl; 				
-	      	  cout<<"n1stMost3dSigTrk ="<<n1stMost3dSigTrk << endl; 				
-	      	  cout<<"n3rdIP3dTrk      ="<<n3rdIP3dTrk      << endl; 				
-	      	  cout<<"n2ndIP3dTrk      ="<<n2ndIP3dTrk      << endl; 				
-	      	  cout<<"n1stIP3dTrk      ="<<n1stIP3dTrk      << endl; 				
-	                         
-		  }
+	      	  //if(counter>=3){
+		  //cout<<"n3rdMost2dSigTrk ="<<n3rdMost2dSigTrk << endl; 				
+	      	  //cout<<"n2ndMost2dSigTrk ="<<n2ndMost2dSigTrk << endl; 				
+	      	  //cout<<"n1stMost2dSigTrk ="<<n1stMost2dSigTrk << endl; 				
+	      	  //cout<<"n3rdIP2dTrk      ="<<n3rdIP2dTrk      << endl; 				
+	      	  //cout<<"n2ndIP2dTrk      ="<<n2ndIP2dTrk      << endl; 				
+	      	  //cout<<"n1stIP2dTrk      ="<<n1stIP2dTrk      << endl; 				
+	      	  //cout<<"n3rdMost3dSigTrk ="<<n3rdMost3dSigTrk << endl; 				
+	      	  //cout<<"n2ndMost3dSigTrk ="<<n2ndMost3dSigTrk << endl; 				
+	      	  //cout<<"n1stMost3dSigTrk ="<<n1stMost3dSigTrk << endl; 				
+	      	  //cout<<"n3rdIP3dTrk      ="<<n3rdIP3dTrk      << endl; 				
+	      	  //cout<<"n2ndIP3dTrk      ="<<n2ndIP3dTrk      << endl; 				
+	      	  //cout<<"n1stIP3dTrk      ="<<n1stIP3dTrk      << endl; 					                         
+		  //}
 	      	}//doMostSignificanTracks Check                                                         
-
 	      newTree.Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
 	    }//jetloop
 	}//eventloop
@@ -942,9 +938,9 @@ static inline void branchAddresses(TTree *akPu3)
   return;
 }
 
-int impactParameterExploration(int argument)
+int impactParameterExploration()
 {
-  double paranoiaCheck=0;
+  //double paranoiaCheck=0;
   string fileName;
   ifstream fileStream(fileList.c_str(), ifstream::in);
   fileStream >> fileName;
@@ -967,7 +963,7 @@ int impactParameterExploration(int argument)
   for (int i=0; i<nEvents; i++) 
 	{
 	  akPu3->GetEntry(i);
-	  int trackPosition=0;
+	  //	  int trackPosition=0;
 	  //Jet Processing	  
 	  for (int j=0; j<nref; j++) 
 	    {

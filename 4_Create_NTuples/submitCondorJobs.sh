@@ -1,5 +1,7 @@
 #!/bin/sh
-
+NAME=run_bTagNTuple
+now="${NAME}_$(date +"%m.%d.%Y_T_%H.%M")"
+mkdir $now
 #export X509_USER_PROXY=/net/hisrv0001/home/rkunnawa/myproxy/
 joblist=runTheseCondorJobs.list
 nJobs=`wc -l < $joblist`
@@ -14,7 +16,7 @@ source /osg/app/cmssoft/cms/cmsset_default.sh
 cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20/src/
 eval `scramv1 runtime -sh`
 declare \$( printenv | grep export/d00 | sed 's/export\/d00/cvmfs\/cvmfs.cmsaf.mit.edu\/hidsk0001/g' )
-cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20/src/For_Ian/4_Create_NTuples/
+cd /cvmfs/cvmfs.cmsaf.mit.edu/hidsk0001/higroup/ilaflott/Leos_Analysis/CMSSW_5_3_20/src/For_Ian/4_Create_NTuples
 echo "Processing..."
 $LINE
 echo "Done!"
@@ -28,9 +30,9 @@ Initialdir     = $PWD/
 Executable     = $PWD/runfile_$counter
 +AccountingGroup = "group_cmshi.ilaflott"
 #Input          = /dev/null
-Error          = /net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/condor_$counter.stderr
-Output         = /net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/condor_$counter.output
-Log            = /net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/condor_$counter.log
+Error          = $PWD/$now/condor_$counter.stderr
+Output         = $PWD/$now/condor_$counter.output
+Log            = $PWD/$now/condor_$counter.log
 GetEnv         = True
 # prefer to run on fast computers
 Rank           = kflops
