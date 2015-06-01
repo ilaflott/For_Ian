@@ -352,8 +352,8 @@ int makeNTuple(int type)
 		{
 		case 0: break;//no particle level selection for data
 		case 1: break;//want all parton flavors from QCD file
-		case 2:  if (fabs(refparton_flavorForB[j])!=5) continue; break;//want only bs from b file
-		case 3:  if (fabs(refparton_flavorForB[j])!=4) continue; break;//want only cs from c file
+		case 2:  if (abs(refparton_flavorForB[j])!=5) continue; break;//want only bs from b file
+		case 3:  if (abs(refparton_flavorForB[j])!=4) continue; break;//want only cs from c file
 		}
 	      
 	      ////jet level selection, might never apply it at this level...
