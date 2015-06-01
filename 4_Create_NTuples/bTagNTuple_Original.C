@@ -45,7 +45,7 @@ static double MCWeights(double pthat);
 static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
-int impactParameterExploration(int type);
+//int impactParameterExploration(int type);
 //int mergeMCSamples();
 //int calculateWeights(int type);
 //int forestStatistics(int type);
@@ -89,7 +89,7 @@ const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_f
 const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_5.29.15_akJetBugFixed.root";
 const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/QCD_5.29.15_akJetBugFixed.root";
 const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/BJet_halfOfficial_5.29.15_akJetBugFixed.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/CJet_halfOfficial_5.29.15_akJetBugFixedh.root";
+const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/CJet_halfOfficial_5.29.15_akJetBugFixed.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -267,7 +267,7 @@ int bTagNTuple_Original(int type)
     }
 
   if(type<4)result = makeNTuple(type);
-  else result=impactParameterExploration(type);
+  //else result=impactParameterExploration(type);
 	 
   return result;
 }
@@ -938,51 +938,51 @@ static inline void branchAddresses(TTree *akPu3)
   return;
 }
 
-int impactParameterExploration()
-{
-  //double paranoiaCheck=0;
-  string fileName;
-  ifstream fileStream(fileList.c_str(), ifstream::in);
-  fileStream >> fileName;
-  
-  TFile *file = TFile::Open(fileName.c_str());//grab a single file, doesn't matter which one
-  cout << "Opening Trees..." << endl;
-  TTree *akPu3 = (TTree *)file->Get("akPu3PFJetAnalyzer/t");
-  //akPu3->AddFriend("hlt=hltanalysis/HltTree");
-  akPu3->AddFriend("hiEvt=hiEvtAnalyzer/HiTree");
-  akPu3->AddFriend("skim=skimanalysis/HltTree");
-  akPu3->AddFriend("trk=ppTrack/trackTree"); 
-  
-  branchAddresses(akPu3);
-  
-  // Process every event
-  int nEvents = akPu3->GetEntries();
-  cout << nEvents << " events to loop over in " << fileName << endl;
-  //int totNumTracks=0;
-  //nEvents = 10000;/*debug*/
-  for (int i=0; i<nEvents; i++) 
-	{
-	  akPu3->GetEntry(i);
-	  //	  int trackPosition=0;
-	  //Jet Processing	  
-	  for (int j=0; j<nref; j++) 
-	    {
-	      if (nsvtx[j]>1)cout << "nsvtx=" << nsvtx[j]<<endl;
-	      //trackPosition+=nselIPtrk[j];
-	      //
-	      //for(int it = trackPosition-nselIPtrk[j];it<trackPosition;it++)
-	      //	{
-	      //	  //paranoiaCheck=trkDxy1[it]*trkDxy1[it] + trkDz1[it]*trkDz1[it];
-	      //	  //cout<<"trkDxy^2 + trkDz^2 = "<<paranoiaCheck<<endl;
-	      //	  //cout << "ip3d^2=" << ip3d[it]*ip3d[it]<<endl;
-	      //	  //cout << "ip2d=" << ip2d[it]<<endl;
-	      //	  
-	      //	  //cout << "trkDz1="<<trkDz1[it]<<endl;
-	      //}//trackloop
-	    }//jetloop
-	}//event loop
-  return 0;
-}
+//int impactParameterExploration()
+//{
+//  //double paranoiaCheck=0;
+//  string fileName;
+//  ifstream fileStream(fileList.c_str(), ifstream::in);
+//  fileStream >> fileName;
+//  
+//  TFile *file = TFile::Open(fileName.c_str());//grab a single file, doesn't matter which one
+//  cout << "Opening Trees..." << endl;
+//  TTree *akPu3 = (TTree *)file->Get("akPu3PFJetAnalyzer/t");
+//  //akPu3->AddFriend("hlt=hltanalysis/HltTree");
+//  akPu3->AddFriend("hiEvt=hiEvtAnalyzer/HiTree");
+//  akPu3->AddFriend("skim=skimanalysis/HltTree");
+//  akPu3->AddFriend("trk=ppTrack/trackTree"); 
+//  
+//  branchAddresses(akPu3);
+//  
+//  // Process every event
+//  int nEvents = akPu3->GetEntries();
+//  cout << nEvents << " events to loop over in " << fileName << endl;
+//  //int totNumTracks=0;
+//  //nEvents = 10000;/*debug*/
+//  for (int i=0; i<nEvents; i++) 
+//	{
+//	  akPu3->GetEntry(i);
+//	  //	  int trackPosition=0;
+//	  //Jet Processing	  
+//	  for (int j=0; j<nref; j++) 
+//	    {
+//	      if (nsvtx[j]>1)cout << "nsvtx=" << nsvtx[j]<<endl;
+//	      //trackPosition+=nselIPtrk[j];
+//	      //
+//	      //for(int it = trackPosition-nselIPtrk[j];it<trackPosition;it++)
+//	      //	{
+//	      //	  //paranoiaCheck=trkDxy1[it]*trkDxy1[it] + trkDz1[it]*trkDz1[it];
+//	      //	  //cout<<"trkDxy^2 + trkDz^2 = "<<paranoiaCheck<<endl;
+//	      //	  //cout << "ip3d^2=" << ip3d[it]*ip3d[it]<<endl;
+//	      //	  //cout << "ip2d=" << ip2d[it]<<endl;
+//	      //	  
+//	      //	  //cout << "trkDz1="<<trkDz1[it]<<endl;
+//	      //}//trackloop
+//	    }//jetloop
+//	}//event loop
+//  return 0;
+//}
 
 //Leo's Old Notes about Jet Reweighting
 /* 
