@@ -45,7 +45,7 @@ static double MCWeights(double pthat);
 static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
-//int impactParameterExploration(int type);
+int impactParameterExploration(int type);
 //int mergeMCSamples();
 //int calculateWeights(int type);
 //int forestStatistics(int type);
@@ -256,19 +256,16 @@ int bTagNTuple_Original(int type)
 {
   switch (type) 
     {
-    case 0: fileList = dataFileList ; printf("\n you chose data"); weights_file = dataWeightsFile ; break ;
-    case 1: fileList = QCDFileList  ; printf("\n you chose QCD") ; weights_file = QCDWeightsFile  ; break ;
-    case 2: fileList = BJetFileList ; printf("\n you chose BJets"); weights_file = BJetWeightsFile ; break ;
-    case 3: fileList = CJetFileList ; printf("\n you chose CJets"); weights_file = CJetWeightsFile ; break ;
-    case 4: fileList = QCDFileList;break;//other function
+    case 0: fileList = dataFileList ; printf("\n you chose data") ; weights_file = dataWeightsFile ; result = makeNTuple(type); break ;
+    case 1: fileList = QCDFileList  ; printf("\n you chose QCD")  ; weights_file = QCDWeightsFile  ; result = makeNTuple(type); break ;
+    case 2: fileList = BJetFileList ; printf("\n you chose BJets"); weights_file = BJetWeightsFile ; result = makeNTuple(type); break ;
+    case 3: fileList = CJetFileList ; printf("\n you chose CJets"); weights_file = CJetWeightsFile ; result = makeNTuple(type); break ;
+    case 4: fileList = QCDFileList; result = impactParameterExploration(type) ;  break;//other function
     default:
       cerr << "Type must be from {0,1,2,3}" << endl;
       return -1;
     }
 
-  if(type<4)result = makeNTuple(type);
-  //else result=impactParameterExploration(type);
-	 
   return result;
 }
 
@@ -938,8 +935,8 @@ static inline void branchAddresses(TTree *akPu3)
   return;
 }
 
-//int impactParameterExploration()
-//{
+int impactParameterExploration(int type)
+{
 //  //double paranoiaCheck=0;
 //  string fileName;
 //  ifstream fileStream(fileList.c_str(), ifstream::in);
@@ -981,8 +978,9 @@ static inline void branchAddresses(TTree *akPu3)
 //	      //}//trackloop
 //	    }//jetloop
 //	}//event loop
-//  return 0;
-//}
+  cout << "helloworld!"<<endl;
+  return 0;
+}
 
 //Leo's Old Notes about Jet Reweighting
 /* 

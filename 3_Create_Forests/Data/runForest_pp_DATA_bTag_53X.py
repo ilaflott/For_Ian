@@ -16,12 +16,13 @@ process.options = cms.untracked.PSet(
 
 process.load("HeavyIonsAnalysis.JetAnalysis.HiForest_cff")
 process.HiForest.inputLines = cms.vstring("HiForest V3",)
-import subprocess
-version = subprocess.Popen(["(cd $CMSSW_BASE/src && git describe --tags)"], stdout=subprocess.PIPE, shell=True).stdout.read()
-if version == '':
-    version = 'no git info'
+#import subprocess
+#version = subprocess.Popen(["(cd $CMSSW_BASE/src && git describe --tags)"], stdout=subprocess.PIPE, shell=True).stdout.read()
+#if version == '':
+version = 'no git info'
 process.HiForest.HiForestVersion = cms.untracked.string(version)
 
+#
 #####################################################################################
 # Input source
 #####################################################################################
@@ -31,13 +32,13 @@ process.source = cms.Source("PoolSource",
                             #fileNames = cms.untracked.vstring(
                             #    "file:/afs/cern.ch/work/r/richard/pp-Data-RECO.root"
                             #)
-                            fileNames = cms.untracked.vstring('root://xrootd.unl.edu//store/data/Run2013A/PPJet/RECO/PromptReco-v1/000/211/693/00000/E217D7AB-9775-E211-BCE7-003048F1110E.root')
+                            fileNames = cms.untracked.vstring('root://xrootd.unl.edu//store/data/Run2013A/PPMuon/RECO/PromptReco-v1/000/211/822/00000/7497187E-F777-E211-AF1E-003048D2BC38.root')
                             #fileNames = cms.untracked.vstring('file:/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/3_Create_Forests/Data/F00776F3-3075-E211-AD4E-0025901D5E10.root')
 )
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10))
+    input = cms.untracked.int32(1000))
 
 #####################################################################################
 # Load Global Tag, Geometry, etc.

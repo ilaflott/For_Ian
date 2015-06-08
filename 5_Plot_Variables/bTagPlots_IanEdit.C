@@ -34,13 +34,13 @@ const float int_lumi = 4209000000;//inverse millibarns of data. according to lum
 const char *data_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/";
 const char *MC_file_path   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
 const char* QCD_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/";
-const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/5.22.15_muTagbJetRpA_pp_QAplots/";
-const char *pdf_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/5.22.15_muTagbJetRpA_pp_QAplots/";
+const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
+const char *pdf_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
 
 //filenames
-const char *data_file_name = "data_5.22.15";
-const char *MC_file_name   = "MC_HFaugmented_halfOfficial_5.22.15";
-const char* QCD_file_name  = "QCD_5.22.15";
+const char *data_file_name = "data_6.1.15";
+const char *MC_file_name   = "MC_HFaugmented_halfOfficial_6.1.15";
+const char* QCD_file_name  = "QCD_6.1.15";
 const char *hist_file_name = "bTagPlots_pp";
 
 //plot formatting parameters
@@ -52,19 +52,19 @@ const char *leg_label[]  = { "Data pp", "MC", "b", "c", "udsg" };
 const char *y_label   = "xsec (mb)";
 const char *x_label[] =
   {
-    "jtpt (GeV)",    "jteta",  "jtphi (rad)",         
-    "mupt (Gev)", "muptrel (GeV)",    "muphi (rad)",   "mudr", "mueta",
-    "discr_ssvHighEff", "discr_ssvHighPur",
-    "nsvtx", "svtxntrk", "svtxdl (cm)",  "svtxdls",
-    "ip2d (cm)","2dIP Sig","ip3d (cm)","3D IP Sig","deltaRtrk2Jet",
-    "IP2dSig 1st Trk"  ,  "IP2dSig 2nd Trk"  , "IP2dSig 3rd Trk"  ,
-    "IP2d 1st Trk (cm)",  "IP2d 2nd Trk (cm)", "IP2d 3rd Trk (cm)",
-    "IP3dSig 1st Trk"  ,  "IP3dSig 2nd Trk"  , "IP3dSig 3rd Trk"  ,
-    "IP3d 1st Trk (cm)",  "IP3d 2nd Trk (cm)", "IP3d 3rd Trk (cm)"
+    "jtpt (GeV)" , "jteta" , "jtphi (rad)" ,         
+    "mupt (Gev)" , "muptrel (GeV)" , "mueta" , "muphi (rad)" , "mudr" , 
+    "discr_ssvHighEff" , "discr_ssvHighPur" ,
+    "nsvtx" , "svtxntrk" , "svtxdl (cm)" , "svtxdls" ,
+    "IP2d (cm)" , "IP2sSig" , "IP3d (cm)" , "IP3dSig" , "deltaRtrk2Jet",
+    "IP2dSig 1st Trk"   ,  "IP2dSig 2nd Trk"   , "IP2dSig 3rd Trk"   ,
+    "IP2d 1st Trk (cm)" ,  "IP2d 2nd Trk (cm)" , "IP2d 3rd Trk (cm)" ,
+    "IP3dSig 1st Trk"   ,  "IP3dSig 2nd Trk"   , "IP3dSig 3rd Trk"   ,
+    "IP3d 1st Trk (cm)" ,  "IP3d 2nd Trk (cm)" , "IP3d 3rd Trk (cm)" 
   };
 
 //n_vars parameters
-const int n_vars_low   = 15 ;//starting variable for formatting
+const int n_vars_low   = 0  ;//starting variable for formatting
 const int n_vars_high  = 30 ;//ending variable for formatting
 const int n_vars       = (n_vars_high - n_vars_low) + 1;//for formatting plots, reflects total number of plots being formatted
 const int n_vars_TOTAL = 31;//for making plots, always make plots of all variables
@@ -137,14 +137,14 @@ const bool  doLogy[] =
     1, 1, 1, 0, 1,  		//muons, vars 3-7			  
     1, 1, 			//discriminators, 8-9		  
     1, 1, 1, 1, 		//secondary vertex, vars 10-14	  
-    0, 0, 0, 0, 1,		//impact parameters+deltaR, vars 15-19 
+    1,1,1,1, 1,		//impact parameters+deltaR, vars 15-19 
     1, 1, 1,			//most significant tracks, vars 20-31  
     1, 1, 1,
     1, 1, 1,
     1, 1, 1
   };
 
-const char *default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.5";
+const char *default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.0";
 const char *default_version ="default_Cuts";
 
 //MAIN FUNCTIONS
@@ -156,7 +156,6 @@ const char *default_version ="default_Cuts";
 //be taken in as an input value to cutsVersion, even if what you really wanted to change is the cuts 
 void bTagPlots_IanEdit( int option = 1 ,const char* cutsVersion = default_version, const char* cuts = default_cut , int stackOption = 1)
 {
-  
   printf("\nYour cuts are:\n %s\n",cuts);
   printf("\nYour version is:\n %s\n",cutsVersion);
   
@@ -246,6 +245,7 @@ void makePlots(const char* cuts, const char* outputFile)
 	      QCD_tree->Draw(Form("%s>>QCDhist_%d_%d",var[i_var],i_var,i_type), Form("weight*(%s&&%s)", particle_cut[i_type],cuts), "goff");
 	      QCD_HFintegral = QCDhist[i_var][i_type]->Integral();
 	      delete QCDhist[i_var][i_type];//gotta clean up, lest there exist memory leaks
+
 	      double HFscale_factor = QCD_HFintegral/integrals[i_var][i_type];
 	      printf("QCD HF Integral for i_type == %d is %f\n", i_type, QCD_HFintegral);
 	      printf("HF Scale factor is: %f\n",HFscale_factor);
@@ -370,11 +370,9 @@ static void formatPlots(const char* input_file_name, int stackOption)
 	  //hist[i_var][i_type]->GetYaxis()->SetRangeUser(1,highY[i_var]);
 	  
 	  if (!doLogy[i_var]) hist[i_var][i_type]->SetMinimum(0);
-
-	  if (i_type>=2&&stackOption==1) 
-	    {
-	      stacked_hist[i_var]->Add(hist[i_var][i_type]);
-	    }
+	  
+	  if (i_type>=2&&stackOption==1) stacked_hist[i_var]->Add(hist[i_var][i_type]);
+	    
 	}
       
       canv[i_var]->cd(1);
