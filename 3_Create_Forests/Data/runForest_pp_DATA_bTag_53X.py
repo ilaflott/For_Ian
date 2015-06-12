@@ -242,6 +242,7 @@ process.ppTrack.doSimTrack = False
 
 #####################
 # photons
+#####################
 process.load('HeavyIonsAnalysis.JetAnalysis.EGammaAnalyzers_cff')
 process.photonStep.remove(process.photonMatch)
 process.hiGoodTracks.src = cms.InputTag("generalTracks")
