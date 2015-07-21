@@ -63,8 +63,8 @@ int impactParameterExploration(int type);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Switches
-const bool doTracks=false;
-const bool doMostSignificantTracks=false;
+const bool doTracks=true;
+const bool doMostSignificantTracks=true;
 
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // Macro settings/constants
@@ -263,7 +263,7 @@ double nTrkDz[10000];
 int nIpNHitPixel[10000];
 int nIpNHitStrip[10000];
 
-double nDeltaRtrk2Jet[10000];
+//double nDeltaRtrk2Jet[10000];
 int    nNsvtx;
 int    nSvtxntrk;
 double nSvtxdl;
@@ -275,6 +275,10 @@ double nSvtxpt;
 double nSvtxXPos;
 double nSvtxYPos;
 double nSvtxZPos;
+double nSvtxEta;
+double nSvtxPhi;
+double nSvtxDeltaEta;
+double nSvtxDeltaPhi;
 double nDiscr_ssvHighEff;
 double nDiscr_ssvHighPur;
 
@@ -338,8 +342,8 @@ int makeNTuple(int type)
   int file_number = 0;
   // For every file in file list, process trees
   cout << "beginning file loop" << endl;
-  //  for(int kkk = 0 ; kkk < 50 ; kkk++)
-  while (!fileStream.eof()) 
+  for(int kkk = 0 ; kkk < 50 ; kkk++)
+    //while (!fileStream.eof()) 
     {
       // Open input file
       file_number++;
@@ -436,6 +440,19 @@ int makeNTuple(int type)
 	      nSvtxYPos = svtxYPos[j];
 	      nSvtxZPos = svtxZPos[j];
 
+	      //compute secondary vertex eta, phi + deltaR to Jet
+	      nSvtxeta = -log(tan((1/2)*acos(nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos))));
+
+	      nSvtxphi = acos(nSvtxXPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos));
+	      if(nSvtxYPos<0) nSvtxphi = -nSvtxphi;
+
+	      nDeltaPhiSvtx = jtphi[j]-nSvtxphi;
+	      if(fabs(deltaPhSvtxi)>pi) deltaPhiSvtx = 2*pi-fabs(deltaPhiSvtx);
+	      else deltaPhiSvtx = fabs(deltaPhiSvtx);
+	      
+	      nDeltaEtaSvtx = jteta[j]-nSvtxeta;
+	      nSvtxDeltaR2Jet = sqrt(nDeltaEtaSvtx*nDeltaEtaSvtx+nDeltaPhiSvtx*nDeltaPhiSvtx);
+
 	      //discriminator values
 	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
 	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
@@ -462,8 +479,8 @@ int makeNTuple(int type)
 		    {
 		      //basic track selection
 		      //perhaps pixel/tracker hit selection was done at RECO step?
-		      if( abs(trkDz1[it]) > 0.02   || 
-			  abs(trkDxy1[it]) > 17    || 
+		      if( abs(trkDz1[it]) > 17     || 
+			  abs(trkDxy1[it]) > 0.02  || 
 			  trkPt[it] < 1            || 
 			  trkChi2[it] > 5          ||
 			  ipDist2Jet[it] < -0.07   || //shortest distance between track and jet axis
@@ -473,14 +490,14 @@ int makeNTuple(int type)
 			  ) continue;
 		      
 		      //"phi matching"
-		      float deltaPhi = jtphi[j] - trkPhi[it];
-		      if(fabs(deltaPhi)>pi)deltaPhi=2*pi-fabs(deltaPhi);
-		      else deltaPhi=fabs(deltaPhi);
+		      nDeltaPhi[counter] = jtphi[j] - trkPhi[it] ;
+		      if( fabs(nDeltaPhi[counter])>pi ) nDeltaPhi[counter] = 2*pi-fabs(nDeltaPhi[counter]) ;
+		      else nDeltaPhi[counter] = fabs(nDeltaPhi[counter]) ;
 		      
 		      //deltaRcut
-		      float deltaEta = jteta[j] - trkEta[it];
-		      deltaRtrk2Jet[it]=sqrt(deltaPhi*deltaPhi+deltaEta*deltaEta); 
-		      if(deltaRtrk2Jet[it]>0.3)continue;
+		      nDeltaEta[counter] = jteta[j] - trkEta[it];
+		      nDeltaRtrk2Jet[counter]=sqrt(nDeltaPhi[counter]*nDeltaPhi[counter]+nDeltaEta[counter]*nDeltaEta[counter]); 
+		      if(nDeltaRtrk2Jet[counter]>0.3)continue;
 		      
 		      nIPJetIndex[counter]    = ipJetIndex[it];//this number reflects the index of the jet that the ip belongs to
 		      nIPPt[counter]          = ipPt[it];
@@ -503,7 +520,7 @@ int makeNTuple(int type)
 		      //		      cout << ipNHitPixel[it] << endl;
 		      nIpNHitStrip[counter]   = ipNHitStrip[it];
 		      //		      cout << ipNHitStrip[it] << endl;
-		      nDeltaRtrk2Jet[counter] = deltaRtrk2Jet[it];
+		      //		      nDeltaRtrk2Jet[counter] = deltaRtrk2Jet[it];
 		      
 		      counter++;
 		      
@@ -573,22 +590,9 @@ int makeNTuple(int type)
 	      	      	}   										
 	      	      											
 	      	    }//doMostSignificantTracks loop							
-	      	  //if(counter>=3){
-		  //cout<<"n3rdMost2dSigTrk ="<<n3rdMost2dSigTrk << endl; 				
-	      	  //cout<<"n2ndMost2dSigTrk ="<<n2ndMost2dSigTrk << endl; 				
-	      	  //cout<<"n1stMost2dSigTrk ="<<n1stMost2dSigTrk << endl; 				
-	      	  //cout<<"n3rdIP2dTrk      ="<<n3rdIP2dTrk      << endl; 				
-	      	  //cout<<"n2ndIP2dTrk      ="<<n2ndIP2dTrk      << endl; 				
-	      	  //cout<<"n1stIP2dTrk      ="<<n1stIP2dTrk      << endl; 				
-	      	  //cout<<"n3rdMost3dSigTrk ="<<n3rdMost3dSigTrk << endl; 				
-	      	  //cout<<"n2ndMost3dSigTrk ="<<n2ndMost3dSigTrk << endl; 				
-	      	  //cout<<"n1stMost3dSigTrk ="<<n1stMost3dSigTrk << endl; 				
-	      	  //cout<<"n3rdIP3dTrk      ="<<n3rdIP3dTrk      << endl; 				
-	      	  //cout<<"n2ndIP3dTrk      ="<<n2ndIP3dTrk      << endl; 				
-	      	  //cout<<"n1stIP3dTrk      ="<<n1stIP3dTrk      << endl; 					                         
-		  //}
 	      	}//doMostSignificanTracks Check                                                         
 	      newTree.Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
+	                     //may be problematic for vz weighting
 	    }//jetloop
 	}//eventloop
       
@@ -638,11 +642,13 @@ static double MCWeights(double MCPthat)
       ofstream weightFile(weights_file.c_str(), ofstream::out);
 
       inStr >> fileName;
+      int hahaha=0;//another file count variable, I'm running out of names
       while (!inStr.eof()) 
 	{
           ch->Add(fileName.c_str());
-          cout << "Added " << fileName << " to chain." << endl;
+          if (hahaha%1000==0)cout << "Added " << fileName << " to chain." << endl;
 	  inStr >> fileName;
+	  hahaha++;
 	}
       cout << "Done adding files to chain." << endl;
       
@@ -757,12 +763,14 @@ static void heavyJetWeights(double *pthatEntries)
   string QCDFileName;
   
   QCDInStr >> QCDFileName;
+  int file4weights_count=0;
   while  (!QCDInStr.eof()) 
     {
       QCDCh->Add(QCDFileName.c_str());
       QCDCh_hiEvt->Add(QCDFileName.c_str());
-      cout << "Added " << QCDFileName << " to chain." << endl;
+      if(file4weights_count%1000==0)cout << "Added " << QCDFileName << " to chain." << endl;
       QCDInStr >> QCDFileName;
+      file4weights_count++;
     }
   QCDCh->AddFriend(QCDCh_hiEvt);
   
@@ -865,7 +873,12 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");
   newTree->Branch("svtxm", &nSvtxm, "svtxm/D");
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");
-  
+  newTree->Branch("svtxeta", &nSvtxeta, "svtxeta/D");
+  newTree->Branch("svtxphi", &nSvtxphi, "svtxphi/D");
+  newTree->Branch("svtxDeltaR2Jet", &nSvtxDeltaR2Jet, "svtxDeltaR2Jet/D");
+  newTree->Branch("svtxDeltaPhi2Jet", &nSvtxDeltaPhi, "svtxDeltaPhi2Jet/D");
+  newTree->Branch("svtxDeltaEta2Jet", &nSvtxDeltaEta, "svtxDeltaEta2Jet/D");
+
   //tracks
   newTree->Branch("trackMax", &nTrackMax, "trackMax/D");
   newTree->Branch("nIPtrk" ,&nNIPtrk  , "nIPtrk/I");
@@ -895,6 +908,8 @@ static inline void newBranches(TTree *newTree)
       newTree->Branch( "trkDz1"  , &nTrkDz  , "trkDz1[nIP]/D"  );
       newTree->Branch( "trkDxy1" , &nTrkDz  , "trkDxy1[nIP]/D" );
       newTree->Branch( "deltaRtrk2Jet" , &nDeltaRtrk2Jet  , "deltaRtrk2Jet[nIP]/D" );
+      newTree->Branch( "deltaPhitrk2Jet" , &nDeltaPhi  , "deltaPhitrk2Jet[nIP]/D" );
+      newTree->Branch( "deltaEtatrk2Jet" , &nDeltaEta  , "deltaEtatrk2Jet[nIP]/D" );
 
       if(doMostSignificantTracks)
 	{
