@@ -63,8 +63,8 @@ int impactParameterExploration(int type);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Switches
-const bool doTracks=true;
-const bool doMostSignificantTracks=true;
+const bool doTracks=false;
+const bool doMostSignificantTracks=false;
 
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // Macro settings/constants
@@ -72,8 +72,8 @@ const double pi = 3.141592653589793238462643383279502884197169399375105820974944
 const string fileListPath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
 const string QCDFileList  = "QCDJets_filelist.txt";
-const string BJetFileList = "";
-const string CJetFileList = "";
+const string BJetFileList = "BJets_filelist.txt";
+const string CJetFileList = "CJets_filelist.txt";
 
 //Weight Files
 const string weightFilePath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/weights/";
@@ -85,10 +85,14 @@ const string CJetWeightsFile = "CJets.txt";
 
 //Output Files
 const string outFilePath = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
-const char* dataOutFile   = "data_NTuple.root";
-const char* QCDOutFile    = "QCDJets_NTuple.root";
-const char* BJetOutFile   = "BJets_NTuples.root";
-const char* CJetOutFile   = "CJets_NTuple.root";
+const string dataOutFile   = "data_NTuple_TEST.root";
+const string QCDOutFile    = "QCDJets_NTuple_TEST.root";
+const string BJetOutFile   = "BJets_NTuples_TEST.root";
+const string CJetOutFile   = "CJets_NTuple_TEST.root";
+//const char* dataOutFile   = "data_NTuple_TEST.root";
+//const char* QCDOutFile    = "QCDJets_NTuple.root";
+//const char* BJetOutFile   = "BJets_NTuples.root";
+//const char* CJetOutFile   = "CJets_NTuple.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -292,10 +296,10 @@ int bTagNTuple_Original(int type)
 {
   switch (type) 
     {
-    case 0: fileList = fileListPath + dataFileList ; printf("\n you chose data") ; weights_file = weightFilePath + dataWeightsFile ; result = makeNTuple(type); break ;
-    case 1: fileList = fileListPath + QCDFileList  ; printf("\n you chose QCD")  ; weights_file = weightFilePath + QCDWeightsFile  ; result = makeNTuple(type); break ;
-    case 2: fileList = fileListPath + BJetFileList ; printf("\n you chose BJets"); weights_file = weightFilePath + BJetWeightsFile ; result = makeNTuple(type); break ;
-    case 3: fileList = fileListPath + CJetFileList ; printf("\n you chose CJets"); weights_file = weightFilePath + CJetWeightsFile ; result = makeNTuple(type); break ;
+    case 0: fileList = fileListPath + dataFileList ; printf("\n you chose data\n") ; weights_file = weightFilePath + dataWeightsFile ; result = makeNTuple(type); break ;
+    case 1: fileList = fileListPath + QCDFileList  ; printf("\n you chose QCD\n")  ; weights_file = weightFilePath + QCDWeightsFile  ; result = makeNTuple(type); break ;
+    case 2: fileList = fileListPath + BJetFileList ; printf("\n you chose BJets\n"); weights_file = weightFilePath + BJetWeightsFile ; result = makeNTuple(type); break ;
+    case 3: fileList = fileListPath + CJetFileList ; printf("\n you chose CJets\n"); weights_file = weightFilePath + CJetWeightsFile ; result = makeNTuple(type); break ;
     case 4: fileList = fileListPath + QCDFileList; result = impactParameterExploration(type) ;  break;//other function
     default:
       cerr << "Type must be from {0,1,2,3}" << endl;
@@ -316,10 +320,10 @@ int makeNTuple(int type)
   string outFileName;
   switch (dataType) 
     {
-    case 0: outFileName = outFilePath + outputFilePath ; outFile = new TFile( Form("%s",outFileName) , "RECREATE" ); break;
-    case 1: outFileName = outFilePath + outputFilePath ; outFile = new TFile( Form("%s",outFileName) , "RECREATE" ); break;
-    case 2: outFileName = outFilePath + outputFilePath ; outFile = new TFile( Form("%s",outFileName) , "RECREATE" ); break;
-    case 3: outFileName = outFilePath + outputFilePath ; outFile = new TFile( Form("%s",outFileName) , "RECREATE" ); break;
+    case 0: outFileName = outFilePath + dataOutFile ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break;
+    case 1: outFileName = outFilePath + QCDOutFile  ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break;
+    case 2: outFileName = outFilePath + BJetOutFile ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break;
+    case 3: outFileName = outFilePath + CJetOutFile ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
 
@@ -331,17 +335,20 @@ int makeNTuple(int type)
   ifstream fileStream(fileList.c_str(), ifstream::in);
   string fileName;      
   fileStream >> fileName;
-  //int file_number = 0;
+  int file_number = 0;
   // For every file in file list, process trees
-  for(int kkk = 0 ; kkk < 3 ; kkk++)
-  //while (!fileStream.eof()) 
+  cout << "beginning file loop" << endl;
+  //  for(int kkk = 0 ; kkk < 50 ; kkk++)
+  while (!fileStream.eof()) 
     {
       // Open input file
-      printf("\n Opening File: %s \n",fileName.c_str());
+      file_number++;
+      if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;
+
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
       
       // Open trees
-      cout << "Opening Trees..." << endl;
+      if(file_number%100==0 )cout << "Opening Trees..." << endl;
       TTree *akPu3 = (TTree *)inFile->Get("akPu3PFJetAnalyzer/t");
       akPu3->AddFriend("hlt=hltanalysis/HltTree");
       akPu3->AddFriend("hiEvt=hiEvtAnalyzer/HiTree");
@@ -353,12 +360,12 @@ int makeNTuple(int type)
       
       // Process every event
       int nEvents = akPu3->GetEntries();
-      cout << nEvents << " events to loop over in " << fileName << endl;
+      if(file_number%100==0 )cout << nEvents << " events to loop over in " << fileName << endl;
 
       //nEvents = 10;/*debug*/
       for (int i=0; i<nEvents; i++) 
 	{
-	  if (i%20000 == 0 ) cout << "Processing Event " << i << endl;
+	  if (i%10000 == 0 && i != 0) cout << "Processing Event " << i << endl;
 	  akPu3->GetEntry(i);
 
 	  // Event Level Selection
@@ -493,8 +500,9 @@ int makeNTuple(int type)
 		      nTrkDz[counter]         = trkDz1[it];
 		      nTrkDxy[counter]        = trkDxy1[it];
 		      nIpNHitPixel[counter]   = ipNHitPixel[it];
+		      //		      cout << ipNHitPixel[it] << endl;
 		      nIpNHitStrip[counter]   = ipNHitStrip[it];
-
+		      //		      cout << ipNHitStrip[it] << endl;
 		      nDeltaRtrk2Jet[counter] = deltaRtrk2Jet[it];
 		      
 		      counter++;
@@ -585,7 +593,7 @@ int makeNTuple(int type)
 	}//eventloop
       
       // Cleanup
-      cout << "closing " << fileName << endl;
+      if(file_number%100==0)cout << "closing " << fileName << endl;
       inFile->Close();
 
       fileStream >> fileName;
@@ -614,7 +622,7 @@ static double MCWeights(double MCPthat)
 {
   static bool initialized = false;
   static double *weight;
-  
+  string QCDFileList4Weights = fileListPath + QCDFileList;
   weight = new double[QCDBins+1];
 
   // Calculate the weight for each pthat bin in the QCD MC sample
@@ -624,7 +632,8 @@ static double MCWeights(double MCPthat)
       if(!initialized) cout << "No weights_file found. Initializing weight function.\n";
       // Add QCD MC files to chain
       TChain *ch = new TChain("akPu3PFJetAnalyzer/t");
-      ifstream inStr(QCDFileList.c_str(), ifstream::in);
+      
+      ifstream inStr(QCDFileList4Weights.c_str(), ifstream::in);
       string fileName;
       ofstream weightFile(weights_file.c_str(), ofstream::out);
 
@@ -708,12 +717,12 @@ static void heavyJetWeights(double *pthatEntries)
   
   string HFfileList;
   int heavyFlavor;				 						 
-  
+  string QCDFileList4HFWeights = fileListPath + QCDFileList;
   switch(dataType)
     {
-    case 2: HFfileList=BJetFileList;heavyFlavor=5;break;
-    case 3: HFfileList=CJetFileList;heavyFlavor=4;break;
-    default: heavyFlavor=-1;break;
+    case 2: HFfileList=fileListPath + BJetFileList ; heavyFlavor=5 ; break;
+    case 3: HFfileList=fileListPath + CJetFileList ; heavyFlavor=4 ; break;
+    default: heavyFlavor=-1; break;
     }
   
   ifstream HFInStr(HFfileList.c_str(), ifstream::in);
@@ -744,7 +753,7 @@ static void heavyJetWeights(double *pthatEntries)
   TChain *QCDCh = new TChain("akPu3PFJetAnalyzer/t");
   TChain *QCDCh_hiEvt = new TChain("hiEvtAnalyzer/HiTree");
   
-  ifstream QCDInStr(QCDFileList.c_str(), ifstream::in);
+  ifstream QCDInStr(QCDFileList4HFWeights.c_str(), ifstream::in);
   string QCDFileName;
   
   QCDInStr >> QCDFileName;
@@ -852,6 +861,8 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtxntrk", &nSvtxntrk, "svtxntrk/I");
   newTree->Branch("svtxdl", &nSvtxdl, "svtxdl/D");
   newTree->Branch("svtxdls", &nSvtxdls, "svtxdls/D");
+  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");
+  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");
   newTree->Branch("svtxm", &nSvtxm, "svtxm/D");
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");
   
@@ -873,6 +884,9 @@ static inline void newBranches(TTree *newTree)
       newTree->Branch("ipDist2Jet",&nIPDist2Jet , "ipDist2Jet[nIP]/D");
       //newTree->Branch("ipDist2JetSig",&nIPDist2JetSig , "ipDist2JetSig[nIP]/D");
       newTree->Branch("ipCloset2Jet",&nIPClosest2Jet , "ipClosest2Jet[nIP]/D");
+      newTree->Branch("ipNHitPixel" ,&nIpNHitPixel  , "ipNHitPixel[nIP]/I");
+      newTree->Branch("ipNHitStrip" ,&nIpNHitStrip  , "ipNHitStrip[nIP]/I");
+
       //new track variables from ppTrack tree
       newTree->Branch( "trkChi2" , &nTrkChi2, "trkChi2[nIP]/D" );
       newTree->Branch( "trkPt"   , &nTrkPt  , "trkPt[nIP]/D"   );
@@ -953,14 +967,19 @@ static inline void branchAddresses(TTree *akPu3)
       akPu3->SetBranchAddress("trkPhi" ,&trkPhi );
       akPu3->SetBranchAddress("trkDz1" ,&trkDz1 );
       akPu3->SetBranchAddress("trkDxy1",&trkDxy1);
-      
+      akPu3->SetBranchAddress("ipNHitPixel",&ipNHitPixel);
+      akPu3->SetBranchAddress("ipNHitStrip",&ipNHitStrip);
+
     }
 
   //HLT
-  akPu3->SetBranchAddress("HLT_PAMu3_v1", &HLT_PAMu3_v1);
-  akPu3->SetBranchAddress("HLT_PAMu7_v1", &HLT_PAMu7_v1);
+  akPu3->SetBranchAddress("HLT_PAMu3_v1" , &HLT_PAMu3_v1);
+  akPu3->SetBranchAddress("HLT_PAMu7_v1" , &HLT_PAMu7_v1);
   akPu3->SetBranchAddress("HLT_PAMu12_v1", &HLT_PAMu12_v1);
+  akPu3->SetBranchAddress("HLT_PAMu3PFJet20_v1", &HLT_PAMu3PFJet20_v1);
   akPu3->SetBranchAddress("HLT_PAMu3PFJet40_v1", &HLT_PAMu3PFJet40_v1);
+  akPu3->SetBranchAddress("HLT_PAMu7PFJet20_v1", &HLT_PAMu7PFJet20_v1);
+  akPu3->SetBranchAddress("HLT_PABTagMu_Jet20_Mu4_v1", &HLT_PABTagMu_Jet20_Mu4_v1);
     
   //MUON
   akPu3->SetBranchAddress("mupt"   , &mupt   );
