@@ -63,33 +63,32 @@ int impactParameterExploration(int type);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Switches
-//int dataType = 0;
-string weights_file;
 const bool doTracks=true;
 const bool doMostSignificantTracks=true;
+
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // Macro settings/constants
 //FileLists
 const string fileListPath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
-const string dataFileList = "/afs/cern.ch/user/i/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/ppMuon_data_filelist.txt";
-const string QCDFileList  = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_QCD_filelist.txt";
-const string BJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_BJet_2760GeV_halfOfficial_filelist.txt";
-const string CJetFileList = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/pp_MC_CJet_2760GeV_halfOfficial_filelist.txt";
+const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
+const string QCDFileList  = "QCDJets_filelist.txt";
+const string BJetFileList = "";
+const string CJetFileList = "";
 
 //Weight Files
-const string weightFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/";
+const string weightFilePath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/weights/";
 //the weights only change if i change the event selection, i.e. the weights i've already calculated should be fine for any NTuples i make in the future
-const string dataWeightsFile = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/weights_data.txt";			 
-const string QCDWeightsFile  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/weights_QCD_6.1.15.txt";		 
-const string BJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/weights_BJet_halfOfficial_6.1.15.txt";
-const string CJetWeightsFile = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/weights_CJet_halfOfficial_6.1.15.txt";
+const string dataWeightsFile = "data.txt";
+const string QCDWeightsFile  = "QCDJets.txt";
+const string BJetWeightsFile = "BJets.txt";
+const string CJetWeightsFile = "CJets.txt";
 
 //Output Files
-const string outputFilePath = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples";
-const char* dataOutFile   = "/afs/cern.ch/work/i/ilaflott/bTagNTuples_ppMC_2760GeV/data_6.1.15.root";
-const char* QCDOutFile    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/QCD_6.1.15.root";
-const char* BJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/BJet_halfOfficial_6.1.15.root";
-const char* CJetOutFile   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_halfOfficial/CJet_halfOfficial_6.1.15.root";
+const string outFilePath = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
+const char* dataOutFile   = "data_NTuple.root";
+const char* QCDOutFile    = "QCDJets_NTuple.root";
+const char* BJetOutFile   = "BJets_NTuples.root";
+const char* CJetOutFile   = "CJets_NTuple.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -131,30 +130,47 @@ const double xsection[] =
   }; 
 
 // Data storage variables
-// akPu3PFJetAnalyzer/t
+//JetAnalyzer
 int   nref;
 float rawpt[1000];
 float jtpt[1000];
 float jteta[1000];
 float jtphi[1000];
 float trackMax[1000];
+
 float mupt[1000];
 int   muN[1000];
 float mueta[1000];
 float muphi[1000];
 float mudr[1000];
 float muptrel[1000];
+
 float discr_ssvHighEff[1000];
 float discr_ssvHighPur[1000];
+//float discr_csvMva[1000];
+//float discr_csvSimple[1000];
+//float discr_muByIp3[1000];
+//float discr_muByPt[1000];
+//float discr_prob[1000];
+//float discr_probb[1000];
+//float discr_tcHighEff[1000];
+//float discr_tcHighPur[1000];
+
 int   nsvtx[1000];
 int   svtxntrk[1000];
 float svtxdl[1000];
 float svtxdls[1000];
+float svtx2Ddl[1000];
+float svtx2Ddls[1000];
 float svtxm[1000];
 float svtxpt[1000];
+float svtxXPos[1000];
+float svtxYPos[1000];
+float svtxZPos[1000];
+
+int nIP;//per event
 int nIPtrk[1000];//per jet
 int nselIPtrk[1000];//per jet
-int nIP;//per event
 int ipJetIndex[10000];//per track
 float ipPt[10000];
 float ipProb0[10000];
@@ -166,21 +182,31 @@ float ip3dSig[10000];
 float ipDist2Jet[10000];
 float ipDist2JetSig[10000];
 float ipClosest2Jet[10000];
+int ipNHitPixel[10000];
+int ipNHitStrip[10000];
+
 float trkChi2[10000];
 float trkPt[10000];
 float trkEta[10000];
 float trkPhi[10000];
 float trkDz1[10000];
 float trkDxy1[10000];
-float deltaRtrk2Jet[10000];
-float pthat;                      // MC
-float refpt[1000];                // MC
-int   refparton_flavorForB[1000]; // MC
+
+float deltaRtrk2Jet[10000];//i compute this one
+
+float pthat;                      // MC Only
+float refpt[1000];                // MC Only
+int   refparton_flavorForB[1000]; // MC Only
+
 // hltanalysis/HltTree
 int HLT_PAMu3_v1;
 int HLT_PAMu7_v1;
 int HLT_PAMu12_v1;
+int HLT_PABTagMu_Jet20_Mu4_v1;
+int HLT_PAMu3PFJet20_v1;
 int HLT_PAMu3PFJet40_v1;
+int HLT_PAMu7PFJet20_v1;
+
 // hiEvtAnalyzer/HiTree
 float vz;
 // skimanalysis/HltTree
@@ -198,8 +224,6 @@ double nMuphi;
 int    nMuN;
 double nMudr;
 double nMuptrel;
-double nDiscr_ssvHighEff;
-double nDiscr_ssvHighPur;
 int nNIPtrk;
 int nNselIPtrk;
 int nNIP;
@@ -232,19 +256,31 @@ double nTrkEta[10000];
 double nTrkPhi[10000];
 double nTrkDxy[10000];
 double nTrkDz[10000];
+int nIpNHitPixel[10000];
+int nIpNHitStrip[10000];
+
 double nDeltaRtrk2Jet[10000];
 int    nNsvtx;
 int    nSvtxntrk;
 double nSvtxdl;
 double nSvtxdls;
+double nSvtx2Ddl;
+double nSvtx2Ddls;
 double nSvtxm;
 double nSvtxpt;
-//double nVz; //Event info
-double nVz;
-double nPthat; //MC
-double nRefpt;                // MC
-int    nRefparton_flavorForB; // MC
+double nSvtxXPos;
+double nSvtxYPos;
+double nSvtxZPos;
+double nDiscr_ssvHighEff;
+double nDiscr_ssvHighPur;
+
+double nVz;  //Event Information
+double nPthat;                // MC Only
+double nRefpt;                // MC Only
+int    nRefparton_flavorForB; // MC Only
 double nWeight;
+
+string weights_file;
 string fileList; 
 int result;
 int dataType;
@@ -256,11 +292,11 @@ int bTagNTuple_Original(int type)
 {
   switch (type) 
     {
-    case 0: fileList = dataFileList ; printf("\n you chose data") ; weights_file = dataWeightsFile ; result = makeNTuple(type); break ;
-    case 1: fileList = QCDFileList  ; printf("\n you chose QCD")  ; weights_file = QCDWeightsFile  ; result = makeNTuple(type); break ;
-    case 2: fileList = BJetFileList ; printf("\n you chose BJets"); weights_file = BJetWeightsFile ; result = makeNTuple(type); break ;
-    case 3: fileList = CJetFileList ; printf("\n you chose CJets"); weights_file = CJetWeightsFile ; result = makeNTuple(type); break ;
-    case 4: fileList = QCDFileList; result = impactParameterExploration(type) ;  break;//other function
+    case 0: fileList = fileListPath + dataFileList ; printf("\n you chose data") ; weights_file = weightFilePath + dataWeightsFile ; result = makeNTuple(type); break ;
+    case 1: fileList = fileListPath + QCDFileList  ; printf("\n you chose QCD")  ; weights_file = weightFilePath + QCDWeightsFile  ; result = makeNTuple(type); break ;
+    case 2: fileList = fileListPath + BJetFileList ; printf("\n you chose BJets"); weights_file = weightFilePath + BJetWeightsFile ; result = makeNTuple(type); break ;
+    case 3: fileList = fileListPath + CJetFileList ; printf("\n you chose CJets"); weights_file = weightFilePath + CJetWeightsFile ; result = makeNTuple(type); break ;
+    case 4: fileList = fileListPath + QCDFileList; result = impactParameterExploration(type) ;  break;//other function
     default:
       cerr << "Type must be from {0,1,2,3}" << endl;
       return -1;
@@ -277,13 +313,13 @@ int makeNTuple(int type)
 
   // Initialize output file
   TFile *outFile;
-  //string outFileName;
+  string outFileName;
   switch (dataType) 
     {
-    case 0: ;outFile = new TFile( Form("%s",dataOutFile) , "RECREATE" ); break;
-    case 1: ;outFile = new TFile( Form("%s",QCDOutFile ) , "RECREATE" ); break;
-    case 2: ;outFile = new TFile( Form("%s",BJetOutFile) , "RECREATE" ); break;
-    case 3: ;outFile = new TFile( Form("%s",CJetOutFile) , "RECREATE" ); break;
+    case 0: outFileName = outFilePath + outputFilePath ; outFile = new TFile( Form("%s",outFileName) , "RECREATE" ); break;
+    case 1: outFileName = outFilePath + outputFilePath ; outFile = new TFile( Form("%s",outFileName) , "RECREATE" ); break;
+    case 2: outFileName = outFilePath + outputFilePath ; outFile = new TFile( Form("%s",outFileName) , "RECREATE" ); break;
+    case 3: outFileName = outFilePath + outputFilePath ; outFile = new TFile( Form("%s",outFileName) , "RECREATE" ); break;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
 
@@ -295,9 +331,10 @@ int makeNTuple(int type)
   ifstream fileStream(fileList.c_str(), ifstream::in);
   string fileName;      
   fileStream >> fileName;
-  
+  //int file_number = 0;
   // For every file in file list, process trees
-  while (!fileStream.eof()) 
+  for(int kkk = 0 ; kkk < 3 ; kkk++)
+  //while (!fileStream.eof()) 
     {
       // Open input file
       printf("\n Opening File: %s \n",fileName.c_str());
@@ -372,25 +409,30 @@ int makeNTuple(int type)
 	      nMudr    = mudr[j];
 	      nMuptrel = muptrel[j];
 	      
-	      //ssv discriminator values for jet
-	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
-	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
-	     
 	      //what is this variable?
 	      nTrackMax = trackMax[j];
 	      
 	      //jet-track variables
-	      nNIPtrk    =nIPtrk[j];
-	      nNselIPtrk =nselIPtrk[j];
+	      nNIPtrk    = nIPtrk[j];
+	      nNselIPtrk = nselIPtrk[j];
 	      
 	      //secondary vertex variables, not being filled correct
 	      nNsvtx    = nsvtx[j];
 	      nSvtxntrk = svtxntrk[j];
 	      nSvtxdl   = svtxdl[j];
 	      nSvtxdls  = svtxdls[j];
+	      nSvtx2Ddls  = svtx2Ddls[j];
+	      nSvtx2Ddls  = svtx2Ddls[j];
 	      nSvtxm    = svtxm[j];
 	      nSvtxpt   = svtxpt[j];           
-	      
+	      nSvtxXPos = svtxXPos[j];
+	      nSvtxYPos = svtxYPos[j];
+	      nSvtxZPos = svtxZPos[j];
+
+	      //discriminator values
+	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
+	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
+
 	      //cout << "doing tracks for this jet" << endl;
 	      //track based variables
 	      if(doTracks)//tracks take awhile to run, may want to turn it off in the future?
@@ -413,12 +455,14 @@ int makeNTuple(int type)
 		    {
 		      //basic track selection
 		      //perhaps pixel/tracker hit selection was done at RECO step?
-		      if( abs(trkDz1[it]) > 0.02   || //some confusion with these cuts
-			  abs(trkDxy1[it]) > 17    || //
+		      if( abs(trkDz1[it]) > 0.02   || 
+			  abs(trkDxy1[it]) > 17    || 
 			  trkPt[it] < 1            || 
 			  trkChi2[it] > 5          ||
 			  ipDist2Jet[it] < -0.07   || //shortest distance between track and jet axis
-			  ipClosest2Jet[it] > 5.0     // decay length
+			  ipClosest2Jet[it] > 5.0  || // decay length
+			  ipNHitPixel[it] < 2      ||
+			  ipNHitStrip[it] < 8
 			  ) continue;
 		      
 		      //"phi matching"
@@ -448,6 +492,9 @@ int makeNTuple(int type)
 		      nTrkPhi[counter]        = trkPhi[it];
 		      nTrkDz[counter]         = trkDz1[it];
 		      nTrkDxy[counter]        = trkDxy1[it];
+		      nIpNHitPixel[counter]   = ipNHitPixel[it];
+		      nIpNHitStrip[counter]   = ipNHitStrip[it];
+
 		      nDeltaRtrk2Jet[counter] = deltaRtrk2Jet[it];
 		      
 		      counter++;
@@ -610,7 +657,7 @@ static double MCWeights(double MCPthat)
 	{
 	  //if there are no entries there's nothing to weigh
           if (pthatEntries[i]==0) weight[i] = 0.0;
-	  else//there are entries to weight
+	  else//there are entries to weigh
 	    {
 	      if (i!=QCDBins) weight[i] = (xsection[i] - xsection[i+1])/pthatEntries[i];
 	      else weight[i] = xsection[i]/pthatEntries[i];//so i dont run off the end of the xsec array, whats the xsec @ pthat=infty anyways? pretty sure it's zero.
@@ -623,11 +670,11 @@ static double MCWeights(double MCPthat)
       // Cleanup
       inStr.close();
       delete ch;
-      cout << "weight file closing..." << endl;
       weightFile.close();
 
       initialized = true;
-      //cout << "MCWeights Initialized" << endl;
+      
+      cout << "MCWeights Initialized" << endl;
     }
   else
     {
@@ -760,11 +807,12 @@ static void heavyJetWeights(double *pthatEntries)
 
   // Cleanup
   delete HFCh;
-  HFInStr.close();
   delete QCDCh;
-  QCDInStr.close();
   delete HFJetHist;
   delete QCDJetHist;
+
+  HFInStr.close();
+  QCDInStr.close();
 
   return;
 }
@@ -795,10 +843,10 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("muptrel", &nMuptrel, "muptrel/D");//muon momentum, in the plane transverse to the jet axis
                                                      //NOT muon transverse momentum projected onto the jet axis
   
-  //ssv discriminator values
+  //discriminator values
   newTree->Branch("discr_ssvHighEff", &nDiscr_ssvHighEff, "discr_ssvHighEff/D");
   newTree->Branch("discr_ssvHighPur", &nDiscr_ssvHighPur, "discr_ssvHighPur/D");
-  
+
   //secondary vertex
   newTree->Branch("nsvtx", &nNsvtx, "nsvtx/I");
   newTree->Branch("svtxntrk", &nSvtxntrk, "svtxntrk/I");
@@ -833,6 +881,7 @@ static inline void newBranches(TTree *newTree)
       newTree->Branch( "trkDz1"  , &nTrkDz  , "trkDz1[nIP]/D"  );
       newTree->Branch( "trkDxy1" , &nTrkDz  , "trkDxy1[nIP]/D" );
       newTree->Branch( "deltaRtrk2Jet" , &nDeltaRtrk2Jet  , "deltaRtrk2Jet[nIP]/D" );
+
       if(doMostSignificantTracks)
 	{
 	  newTree->Branch("1stMost2dSigTrk",&n1stMost2dSigTrk ,"1stMost2dSigTrk/D");
@@ -853,16 +902,17 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("HLT_PAMu3_v1", &HLT_PAMu3_v1, "HLT_PAMu3_v1/I");
   newTree->Branch("HLT_PAMu7_v1", &HLT_PAMu7_v1, "HLT_PAMu7_v1/I");
   newTree->Branch("HLT_PAMu12_v1", &HLT_PAMu12_v1, "HLT_PAMu12_v1/I");
+  newTree->Branch("HLT_PAMu3PFJet20_v1", &HLT_PAMu3PFJet20_v1, "HLT_PAMu3PFJet20_v1/I");
   newTree->Branch("HLT_PAMu3PFJet40_v1", &HLT_PAMu3PFJet40_v1, "HLT_PAMu3PFJet40_v1/I");
-  
+  newTree->Branch("HLT_PAMu7PFJet20_v1", &HLT_PAMu7PFJet20_v1, "HLT_PAMu7PFJet20_v1/I");
+  newTree->Branch("HLT_PABTagMu_Jet20_Mu4_v1",&HLT_PABTagMu_Jet20_Mu4_v1,"HLT_PABTagMu_Jet20_Mu4_v1");
+
   return;
 }
 
 // Set all the input branch addresses for the input files
 static inline void branchAddresses(TTree *akPu3) 
 {
-
-
   //EVENT INFO
   akPu3->SetBranchAddress("nref", &nref);
   akPu3->SetBranchAddress("vz", &vz);
@@ -929,9 +979,13 @@ static inline void branchAddresses(TTree *akPu3)
   akPu3->SetBranchAddress("svtxntrk", &svtxntrk );
   akPu3->SetBranchAddress("svtxdl"  , &svtxdl   );
   akPu3->SetBranchAddress("svtxdls" , &svtxdls  );
+  akPu3->SetBranchAddress("svtx2Ddls" , &svtx2Ddls  );
+  akPu3->SetBranchAddress("svtx2Ddls" , &svtx2Ddls  );
   akPu3->SetBranchAddress("svtxm"   , &svtxm    );
   akPu3->SetBranchAddress("svtxpt"  , &svtxpt   );
-  
+  akPu3->SetBranchAddress("svtxXPos"   , &svtxXPos    );
+  akPu3->SetBranchAddress("svtxYPos"   , &svtxYPos    );
+  akPu3->SetBranchAddress("svtxZPos"   , &svtxZPos    );
   return;
 }
 
