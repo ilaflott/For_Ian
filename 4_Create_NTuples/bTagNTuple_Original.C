@@ -68,31 +68,35 @@ const bool doMostSignificantTracks=true;
 
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // Macro settings/constants
-//FileLists
-const string fileListPath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
+//FleLists
+//for local debugging/running
+//const string fileListPath   = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
+//const string weightFilePath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/weights/";
+//const string outFilePath    = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
+
+//for batch running
+const string fileListPath   = "filelists/";
+const string weightFilePath = "";
+const string outFilePath    = "";
+
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
 const string QCDFileList  = "QCDJets_filelist.txt";
 const string BJetFileList = "BJets_filelist.txt";
 const string CJetFileList = "CJets_filelist.txt";
 
 //Weight Files
-const string weightFilePath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/weights/";
 //the weights only change if i change the event selection, i.e. the weights i've already calculated should be fine for any NTuples i make in the future
-const string dataWeightsFile = "data.txt";
-const string QCDWeightsFile  = "QCDJets.txt";
-const string BJetWeightsFile = "BJets.txt";
-const string CJetWeightsFile = "CJets.txt";
+const string dataWeightsFile = "data_weights.txt";
+const string QCDWeightsFile  = "QCDJets_weights.txt";
+const string BJetWeightsFile = "BJets_weights.txt";
+const string CJetWeightsFile = "CJets_weights.txt";
 
 //Output Files
-const string outFilePath = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
-const string dataOutFile   = "data_NTuple_TEST.root";
-const string QCDOutFile    = "QCDJets_NTuple_TEST.root";
-const string BJetOutFile   = "BJets_NTuples_TEST.root";
-const string CJetOutFile   = "CJets_NTuple_TEST.root";
-//const char* dataOutFile   = "data_NTuple_TEST.root";
-//const char* QCDOutFile    = "QCDJets_NTuple.root";
-//const char* BJetOutFile   = "BJets_NTuples.root";
-//const char* CJetOutFile   = "CJets_NTuple.root";
+const string dataOutFile   = "data_NTuple_7.21.15.root";
+const string QCDOutFile    = "QCDJets_NTuple_7.21.15.root";
+const string BJetOutFile   = "BJets_NTuple_7.21.15.root";
+const string CJetOutFile   = "CJets_NTuple_7.21.15.root";
+
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -260,10 +264,13 @@ double nTrkEta[10000];
 double nTrkPhi[10000];
 double nTrkDxy[10000];
 double nTrkDz[10000];
+double nDeltaEta[10000];
+double nDeltaPhi[10000];
+double nDeltaRtrk2Jet[10000];
 int nIpNHitPixel[10000];
 int nIpNHitStrip[10000];
 
-//double nDeltaRtrk2Jet[10000];
+
 int    nNsvtx;
 int    nSvtxntrk;
 double nSvtxdl;
@@ -279,6 +286,7 @@ double nSvtxEta;
 double nSvtxPhi;
 double nSvtxDeltaEta;
 double nSvtxDeltaPhi;
+double nSvtxDeltaR2Jet;
 double nDiscr_ssvHighEff;
 double nDiscr_ssvHighPur;
 
@@ -320,45 +328,48 @@ int makeNTuple(int type)
   dataType = type;  
 
   // Initialize output file
+
   TFile *outFile;
+
   string outFileName;
   switch (dataType) 
     {
-    case 0: outFileName = outFilePath + dataOutFile ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break;
-    case 1: outFileName = outFilePath + QCDOutFile  ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break;
-    case 2: outFileName = outFilePath + BJetOutFile ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break;
-    case 3: outFileName = outFilePath + CJetOutFile ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break;
+    case 0: outFileName = outFilePath + dataOutFile ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 1: outFileName = outFilePath + QCDOutFile  ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 2: outFileName = outFilePath + BJetOutFile ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 3: outFileName = outFilePath + CJetOutFile ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
-
+  cout << "decalring new tree+branches" << endl;
   // New tree, new branches
   TTree newTree("nt","nt");
   newBranches(&newTree);
-  
+  cout << "fileList is: " << fileList << endl;
   //grab filename
   ifstream fileStream(fileList.c_str(), ifstream::in);
   string fileName;      
   fileStream >> fileName;
   int file_number = 0;
+
   // For every file in file list, process trees
   cout << "beginning file loop" << endl;
-  for(int kkk = 0 ; kkk < 50 ; kkk++)
+  for(int kkk = 0 ; kkk < 5 ; kkk++)
     //while (!fileStream.eof()) 
     {
       // Open input file
-      file_number++;
-      if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;
-
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
-      
+      //cout << "fileName is: " << fileName << endl;
+      if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;
+      file_number++;
       // Open trees
       if(file_number%100==0 )cout << "Opening Trees..." << endl;
       TTree *akPu3 = (TTree *)inFile->Get("akPu3PFJetAnalyzer/t");
+      //cout << "I die in batch here" << endl;//this is it, why here? 
       akPu3->AddFriend("hlt=hltanalysis/HltTree");
       akPu3->AddFriend("hiEvt=hiEvtAnalyzer/HiTree");
       akPu3->AddFriend("skim=skimanalysis/HltTree");
       akPu3->AddFriend("trk=ppTrack/trackTree");
-      
+
       // Set branch addresses
       branchAddresses(akPu3);
       
@@ -377,9 +388,8 @@ int makeNTuple(int type)
 	  else if(abs(vz)>15)continue;// (dataType >= 1) 
 	    	  
 	  // Set weight
-	  if (dataType == 0) nWeight = 1.0;
-	  else nWeight = MCWeights(pthat);
-	  //else nWeight = 1;/*debug*/
+	  //if (dataType == 0) nWeight = 1.0;
+	  //else nWeight = MCWeights(pthat);
 	  	  
 	  //Event Info
 	  nVz    = vz;
@@ -441,18 +451,38 @@ int makeNTuple(int type)
 	      nSvtxZPos = svtxZPos[j];
 
 	      //compute secondary vertex eta, phi + deltaR to Jet
-	      nSvtxeta = -log(tan((1/2)*acos(nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos))));
-
-	      nSvtxphi = acos(nSvtxXPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos));
-	      if(nSvtxYPos<0) nSvtxphi = -nSvtxphi;
-
-	      nDeltaPhiSvtx = jtphi[j]-nSvtxphi;
-	      if(fabs(deltaPhSvtxi)>pi) deltaPhiSvtx = 2*pi-fabs(deltaPhiSvtx);
-	      else deltaPhiSvtx = fabs(deltaPhiSvtx);
+//	      cout << "nSvtxZPos = " << nSvtxZPos << endl;
+//	      cout << "nSvtxYPos = " << nSvtxYPos << endl;
+//	      cout << "nSvtxXPos = " << nSvtxXPos << endl;
+//	      cout << "denominator = " << sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) << endl;
+//	      cout << "inside fracion = " << nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) << endl;
+//	      cout << "acos = " << acos( nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) ) << endl;
+//	      cout << "tan = " << tan( 0.5*acos( nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) ) )<< endl;//either 0 or nan, why?
+//	      cout << "log = " << -log( tan( 0.5*acos( nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) ) ) )<< endl;
 	      
-	      nDeltaEtaSvtx = jteta[j]-nSvtxeta;
-	      nSvtxDeltaR2Jet = sqrt(nDeltaEtaSvtx*nDeltaEtaSvtx+nDeltaPhiSvtx*nDeltaPhiSvtx);
-
+	      nSvtxEta = -log( tan( 0.5*acos( nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) ) ) );
+	      nSvtxPhi = acos(nSvtxXPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos));
+	      if(nSvtxYPos<0) nSvtxPhi = -nSvtxPhi;
+	      
+	      //NaN check, IEEE method
+	      if(nSvtxEta!=nSvtxEta || nSvtxPhi!=nSvtxPhi)
+		{
+		  //if NaN, stick in garbage values for later analysis of these events while not affecting the distributions I'll want to see
+		  nSvtxEta=-19;
+		  nSvtxPhi=-2*pi; // -pi<phi<pi
+		  nSvtxDeltaPhi=-pi;// 0<deltaphi
+		  nSvtxDeltaEta=-1; // 0<deltaEta
+		  nSvtxDeltaR2Jet=-1; //0<deltaR2Jet
+		}
+	      else //no nans, we're fine
+		{
+		  nSvtxDeltaPhi = jtphi[j]-nSvtxPhi;
+		  if(fabs(nSvtxDeltaPhi)>pi) nSvtxDeltaPhi = 2*pi-fabs(nSvtxDeltaPhi);
+		  else nSvtxDeltaPhi = fabs(nSvtxDeltaPhi);	      
+		  nSvtxDeltaEta = fabs(jteta[j]-nSvtxEta);
+		  nSvtxDeltaR2Jet = sqrt(nSvtxDeltaEta*nSvtxDeltaEta+nSvtxDeltaPhi*nSvtxDeltaPhi);
+		}
+	      //	      cout << nSvtxEta << endl;
 	      //discriminator values
 	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
 	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
@@ -462,20 +492,20 @@ int makeNTuple(int type)
 	      if(doTracks)//tracks take awhile to run, may want to turn it off in the future?
 		{
 		  counter = 0;
-		  n1stMost2dSigTrk =-999;//large negative value indicates that not enough tracks to do three most significant tracks
-		  n2ndMost2dSigTrk =-999;//kurt just stuck non-existant tracks in the 0 bin, i'm going to do it differently.
-		  n3rdMost2dSigTrk =-999;
-		  n1stMost3dSigTrk =-999;
-		  n2ndMost3dSigTrk =-999;
-		  n3rdMost3dSigTrk =-999;
-		  n1stIP2dTrk	=-999 ;  
-		  n2ndIP2dTrk	=-999 ;  
-		  n3rdIP2dTrk	=-999 ;  
-		  n1stIP3dTrk	=-999 ;  
-		  n2ndIP3dTrk	=-999 ;  
-		  n3rdIP3dTrk	=-999 ; 
+		  n1stMost2dSigTrk = 0;//kurt just stuck non-existant tracks in the 0 bin, i'm going to do it differently.
+		  n2ndMost2dSigTrk = 0;
+		  n3rdMost2dSigTrk = 0;
+		  n1stMost3dSigTrk = 0;
+		  n2ndMost3dSigTrk = 0;
+		  n3rdMost3dSigTrk = 0;
+		  n1stIP2dTrk	= 0 ;  
+		  n2ndIP2dTrk	= 0 ;  
+		  n3rdIP2dTrk	= 0 ;  
+		  n1stIP3dTrk	= 0 ;  
+		  n2ndIP3dTrk	= 0 ;  
+		  n3rdIP3dTrk	= 0 ; 
 		  
-		  for(int it = trackPosition-nselIPtrk[j];it<trackPosition;it++)
+		  for(int it = trackPosition-nselIPtrk[j] ; it < trackPosition ; it++)
 		    {
 		      //basic track selection
 		      //perhaps pixel/tracker hit selection was done at RECO step?
@@ -491,11 +521,11 @@ int makeNTuple(int type)
 		      
 		      //"phi matching"
 		      nDeltaPhi[counter] = jtphi[j] - trkPhi[it] ;
-		      if( fabs(nDeltaPhi[counter])>pi ) nDeltaPhi[counter] = 2*pi-fabs(nDeltaPhi[counter]) ;
+		      if( fabs(nDeltaPhi[counter]) > pi ) nDeltaPhi[counter] = 2*pi-fabs(nDeltaPhi[counter]) ;
 		      else nDeltaPhi[counter] = fabs(nDeltaPhi[counter]) ;
 		      
 		      //deltaRcut
-		      nDeltaEta[counter] = jteta[j] - trkEta[it];
+		      nDeltaEta[counter] = fabs(jteta[j] - trkEta[it]);
 		      nDeltaRtrk2Jet[counter]=sqrt(nDeltaPhi[counter]*nDeltaPhi[counter]+nDeltaEta[counter]*nDeltaEta[counter]); 
 		      if(nDeltaRtrk2Jet[counter]>0.3)continue;
 		      
@@ -592,7 +622,7 @@ int makeNTuple(int type)
 	      	    }//doMostSignificantTracks loop							
 	      	}//doMostSignificanTracks Check                                                         
 	      newTree.Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
-	                     //may be problematic for vz weighting
+	                     //may be problematic for vz weighting?
 	    }//jetloop
 	}//eventloop
       
@@ -873,8 +903,8 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");
   newTree->Branch("svtxm", &nSvtxm, "svtxm/D");
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");
-  newTree->Branch("svtxeta", &nSvtxeta, "svtxeta/D");
-  newTree->Branch("svtxphi", &nSvtxphi, "svtxphi/D");
+  newTree->Branch("svtxeta", &nSvtxEta, "svtxeta/D");
+  newTree->Branch("svtxphi", &nSvtxPhi, "svtxphi/D");
   newTree->Branch("svtxDeltaR2Jet", &nSvtxDeltaR2Jet, "svtxDeltaR2Jet/D");
   newTree->Branch("svtxDeltaPhi2Jet", &nSvtxDeltaPhi, "svtxDeltaPhi2Jet/D");
   newTree->Branch("svtxDeltaEta2Jet", &nSvtxDeltaEta, "svtxDeltaEta2Jet/D");
@@ -934,7 +964,7 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("HLT_PAMu3PFJet20_v1", &HLT_PAMu3PFJet20_v1, "HLT_PAMu3PFJet20_v1/I");
   newTree->Branch("HLT_PAMu3PFJet40_v1", &HLT_PAMu3PFJet40_v1, "HLT_PAMu3PFJet40_v1/I");
   newTree->Branch("HLT_PAMu7PFJet20_v1", &HLT_PAMu7PFJet20_v1, "HLT_PAMu7PFJet20_v1/I");
-  newTree->Branch("HLT_PABTagMu_Jet20_Mu4_v1",&HLT_PABTagMu_Jet20_Mu4_v1,"HLT_PABTagMu_Jet20_Mu4_v1");
+  newTree->Branch("HLT_PABTagMu_Jet20_Mu4_v1",&HLT_PABTagMu_Jet20_Mu4_v1,"HLT_PABTagMu_Jet20_Mu4_v1/I");
 
   return;
 }
