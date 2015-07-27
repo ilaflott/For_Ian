@@ -69,7 +69,7 @@ const bool doMostSignificantTracks=true;
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // Macro settings/constants
 //FleLists
-//for local debugging/running
+////for local debugging/running
 //const string fileListPath   = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
 //const string weightFilePath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/weights/";
 //const string outFilePath    = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
@@ -92,10 +92,10 @@ const string BJetWeightsFile = "BJets_weights.txt";
 const string CJetWeightsFile = "CJets_weights.txt";
 
 //Output Files
-const string dataOutFile   = "data_NTuple_7.21.15.root";
-const string QCDOutFile    = "QCDJets_NTuple_7.21.15.root";
-const string BJetOutFile   = "BJets_NTuple_7.21.15.root";
-const string CJetOutFile   = "CJets_NTuple_7.21.15.root";
+const string dataOutFile   = "data_NTuple_7.23.15_noWeight.root";
+const string QCDOutFile    = "QCDJets_NTuple_7.23.15_noWeight.root";
+const string BJetOutFile   = "BJets_NTuple_7.23.15_noWeight.root";
+const string CJetOutFile   = "CJets_NTuple_7.23.15_noWeight.root";
 
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
@@ -216,11 +216,15 @@ int HLT_PAMu3PFJet40_v1;
 int HLT_PAMu7PFJet20_v1;
 
 // hiEvtAnalyzer/HiTree
-float vz;
+float vz ; 
+int evt  ;
+int run  ; 
+int lumi ;
 // skimanalysis/HltTree
 int pPAcollisionEventSelectionPA;
 int pHBHENoiseFilter;
 // New data storage vars
+int nNref;
 double nJtpt;
 double nJteta;
 double nJtphi;
@@ -293,6 +297,9 @@ double nDiscr_ssvHighPur;
 double nVz;  //Event Information
 double nPthat;                // MC Only
 double nRefpt;                // MC Only
+int Evt;
+int Lumi;
+int Run;
 int    nRefparton_flavorForB; // MC Only
 double nWeight;
 
@@ -353,8 +360,8 @@ int makeNTuple(int type)
 
   // For every file in file list, process trees
   cout << "beginning file loop" << endl;
-  for(int kkk = 0 ; kkk < 5 ; kkk++)
-    //while (!fileStream.eof()) 
+  //for(int kkk = 0 ; kkk < 1 ; kkk++)
+  while (!fileStream.eof()) 
     {
       // Open input file
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
@@ -386,16 +393,22 @@ int makeNTuple(int type)
 	  // Event Level Selection
 	  if ((dataType == 0) && (0 || !pPAcollisionEventSelectionPA || !pHBHENoiseFilter || abs(vz)>15)) continue;
 	  else if(abs(vz)>15)continue;// (dataType >= 1) 
-	    	  
+	  //cout << "dataType=" << dataType<<endl;  	  
 	  // Set weight
-	  //if (dataType == 0) nWeight = 1.0;
-	  //else nWeight = MCWeights(pthat);
+	  nWeight = 1.0;
+//	  else nWeight = MCWeights(pthat);
 	  	  
 	  //Event Info
 	  nVz    = vz;
 	  nNIP   = nIP;
 	  nPthat = pthat; 
-	  
+	 
+	       
+	  Evt  =evt;   
+	  Lumi =lumi;  
+	  Run  =run; 
+
+
 	  int trackPosition=0;
 	  //Jet Processing	  
 	  for (int j=0; j<nref; j++) 
@@ -665,31 +678,38 @@ static double MCWeights(double MCPthat)
     {
       if(!initialized) cout << "No weights_file found. Initializing weight function.\n";
       // Add QCD MC files to chain
-      TChain *ch = new TChain("akPu3PFJetAnalyzer/t");
-      
+      //      TChain *ch = new TChain("akPu3PFJetAnalyzer/t");
+      double pthatEntries[QCDBins+1];
       ifstream inStr(QCDFileList4Weights.c_str(), ifstream::in);
       string fileName;
       ofstream weightFile(weights_file.c_str(), ofstream::out);
 
       inStr >> fileName;
       int hahaha=0;//another file count variable, I'm running out of names
+      // Count events across all files
       while (!inStr.eof()) 
+      //for(int kkk = 0;kkk < 5; kkk++)
 	{
-          ch->Add(fileName.c_str());
-          if (hahaha%1000==0)cout << "Added " << fileName << " to chain." << endl;
+	  //cout <<"test weight computation for 5 files" << endl;/*debug*/
+	  TFile *inFileForWeights=TFile::Open(Form("%s",fileName.c_str()));
+	  TTree *ch = (TTree *)inFileForWeights->Get("akPu3PFJetAnalyzer/t");
+	  ch->SetBranchAddress("pthat", &pthat);
+	  
+	  for (int i=0; i<QCDBins+1; i++) 
+	    {
+	      pthatEntries[i] += ch->GetEntries( pthatCut[i].c_str() );
+	    }
+
+	  if (hahaha%1000==0)cout << "Looped over "<<hahaha<<"'th file" << endl;
 	  inStr >> fileName;
 	  hahaha++;
 	}
-      cout << "Done adding files to chain." << endl;
-      
-      // Count events across all files
-      double pthatEntries[QCDBins+1];
       for (int i=0; i<QCDBins+1; i++) 
 	{
-	  pthatEntries[i] = ch->GetEntries( pthatCut[i].c_str() );
-	  cout << "\tQCD pthatEntries with " << pthatCut[i] << ": " << pthatEntries[i] << endl;
+	  cout << "pthatEntries[" << i << "] = " << pthatEntries[i] << endl; ;
 	}
-
+      //cout << "Done adding files to chain." << endl;
+      
       // Modify event count for HF MC files
       if (dataType >= 2) 
 	{
@@ -714,7 +734,7 @@ static double MCWeights(double MCPthat)
 
       // Cleanup
       inStr.close();
-      delete ch;
+      //      delete ch;
       weightFile.close();
 
       initialized = true;
@@ -872,7 +892,10 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("weight", &nWeight, "weight/D");  
   newTree->Branch("vz", &nVz ,"vz/D");
   if(dataType>=1)newTree->Branch("pthat", &nPthat, "pthat/D"); // TEMPORARY
-  
+  newTree->Branch("nref"  , &nNref ,"nref/I");
+  newTree->Branch("evt"   , &Evt  ,"evt/I" );
+  newTree->Branch("lumi"  , &Lumi ,"lumi/I");
+  newTree->Branch("run"   , &Run  ,"run/I" );
   //jet variables
   newTree->Branch("jtpt", &nJtpt, "jtpt/D");
   newTree->Branch("jteta", &nJteta, "jteta/D");
@@ -975,6 +998,9 @@ static inline void branchAddresses(TTree *akPu3)
   //EVENT INFO
   akPu3->SetBranchAddress("nref", &nref);
   akPu3->SetBranchAddress("vz", &vz);
+  akPu3->SetBranchAddress("evt", &evt);
+  akPu3->SetBranchAddress("lumi", &lumi);
+  akPu3->SetBranchAddress("run", &run);
   akPu3->SetBranchAddress("pPAcollisionEventSelectionPA", &pPAcollisionEventSelectionPA);
   akPu3->SetBranchAddress("pHBHENoiseFilter", &pHBHENoiseFilter);
   if(dataType>=1)akPu3->SetBranchAddress("pthat", &pthat);
