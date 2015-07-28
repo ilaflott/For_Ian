@@ -72,16 +72,16 @@ const double pi = 3.141592653589793238462643383279502884197169399375105820974944
 //FleLists
 ////for local debugging/running
 //const string fileListPath   = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
-//const string weightFilePath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/weights/";
+//const string weightFilePath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/weight_info/";
 //const string outFilePath    = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
 
 //for batch running
 const string fileListPath   = "filelists/";
-const string weightFilePath = "weights/";
+const string weightFilePath = "weights_info/";
 const string outFilePath    = "";
 
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
-const string QCDFileList  = "QCDJets_filelist.txt";
+const string QCDFileList  = "QCDJets_noVsJets_filelist.txt";
 const string BJetFileList = "BJets_filelist.txt";
 const string CJetFileList = "CJets_filelist.txt";
 
@@ -91,6 +91,16 @@ const string dataWeightsFile = "data_weights.txt";
 const string QCDWeightsFile  = "QCDJets_weights.txt";
 const string BJetWeightsFile = "BJets_weights.txt";
 const string CJetWeightsFile = "CJets_weights.txt";
+
+//Weight Information Files,  # Events per pthat bin, # BJets/Event per pthat bin
+const string QCD_NEventsFile        ="QCDJets_NEvents.txt";	  
+const string QCD_NbJetsPerEventFile ="QCDJets_NbJetsPerEvent.txt";
+
+const string C_NEventsFile        ="CJets_NEvents.txt";	  
+const string C_NbJetsPerEventFile ="CJets_NbJetsPerEvent.txt";
+
+const string B_NEventsFile        ="BJets_NEvents.txt";	  
+const string B_NbJetsPerEventFile ="BJets_NbJetsPerEvent.txt";
 
 //Output Files
 const string dataOutFile   = "data_NTuple_TEST.root";
@@ -312,7 +322,7 @@ int dataType;
 // Main functions
 // Mode: 0-makeNTuple(), 1-mergeMCSamples()
 // Type: 0-data, 1-QCD, 2-BJet, 3-CJet
-int bTagNTuple_Original(int type)
+int bTagNTuple(int type)
 {
   switch (type) 
     {
@@ -320,7 +330,6 @@ int bTagNTuple_Original(int type)
     case 1: fileList = fileListPath + QCDFileList  ; printf("\n you chose QCD\n")  ; weights_file = weightFilePath + QCDWeightsFile  ; result = makeNTuple(type); break ;
     case 2: fileList = fileListPath + BJetFileList ; printf("\n you chose BJets\n"); weights_file = weightFilePath + BJetWeightsFile ; result = makeNTuple(type); break ;
     case 3: fileList = fileListPath + CJetFileList ; printf("\n you chose CJets\n"); weights_file = weightFilePath + CJetWeightsFile ; result = makeNTuple(type); break ;
-    case 4: fileList = fileListPath + QCDFileList; result = impactParameterExploration(type) ;  break;//other function
     default:
       cerr << "Type must be from {0,1,2,3}" << endl;
       return -1;
