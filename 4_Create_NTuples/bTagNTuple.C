@@ -44,8 +44,8 @@ using namespace std;
 
 // Function declarations
 int makeNTuple(int type);
-int MCWeights(double pthat);
-static void heavyJetWeights(double *pthatEntries);
+int MCCounts(int type);
+//static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
 //int impactParameterExploration(int type);
@@ -71,15 +71,9 @@ const bool doMostSignificantTracks=true;
 
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 // Macro settings/constants
-//FleLists
-////for local debugging/running
-//const string fileListPath   = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/filelists/";
-//const string weightFilePath = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/weight_info/";
-//const string outFilePath    = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
 
-//for batch running
 const string fileListPath   = "filelists/";
-const string weightFilePath = "weights_info/";
+const string weightFilePath = "weight_info/";
 const string outFilePath    = "";
 
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
@@ -95,14 +89,15 @@ const string BJetWeightsFile = "BJets_weights.txt";
 const string CJetWeightsFile = "CJets_weights.txt";
 
 //Weight Information Files,  # Events per pthat bin, # BJets/Event per pthat bin
-const string QCD_NEventsFile        ="QCDJets_NEvents.txt";	  
-const string QCD_NbJetsPerEventFile ="QCDJets_NbJetsPerEvent.txt";
+const string QCD_NEventsFile = "QCDJets_NEvents.txt";	  
+const string QCD_NBJetsFile  = "QCDJets_NBJets.txt";
+const string QCD_NCJetsFile  = "QCDJets_NCJets.txt";
 
-const string C_NEventsFile        ="CJets_NEvents.txt";	  
-const string C_NbJetsPerEventFile ="CJets_NbJetsPerEvent.txt";
+const string C_NEventsFile = "CJets_NEvents.txt";	  
+const string C_NCJetsFile  = "CJets_NCJets.txt";
 
-const string B_NEventsFile        ="BJets_NEvents.txt";	  
-const string B_NbJetsPerEventFile ="BJets_NbJetsPerEvent.txt";
+const string B_NEventsFile = "BJets_NEvents.txt";	  
+const string B_NBJetsFile  = "BJets_NBJets.txt";
 
 //Output Files
 const string dataOutFile   = "data_NTuple_TEST.root";
@@ -318,6 +313,8 @@ double nWeight;
 
 string weights_file;
 string fileList; 
+
+
 int result;
 int dataType;
 
@@ -327,11 +324,6 @@ int dataType;
 int bTagNTuple(int job, int type)
 {
   
-  //weights_file = weightFilePath + dataWeightsFile ;
-  //weights_file = weightFilePath + QCDWeightsFile  ;
-  //weights_file = weightFilePath + BJetWeightsFile ;
-  //weights_file = weightFilePath + CJetWeightsFile ;
-
   switch (type) 
     {
     case 0: fileList = fileListPath + dataFileList ; printf("\n you chose data filelist\n")   ;   break ;
@@ -349,8 +341,9 @@ int bTagNTuple(int job, int type)
   switch (job)
     {
     case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type) ; break ; 
-    case 1:cout << "You Chose MCWeights" << endl; result = MCWeights(type) ; break ; 
-    default: cerr << "Job must be from {0,1}" << endl; return -1;
+    case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
+    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = ApplyNTupleWeights(type) ; break ; 
+    default: cerr << "Job must be from {0,1}" << endl; return -1 ;
     }
   return result;
 }
@@ -708,219 +701,275 @@ int makeNTuple(int type)
 // Return the corresponding weight for an event based on pthat
 //static double MCWeights(double MCPthat)
 //int MCWeights(double MCPthat)'
-int MCWeights(int type)
+int MCCounts(int type)
 {
-  static double *weight;
-  string QCDFileList4Weights = fileListPath + QCDFileList;
-  weight = new double[QCDBins+1];
+  bool doEventCountFile;
+  bool doCJetCountFile ;
+  bool doBJetCountFile ;
+  bool loopOverFiles;
+  string NEventsFile;
+  string NbJetsFile;
+  string NcJetsFile;
+  
 
-  // Calculate the weight for each pthat bin in the QCD MC sample
-
-  if ( !(std::ifstream(weights_file.c_str())) )
+  switch(type)
     {
-    
-      // Add QCD MC files to chain
-      //      TChain *ch = new TChain("akPu3PFJetAnalyzer/t");
-      double pthatEntries[QCDBins+1];
-      ifstream inStr(QCDFileList4Weights.c_str(), ifstream::in);
-      string fileName;
-      ofstream weightFile(weights_file.c_str(), ofstream::out);
-      
-      inStr >> fileName;
-      int hahaha=0;//another file count variable, I'm running out of names
-      // Count events across all files
-      while (!inStr.eof()) 
-	//for(int kkk = 0;kkk < 5; kkk++)
-	{
-	  //cout <<"test weight computation for 5 files" << endl;/*debug*/
-	  TFile *inFileForWeights=TFile::Open(Form("%s",fileName.c_str()));
-	  TTree *ch = (TTree *)inFileForWeights->Get("akPu3PFJetAnalyzer/t");
-	  ch->SetBranchAddress("pthat", &pthat);
-	  
-	  for (int i=0; i<QCDBins+1; i++) 
-	    {
-	      pthatEntries[i] += ch->GetEntries( pthatCut[i].c_str() );
-	    }
-	  
-	  if (hahaha%1000==0)cout << "Looped over "<<hahaha<<"'th file" << endl;
-	  inStr >> fileName;
-	  hahaha++;
-	}
-      for (int i=0; i<QCDBins+1; i++) 
-	{
-	  cout << "pthatEntries[" << i << "] = " << pthatEntries[i] << endl; 
-	}
-      //cout << "Done adding files to chain." << endl;
-      
-      // Modify event count for HF MC files
-      if (dataType >= 2) 
-	{
-          cout << "Heavy flavor file. Updating weights." << endl;
-          heavyJetWeights(pthatEntries);
-	}
-      
-      // Calculate weights
-      for (int i=0; i<QCDBins+1; i++) 
-	{
-	  //if there are no entries there's nothing to weigh
-          if (pthatEntries[i]==0) weight[i] = 0.0;
-	  else//there are entries to weigh
-	    {
-	      if (i!=QCDBins) weight[i] = (xsection[i] - xsection[i+1])/pthatEntries[i];
-	      else weight[i] = xsection[i]/pthatEntries[i];//so i dont run off the end of the xsec array, whats the xsec @ pthat=infty anyways? pretty sure it's zero.
-	    }
-	  
-          cout << "weight[" << i << "] = " << weight[i] << endl;
-          weightFile << weight[i] << endl;
-	}
-      
-      // Cleanup
-      inStr.close();
-      //delete ch;
-      weightFile.close();
+    case 1:  //QCD
+      NEventsFile = weightFilePath + QCD_NEventsFile ; 
+      NbJetsFile  = weightFilePath + QCD_NBJetsFile  ; 
+      NcJetsFile  = weightFilePath + QCD_NCJetsFile  ; 
+      doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
+      doCJetCountFile  = !(std::ifstream(NbJetsFile.c_str()) );
+      doBJetCountFile  = !(std::ifstream(NcJetsFile.c_str()) );
+      loopOverFiles = doCJetCountFile || doBJetCountFile || doEventCountFile;
+      break ;
+    case 2:  //B
+      NEventsFile = weightFilePath + B_NEventsFile ; 
+      NbJetsFile  = weightFilePath + B_NBJetsFile  ; 
+      NcJetsFile  = "";
+      doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
+      doCJetCountFile  = false;
+      doBJetCountFile  = !(std::ifstream(NcJetsFile.c_str()) );
+      loopOverFiles =  doBJetCountFile || doEventCountFile;
+      break ;
+    case 3:  //C
+      NEventsFile = weightFilePath + C_NEventsFile ; 
+      NbJetsFile  = "";
+      NcJetsFile  = weightFilePath + C_NCJetsFile  ; 
+      doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
+      doCJetCountFile  = !(std::ifstream(NbJetsFile.c_str()) );
+      doBJetCountFile  = false;
+      loopOverFiles = doCJetCountFile || doEventCountFile;
+      break ;
+    default:cerr<<"dataType must be 1,2,3 to compute weights"<<endl; return -1;      
     }
-  else
+  if(!loopOverFiles)
     {
+      cout << "All Files Exist! Exiting." << endl;
+      return 0;
+    }
+
+  double pthatEntries[QCDBins+1];
+  double NCJets[QCDBins+1];
+  double NBJets[QCDBins+1];
+
+  //initialize the arrays, was getting NaN before. This may be a bit paranoid.
+  for (int i=0; i<QCDBins+1; i++) 
+    {
+      pthatEntries[i]=0;
+      NCJets[i]=0;
+      NBJets[i]=0;
+    }
+    
+  ifstream inStr(fileList.c_str(), ifstream::in);
+  string fileName;
+  inStr >> fileName;     
+  
+  //If you're not at the end of the list, and there's stuff to be calculated, loop over the files
+  //  while ( !inStr.eof()) 
+  for(int kkk = 0;kkk < 50; kkk++)
+    {
+      //cout <<"test weight computation for 5 files" << endl;/*debug*/
+      TFile *inFile=TFile::Open(Form("%s",fileName.c_str()));
+      TTree *ch = (TTree *)inFile->Get("akPu3PFJetAnalyzer/t");
+      ch->AddFriend("hiEvt=hiEvtAnalyzer/HiTree");
+      ch->SetBranchAddress("pthat", &pthat);
+      ch->SetBranchAddress("vz", &vz);
+      ch->SetBranchAddress("jteta", &jteta);
+      ch->SetBranchAddress("refpt", &refpt);
+      ch->SetBranchAddress("refparton_flavorForB", &refparton_flavorForB);
       
-      cout << "weights file detected. using previously calculated weights..." << endl;
-      cout << "using file: " << weights_file.c_str() << endl;
-      
-      ifstream inWeights(weights_file.c_str(), ifstream::in);
-      for(int i=0; i<QCDBins+1; i++) 
+      TH1D *CJetHist = new TH1D("CJetHist","CJetHist",1,0,10000);
+      TH1D *BJetHist = new TH1D("BJetHist","BJetHist",1,0,10000);
+      double NEntries = 0;
+      double numCJets = 0;
+      double numBJets = 0;
+      for (int i=0; i<QCDBins+1; i++) 
 	{
-	  inWeights >> weight[i];
-	  cout << "weight[" << i << "] = " << weight[i] << endl;
+	  //count events for QCD Weights + HF Weights
+	  if(doEventCountFile) 
+	    {
+	      NEntries = ch->GetEntries( pthatCut[i].c_str() );
+	      pthatEntries[i] += NEntries;
+	    }
+	  //count heavy jets for HF Weights Later	  
+	  if(doCJetCountFile)
+	    {
+	      ch->Draw("jtpt>>CJetHist",Form("%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d",pthatCut[i].c_str(),4),"goff");//draw cjet histo
+	      numCJets = (double)CJetHist->Integral();
+	      NCJets[i] += numCJets;
+	      if (NCJets[i]==NCJets[i]&&NCJets[i]!=NCJets[i]) cout <<"C NaN!!!"<<endl;
+	      CJetHist->Reset();
+	    }
+	  if(doBJetCountFile )
+	    {
+	      ch->Draw("jtpt>>BJetHist",Form("%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d",pthatCut[i].c_str(),5),"goff");//draw bjet histo
+	      numBJets = (double)BJetHist->Integral();
+	      NBJets[i] += numBJets;
+	      BJetHist->Reset();
+	    }
+	  
+	}//loop over bins
+      inStr >> fileName;
+      inFile->Close();
+    }//loop over files
+  
+
+  delete CJetHist;
+  delete BJetHist;
+  inStr.close();        
+
+  ofstream EventCountOutput( NEventsFile.c_str() , ofstream::out ); 
+  ofstream CJetCountOutput(  NcJetsFile.c_str()  , ofstream::out );
+  ofstream BJetCountOutput(  NbJetsFile.c_str()  , ofstream::out );
+  
+  //write out the information to a text file for later use
+  for (int i=0; i<QCDBins+1; i++) 
+    {
+      cout << "data for " << pthatCut[i] << endl;
+      if(doEventCountFile)
+	{
+	  cout << "pthatEntries[" << i << "] = " << pthatEntries[i] << endl;
+	  EventCountOutput << pthatEntries[i] << endl;
 	}
-      
+      if(doCJetCountFile)
+	{
+	  cout << "NCJets[" << i << "] = " << NCJets[i] << endl;
+	  CJetCountOutput << NCJets[i]<<endl;
+	}
+      if(doBJetCountFile)
+	{
+	  cout << "NBJets[" << i << "] = " << NBJets[i] << endl;
+	  BJetCountOutput << NBJets[i]<<endl;
+	}
     }
   
-  int j=0;
-  //say MCPthat = 53, then j = 2 after this loop, calls weight[2] = xsec[2] - xsec[3]/ pthatentries[2]
-  //so weight[2] = \sigma_50 - \sigma_80 / entries[50,80]
-  //largest j gets is j = QCD bins
-  while (MCPthat>pthatBin[j] && j<QCDBins) j++;
-  //return weight[j];
+  //Clean up
+  EventCountOutput.close(); 
+  CJetCountOutput.close();
+  BJetCountOutput.close();
+  
   return 0;
 }
 
-static void heavyJetWeights(double *pthatEntries)
-{
-  // Add heavy flavor MC files to chain
-  TChain *HFCh = new TChain("akPu3PFJetAnalyzer/t");
-  TChain *HFCh_hiEvt = new TChain("hiEvtAnalyzer/HiTree");
-  
-  string HFfileList;
-  int heavyFlavor;				 						 
-  string QCDFileList4HFWeights = fileListPath + QCDFileList;
-  switch(dataType)
-    {
-    case 2: HFfileList=fileListPath + BJetFileList ; heavyFlavor=5 ; break;
-    case 3: HFfileList=fileListPath + CJetFileList ; heavyFlavor=4 ; break;
-    default: heavyFlavor=-1; break;
-    }
-  
-  ifstream HFInStr(HFfileList.c_str(), ifstream::in);
-  string HFFileName;
-  
-  HFInStr >> HFFileName;
-  while (!HFInStr.eof())
-    {
-      HFCh->Add(HFFileName.c_str());
-      HFCh_hiEvt->Add(HFFileName.c_str());
-      cout << "Added " << HFFileName << " to chain." << endl;
-      HFInStr >> HFFileName;
-    }
-  
-  HFCh->AddFriend(HFCh_hiEvt);
-  
-  cout << "Done adding files to chain." << endl;
-  
-  // Count HF events across all files
-  int HFPthatEntries[QCDBins+1];
-  for (int i=0; i<QCDBins+1; i++) 
-    {
-      HFPthatEntries[i] = HFCh->GetEntries( pthatCut[i].c_str() );
-      cout << "\tHFPthatEntries with " << pthatCut[i] << ": " << HFPthatEntries[i] << endl;
-    }
-  
-  // Add QCD MC files to chain
-  TChain *QCDCh = new TChain("akPu3PFJetAnalyzer/t");
-  TChain *QCDCh_hiEvt = new TChain("hiEvtAnalyzer/HiTree");
-  
-  ifstream QCDInStr(QCDFileList4HFWeights.c_str(), ifstream::in);
-  string QCDFileName;
-  
-  QCDInStr >> QCDFileName;
-  int file4weights_count=0;
-  while  (!QCDInStr.eof()) 
-    {
-      QCDCh->Add(QCDFileName.c_str());
-      QCDCh_hiEvt->Add(QCDFileName.c_str());
-      if(file4weights_count%1000==0)cout << "Added " << QCDFileName << " to chain." << endl;
-      QCDInStr >> QCDFileName;
-      file4weights_count++;
-    }
-  QCDCh->AddFriend(QCDCh_hiEvt);
-  
-  cout << "Done adding files to chain." << endl;
-  
-  // Calculate HF weight for each pthat bin
-  double HFWeight[QCDBins+1];
-  char HFJetsCut[200];
-  
-  TH1D *HFJetHist = new TH1D("HFJetHist", "HFJetHist", 1, 0, 10000);
-  TH1D *QCDJetHist = new TH1D("QCDJetHist", "QCDJetHist", 1, 0, 10000);
-  
-  for (int i=0; i<QCDBins+1; i++) 
-    {
-      // Count (indirectly) number of b jets
-      sprintf(HFJetsCut, "%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
-      
-      HFCh->Draw("jtpt>>HFJetHist", HFJetsCut, "goff");
-      QCDCh->Draw("jtpt>>QCDJetHist", HFJetsCut, "goff");
-      
-      cout << "\tHF MC b/cJets: " << HFJetHist->Integral() << endl;
-      cout << "\tQCD MC b/cJets: " << QCDJetHist->Integral() << endl;
-      
-      // Calculate b jets per **event
-      double HFJetsPerEvent = (double)HFJetHist->Integral()/(double)HFPthatEntries[i];
-      double QCDJetsPerEvent = (double)QCDJetHist->Integral()/(double)pthatEntries[i];
-      
-      cout << "\tHF MC b/cJets/Event: " << HFJetsPerEvent << endl;
-      cout << "\tQCD MC b/cJets/Event: " << QCDJetsPerEvent << endl;
-      
-      // Check for NaN (IEEE method) and calculate HF weight
-      if (HFJetsPerEvent != HFJetsPerEvent || QCDJetsPerEvent != QCDJetsPerEvent) HFWeight[i] = 0;
-      else HFWeight[i] = HFJetsPerEvent/QCDJetsPerEvent;
-      
-      cout << "HFWeight for " << pthatCut[i] << ": " << HFWeight[i] << endl;
-      
-      HFJetHist->Reset();
-      QCDJetHist->Reset();
-      
-    }
-
-  // Weigh HF events by HF weight for each pthat bin, add to QCD events
-  for (int i=0; i<QCDBins+1; i++) 
-    {
-      pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
-      //old way the weights were dealt with, keeping here for posterity
-      //if(weightsMode == 1 ) pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
-      //else pthatEntries[i] = HFWeight[i] * HFPthatEntries[i]; //schemeB
-      cout << "Effective pthat entries for pthat " << pthatCut[i] << ": " << pthatEntries[i] << endl;
-    }
-
-  // Cleanup
-  delete HFCh;
-  delete QCDCh;
-  delete HFJetHist;
-  delete QCDJetHist;
-
-  HFInStr.close();
-  QCDInStr.close();
-
-  return;
-}
+//static void heavyJetWeights(double *pthatEntries)
+//{
+//  // Add heavy flavor MC files to chain
+//  TChain *HFCh = new TChain("akPu3PFJetAnalyzer/t");
+//  TChain *HFCh_hiEvt = new TChain("hiEvtAnalyzer/HiTree");
+//  
+//  string HFfileList;
+//  int heavyFlavor;				 						 
+//  string QCDFileList4HFWeights = fileListPath + QCDFileList;
+//  switch(dataType)
+//    {
+//    case 2: HFfileList=fileListPath + BJetFileList ; heavyFlavor=5 ; break;
+//    case 3: HFfileList=fileListPath + CJetFileList ; heavyFlavor=4 ; break;
+//    default: heavyFlavor=-1; break;
+//    }
+//  
+//  ifstream HFInStr(HFfileList.c_str(), ifstream::in);
+//  string HFFileName;
+//  
+//  HFInStr >> HFFileName;
+//  while (!HFInStr.eof())
+//    {
+//      HFCh->Add(HFFileName.c_str());
+//      HFCh_hiEvt->Add(HFFileName.c_str());
+//      cout << "Added " << HFFileName << " to chain." << endl;
+//      HFInStr >> HFFileName;
+//    }
+//  
+//  HFCh->AddFriend(HFCh_hiEvt);
+//  
+//  cout << "Done adding files to chain." << endl;
+//  
+//  // Count HF events across all files
+//  int HFPthatEntries[QCDBins+1];
+//  for (int i=0; i<QCDBins+1; i++) 
+//    {
+//      HFPthatEntries[i] = HFCh->GetEntries( pthatCut[i].c_str() );
+//      cout << "\tHFPthatEntries with " << pthatCut[i] << ": " << HFPthatEntries[i] << endl;
+//    }
+//  
+//  // Add QCD MC files to chain
+//  TChain *QCDCh = new TChain("akPu3PFJetAnalyzer/t");
+//  TChain *QCDCh_hiEvt = new TChain("hiEvtAnalyzer/HiTree");
+//  
+//  ifstream QCDInStr(QCDFileList4HFWeights.c_str(), ifstream::in);
+//  string QCDFileName;
+//  
+//  QCDInStr >> QCDFileName;
+//  int file4weights_count=0;
+//  while  (!QCDInStr.eof()) 
+//    {
+//      QCDCh->Add(QCDFileName.c_str());
+//      QCDCh_hiEvt->Add(QCDFileName.c_str());
+//      if(file4weights_count%1000==0)cout << "Added " << QCDFileName << " to chain." << endl;
+//      QCDInStr >> QCDFileName;
+//      file4weights_count++;
+//    }
+//  QCDCh->AddFriend(QCDCh_hiEvt);
+//  
+//  cout << "Done adding files to chain." << endl;
+//  
+//  // Calculate HF weight for each pthat bin
+//  double HFWeight[QCDBins+1];
+//  char HFJetsCut[200];
+//  
+//  TH1D *HFJetHist = new TH1D("HFJetHist", "HFJetHist", 1, 0, 10000);
+//  TH1D *QCDJetHist = new TH1D("QCDJetHist", "QCDJetHist", 1, 0, 10000);
+//  
+//  for (int i=0; i<QCDBins+1; i++) 
+//    {
+//      // Count (indirectly) number of b jets
+//      sprintf(HFJetsCut, "%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d", pthatCut[i].c_str(), heavyFlavor);
+//      
+//      HFCh->Draw("jtpt>>HFJetHist", HFJetsCut, "goff");
+//      QCDCh->Draw("jtpt>>QCDJetHist", HFJetsCut, "goff");
+//      
+//      cout << "\tHF MC b/cJets: " << HFJetHist->Integral() << endl;
+//      cout << "\tQCD MC b/cJets: " << QCDJetHist->Integral() << endl;
+//      
+//      // Calculate b jets per **event
+//      double HFJetsPerEvent = (double)HFJetHist->Integral()/(double)HFPthatEntries[i];
+//      double QCDJetsPerEvent = (double)QCDJetHist->Integral()/(double)pthatEntries[i];
+//      
+//      cout << "\tHF MC b/cJets/Event: " << HFJetsPerEvent << endl;
+//      cout << "\tQCD MC b/cJets/Event: " << QCDJetsPerEvent << endl;
+//      
+//      // Check for NaN (IEEE method) and calculate HF weight
+//      if (HFJetsPerEvent != HFJetsPerEvent || QCDJetsPerEvent != QCDJetsPerEvent) HFWeight[i] = 0;
+//      else HFWeight[i] = HFJetsPerEvent/QCDJetsPerEvent;
+//      
+//      cout << "HFWeight for " << pthatCut[i] << ": " << HFWeight[i] << endl;
+//      
+//      HFJetHist->Reset();
+//      QCDJetHist->Reset();
+//      
+//    }
+//
+//  // Weigh HF events by HF weight for each pthat bin, add to QCD events
+//  for (int i=0; i<QCDBins+1; i++) 
+//    {
+//      pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
+//      //old way the weights were dealt with, keeping here for posterity
+//      //if(weightsMode == 1 ) pthatEntries[i] += HFWeight[i] * HFPthatEntries[i];  //schemeA
+//      //else pthatEntries[i] = HFWeight[i] * HFPthatEntries[i]; //schemeB
+//      cout << "Effective pthat entries for pthat " << pthatCut[i] << ": " << pthatEntries[i] << endl;
+//    }
+//
+//  // Cleanup
+//  delete HFCh;
+//  delete QCDCh;
+//  delete HFJetHist;
+//  delete QCDJetHist;
+//
+//  HFInStr.close();
+//  QCDInStr.close();
+//
+//  return;
+//}
 
 
 // Create the branches for the new output tree
@@ -1117,8 +1166,8 @@ static inline void branchAddresses(TTree *akPu3)
   return;
 }
 
-int impactParameterExploration(int type)
-{
+//int impactParameterExploration(int type)
+//{
 //  //double paranoiaCheck=0;
 //  string fileName;
 //  ifstream fileStream(fileList.c_str(), ifstream::in);
@@ -1160,9 +1209,9 @@ int impactParameterExploration(int type)
 //	      //}//trackloop
 //	    }//jetloop
 //	}//event loop
-  cout << "helloworld!"<<endl;
-  return 0;
-}
+//  cout << "helloworld!"<<endl;
+//  return 0;
+//}
 
 //Leo's Old Notes about Jet Reweighting
 /* 
