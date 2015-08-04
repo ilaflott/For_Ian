@@ -49,6 +49,7 @@ int ApplyWeights(int type);
 //static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
+
 //int impactParameterExploration(int type);
 //int mergeMCSamples();
 //int calculateWeights(int type);
@@ -76,6 +77,8 @@ const double pi = 3.141592653589793238462643383279502884197169399375105820974944
 const string fileListPath   = "filelists/";
 const string weightFilePath = "weight_info/";
 const string outFilePath    = "";
+//const string NTuplePath = "good_NTuples/";
+const string NTuplePath = "";/*debug*/
 
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
 const string QCDFileList  = "QCDJets_noVsJets_filelist.txt";
@@ -89,7 +92,7 @@ const string QCDWeightsFile  = "QCDJets_weights.txt";
 const string BJetWeightsFile = "BJets_weights.txt";
 const string CJetWeightsFile = "CJets_weights.txt";
 
-//Weight Information Files,  # Events per pthat bin, # BJets/Event per pthat bin
+//Weight Information Files,  #Events per pthat bin, #BJets per pthat bin, #Cjets per pthat bin
 const string QCD_NEventsFile = "QCDJets_NEvents.txt";	  
 const string QCD_NBJetsFile  = "QCDJets_NBJets.txt";
 const string QCD_NCJetsFile  = "QCDJets_NCJets.txt";
@@ -100,12 +103,19 @@ const string C_NCJetsFile  = "CJets_NCJets.txt";
 const string B_NEventsFile = "BJets_NEvents.txt";	  
 const string B_NBJetsFile  = "BJets_NBJets.txt";
 
-//Output Files
-const string dataOutFile   = "data_NTuple_TEST.root";
-const string QCDOutFile    = "QCDJets_NTuple_noVsJets_8.3.15.root";
-const string BJetOutFile   = "BJets_NTuple_TEST.root";
-const string CJetOutFile   = "CJets_NTuple_TEST.root";
+////NTuple Files
+//const string dataNTuple   = "data_NTuple_7.23.15.root";
+////const string QCDNTuple    = "QCDJets_NTuple_noVsJets_8.3.15.root";
+//const string QCDNTuple    = "QCDJets_NTuple_7.23.15_noWeight.root";
+//const string BJetNTuple   = "BJets_NTuple_7.23.15_noWeight.root";
+//const string CJetNTuple   = "CJets_NTuple_7.23.15_noWeight.root";
 
+/*debug*/
+const string dataNTuple   = "data_NTuple_TEST.root";
+const string QCDNTuple    = "QCDJets_NTuple_TEST.root";
+const string BJetNTuple   = "BJets_NTuple_TEST.root";
+const string CJetNTuple   = "CJets_NTuple_TEST.root";
+/*debug*/
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -212,6 +222,7 @@ float trkDxy1[10000];
 float deltaRtrk2Jet[10000];//i compute this one
 
 float pthat;                      // MC Only
+float weight;                      // MC Only
 float refpt[1000];                // MC Only
 int   refparton_flavorForB[1000]; // MC Only
 
@@ -324,7 +335,7 @@ int dataType;
 // Type: 0-data, 1-QCD, 2-BJet, 3-CJet
 int bTagNTuple(int job, int type)
 {
-  
+  dataType = type;  
   switch (type) 
     {
     case 0: fileList = fileListPath + dataFileList ; printf("\n you chose data filelist\n")   ;   break ;
@@ -347,7 +358,7 @@ int bTagNTuple(int job, int type)
 int makeNTuple(int type)
 {
   // Set global data/QCD/BJet/CJet switch
-  dataType = type;  
+  
 
   // Initialize output file
 
@@ -356,10 +367,10 @@ int makeNTuple(int type)
   string outFileName;
   switch (dataType) 
     {
-    case 0: outFileName = outFilePath + dataOutFile ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 1: outFileName = outFilePath + QCDOutFile  ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 2: outFileName = outFilePath + BJetOutFile ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 3: outFileName = outFilePath + CJetOutFile ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 0: outFileName = outFilePath + dataNTuple ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 1: outFileName = outFilePath + QCDNTuple  ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 2: outFileName = outFilePath + BJetNTuple ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 3: outFileName = outFilePath + CJetNTuple ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
   cout << "decalring new tree+branches" << endl;
@@ -379,8 +390,8 @@ int makeNTuple(int type)
   //TStopwatch * clock = new TStopwatch(); /*debug*/
   //clock->Start();                        /*debug*/
 
-  //for(int kkk = 0 ; kkk < 10 ; kkk++)/*debug*/
-  while (!fileStream.eof()) 
+  for(int kkk = 0 ; kkk < 10 ; kkk++)/*debug*/
+  //while (!fileStream.eof()) 
     {
       // Open input file
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
@@ -741,7 +752,7 @@ int MCCounts(int type)
   if(!loopOverFiles)
     {
       cout << "All Files Exist! Exiting." << endl;
-      return 0;
+      return -1;
     }
 
   double pthatEntries[QCDBins+1];
@@ -846,15 +857,35 @@ int MCCounts(int type)
 
 int ApplyWeights(int type)
 {
-  string NTupleFile;
+  string NTupleFile = "";
+  
   switch(type)
     {
-  case 1: NTupleFile  =  break;
-  case 2: NTupleFile  =  break;
-  case 3: NTupleFile  =  break;
+    case 1: NTupleFile = NTuplePath + QCDNTuple; break;
+    case 2: NTupleFile = NTuplePath + BJetNTuple; break;
+    case 3: NTupleFile = NTuplePath + CJetNTuple; break;
     default:cerr<<"dataType must be 1,2,3 to apply weights (MC Only)"<<endl; return -1;      
     }  
-return 0;
+  
+  TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"UPDATE");
+  TTree* nt = (TTree * )NTuple->Get("nt");
+  nt->SetBranchAddress("pthat",&pthat);
+
+  TTree* weightTree = new TTree("weightTree","weightTree");
+  weightTree->Branch("Weight",&nWeight,"Weight/D");
+
+  int NEntries = nt->GetEntries();
+  cout << "NEntries = " << NEntries <<endl;
+  for (int i = 0; i<NEntries; i++)
+  //for (int i = 0; i<10; i++)
+    {
+      nt->GetEntry(i);
+      nWeight=2.0;
+      
+    }
+  nt->AddFriend(weightTree);
+  NTuple->Write();
+  return 0;
 }
 
 
@@ -986,111 +1017,111 @@ return 0;
 
 
 // Create the branches for the new output tree
-static inline void newBranches(TTree *newTree) 
-{
-  //event specific
-  newTree->Branch("weight", &nWeight, "weight/D");  
-  newTree->Branch("vz", &nVz ,"vz/D");
-  if(dataType>=1)newTree->Branch("pthat", &nPthat, "pthat/D"); // TEMPORARY
-  newTree->Branch("nref"  , &nNref ,"nref/I");
-  newTree->Branch("evt"   , &Evt  ,"evt/I" );
-  //  newTree->Branch("lumi"  , &Lumi ,"lumi/I");
-  newTree->Branch("run"   , &Run  ,"run/I" );
-  //jet variables
-  newTree->Branch("jtpt", &nJtpt, "jtpt/D");
-  newTree->Branch("jteta", &nJteta, "jteta/D");
-  newTree->Branch("jtphi", &nJtphi, "jtphi/D");
-  newTree->Branch("rawpt", &nRawpt, "rawpt/D");
-  if(dataType>=1)newTree->Branch("refpt", &nRefpt, "refpt/D");
-  if(dataType>=1)newTree->Branch("refparton_flavorForB", &nRefparton_flavorForB, "refparton_flavorForB/I");
-  
-  //muon variables
-  newTree->Branch("mupt", &nMupt, "mupt/D");
-  newTree->Branch("muN", &nMuN, "muN/I");
-  newTree->Branch("mueta", &nMueta, "mueta/D");
-  newTree->Branch("muphi", &nMuphi, "muphi/D");
-  newTree->Branch("mudr", &nMudr, "mudr/D");
-  newTree->Branch("muptrel", &nMuptrel, "muptrel/D");//muon momentum, in the plane transverse to the jet axis
+static inline void newBranches(TTree *newTree) 								       
+{													       
+  //event specific											       
+  newTree->Branch("weight", &nWeight, "weight/D");  							       
+  newTree->Branch("vz", &nVz ,"vz/D");									       
+  if(dataType>=1)newTree->Branch("pthat", &nPthat, "pthat/D"); // TEMPORARY				       
+  newTree->Branch("nref"  , &nNref ,"nref/I");								       
+  newTree->Branch("evt"   , &Evt  ,"evt/I" );								       
+  //  newTree->Branch("lumi"  , &Lumi ,"lumi/I");							       
+  newTree->Branch("run"   , &Run  ,"run/I" );								       
+  //jet variables											       
+  newTree->Branch("jtpt", &nJtpt, "jtpt/D");								       
+  newTree->Branch("jteta", &nJteta, "jteta/D");								       
+  newTree->Branch("jtphi", &nJtphi, "jtphi/D");								       
+  newTree->Branch("rawpt", &nRawpt, "rawpt/D");								       
+  if(dataType>=1)newTree->Branch("refpt", &nRefpt, "refpt/D");						       
+  if(dataType>=1)newTree->Branch("refparton_flavorForB", &nRefparton_flavorForB, "refparton_flavorForB/I");    
+  													       
+  //muon variables											       
+  newTree->Branch("mupt", &nMupt, "mupt/D");								       
+  newTree->Branch("muN", &nMuN, "muN/I");								       
+  newTree->Branch("mueta", &nMueta, "mueta/D");								       
+  newTree->Branch("muphi", &nMuphi, "muphi/D");								       
+  newTree->Branch("mudr", &nMudr, "mudr/D");								       
+  newTree->Branch("muptrel", &nMuptrel, "muptrel/D");//muon momentum, in the plane transverse to the jet axis  
                                                      //NOT muon transverse momentum projected onto the jet axis
-  
-  //discriminator values
-  newTree->Branch("discr_ssvHighEff", &nDiscr_ssvHighEff, "discr_ssvHighEff/D");
-  newTree->Branch("discr_ssvHighPur", &nDiscr_ssvHighPur, "discr_ssvHighPur/D");
-
-  //secondary vertex
-  newTree->Branch("nsvtx", &nNsvtx, "nsvtx/I");
-  newTree->Branch("svtxntrk", &nSvtxntrk, "svtxntrk/I");
-  newTree->Branch("svtxdl", &nSvtxdl, "svtxdl/D");
-  newTree->Branch("svtxdls", &nSvtxdls, "svtxdls/D");
-  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");
-  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");
-  newTree->Branch("svtxm", &nSvtxm, "svtxm/D");
-  newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");
-  newTree->Branch("svtxeta", &nSvtxEta, "svtxeta/D");
-  newTree->Branch("svtxphi", &nSvtxPhi, "svtxphi/D");
-  newTree->Branch("svtxDeltaR2Jet", &nSvtxDeltaR2Jet, "svtxDeltaR2Jet/D");
-  newTree->Branch("svtxDeltaPhi2Jet", &nSvtxDeltaPhi, "svtxDeltaPhi2Jet/D");
-  newTree->Branch("svtxDeltaEta2Jet", &nSvtxDeltaEta, "svtxDeltaEta2Jet/D");
-
-  //tracks
-  newTree->Branch("trackMax", &nTrackMax, "trackMax/D");
-  newTree->Branch("nIPtrk" ,&nNIPtrk  , "nIPtrk/I");
-  newTree->Branch("nselIPtrk" ,&nNselIPtrk  , "nselIPtrk/I");
-  newTree->Branch("nIP" ,&nNIP  , "nIP/I");
-  if(doTracks)
-    {
-      newTree->Branch("ipJetIndex" ,&nIPJetIndex  , "ipJetIndex[nIP]/I");
-      newTree->Branch("ipPt" ,&nIPPt  , "ipPt[nIP]/I");
-      newTree->Branch("ipProb0" ,&nIPProb0  , "ipProb0[nIP]/I");
-      //newTree->Branch("ipProb1" ,&nIPProb1  , "ipProb1[nIP]/I");
-      newTree->Branch("ip2d" ,&nIP2d  ," ip2d[nIP]/D");
-      newTree->Branch("ip2dSig",&nIP2dsig , "ip2dSig[nIP]/D");
-      newTree->Branch("ip3d" ,&nIP3d  , "ip3d[nIP]/D");
-      newTree->Branch("ip3dSig",&nIP3dsig , "ip3dSig[nIP]/D");
-      newTree->Branch("ipDist2Jet",&nIPDist2Jet , "ipDist2Jet[nIP]/D");
-      //newTree->Branch("ipDist2JetSig",&nIPDist2JetSig , "ipDist2JetSig[nIP]/D");
-      newTree->Branch("ipCloset2Jet",&nIPClosest2Jet , "ipClosest2Jet[nIP]/D");
-      newTree->Branch("ipNHitPixel" ,&nIpNHitPixel  , "ipNHitPixel[nIP]/I");
-      newTree->Branch("ipNHitStrip" ,&nIpNHitStrip  , "ipNHitStrip[nIP]/I");
-
-      //new track variables from ppTrack tree
-      newTree->Branch( "trkChi2" , &nTrkChi2, "trkChi2[nIP]/D" );
-      newTree->Branch( "trkPt"   , &nTrkPt  , "trkPt[nIP]/D"   );
-      newTree->Branch( "trkEta"  , &nTrkEta , "trkEta[nIP]/D"  );
-      newTree->Branch( "trkPhi"  , &nTrkPhi , "trkPhi[nIP]/D"  );
-      newTree->Branch( "trkDz1"  , &nTrkDz  , "trkDz1[nIP]/D"  );
-      newTree->Branch( "trkDxy1" , &nTrkDz  , "trkDxy1[nIP]/D" );
-      newTree->Branch( "deltaRtrk2Jet" , &nDeltaRtrk2Jet  , "deltaRtrk2Jet[nIP]/D" );
-      newTree->Branch( "deltaPhitrk2Jet" , &nDeltaPhi  , "deltaPhitrk2Jet[nIP]/D" );
-      newTree->Branch( "deltaEtatrk2Jet" , &nDeltaEta  , "deltaEtatrk2Jet[nIP]/D" );
-
-      if(doMostSignificantTracks)
-	{
-	  newTree->Branch("1stMost2dSigTrk",&n1stMost2dSigTrk ,"1stMost2dSigTrk/D");
-	  newTree->Branch("2ndMost2dSigTrk",&n2ndMost2dSigTrk ,"2ndMost2dSigTrk/D");
-	  newTree->Branch("3rdMost2dSigTrk",&n3rdMost2dSigTrk ,"3rdMost2dSigTrk/D");
-	  newTree->Branch("1stIP2dTrk"     ,&n1stIP2dTrk      ,"1stIP2dTrk/D"     );	
-	  newTree->Branch("2ndIP2dTrk"     ,&n2ndIP2dTrk      ,"2ndIP2dTrk/D"     );	
-	  newTree->Branch("3rdIP2dTrk"     ,&n3rdIP2dTrk      ,"3rdIP2dTrk/D"     );	
-	  newTree->Branch("1stMost3dSigTrk",&n1stMost3dSigTrk ,"1stMost3dSigTrk/D");
-	  newTree->Branch("2ndMost3dSigTrk",&n2ndMost3dSigTrk ,"2ndMost3dSigTrk/D");
-	  newTree->Branch("3rdMost3dSigTrk",&n3rdMost3dSigTrk ,"3rdMost3dSigTrk/D");
-	  newTree->Branch("1stIP3dTrk"     ,&n1stIP3dTrk      ,"1stIP3dTrk/D"     );
-	  newTree->Branch("2ndIP3dTrk"     ,&n2ndIP3dTrk      ,"2ndIP3dTrk/D"     );
-	  newTree->Branch("3rdIP3dTrk"     ,&n3rdIP3dTrk      ,"3rdIP3dTrk/D"     );
-	}
-  } 
-  //HLT
-  newTree->Branch("HLT_PAMu3_v1", &HLT_PAMu3_v1, "HLT_PAMu3_v1/I");
-  newTree->Branch("HLT_PAMu7_v1", &HLT_PAMu7_v1, "HLT_PAMu7_v1/I");
-  newTree->Branch("HLT_PAMu12_v1", &HLT_PAMu12_v1, "HLT_PAMu12_v1/I");
-  newTree->Branch("HLT_PAMu3PFJet20_v1", &HLT_PAMu3PFJet20_v1, "HLT_PAMu3PFJet20_v1/I");
-  newTree->Branch("HLT_PAMu3PFJet40_v1", &HLT_PAMu3PFJet40_v1, "HLT_PAMu3PFJet40_v1/I");
-  newTree->Branch("HLT_PAMu7PFJet20_v1", &HLT_PAMu7PFJet20_v1, "HLT_PAMu7PFJet20_v1/I");
-  newTree->Branch("HLT_PABTagMu_Jet20_Mu4_v1",&HLT_PABTagMu_Jet20_Mu4_v1,"HLT_PABTagMu_Jet20_Mu4_v1/I");
-
-  return;
-}
+  													       
+  //discriminator values										       
+  newTree->Branch("discr_ssvHighEff", &nDiscr_ssvHighEff, "discr_ssvHighEff/D");			       
+  newTree->Branch("discr_ssvHighPur", &nDiscr_ssvHighPur, "discr_ssvHighPur/D");			       
+													       
+  //secondary vertex											       
+  newTree->Branch("nsvtx", &nNsvtx, "nsvtx/I");								       
+  newTree->Branch("svtxntrk", &nSvtxntrk, "svtxntrk/I");						       
+  newTree->Branch("svtxdl", &nSvtxdl, "svtxdl/D");							       
+  newTree->Branch("svtxdls", &nSvtxdls, "svtxdls/D");							       
+  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
+  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
+  newTree->Branch("svtxm", &nSvtxm, "svtxm/D");								       
+  newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");							       
+  newTree->Branch("svtxeta", &nSvtxEta, "svtxeta/D");							       
+  newTree->Branch("svtxphi", &nSvtxPhi, "svtxphi/D");							       
+  newTree->Branch("svtxDeltaR2Jet", &nSvtxDeltaR2Jet, "svtxDeltaR2Jet/D");				       
+  newTree->Branch("svtxDeltaPhi2Jet", &nSvtxDeltaPhi, "svtxDeltaPhi2Jet/D");				       
+  newTree->Branch("svtxDeltaEta2Jet", &nSvtxDeltaEta, "svtxDeltaEta2Jet/D");				       
+													       
+  //tracks												       
+  newTree->Branch("trackMax", &nTrackMax, "trackMax/D");						       
+  newTree->Branch("nIPtrk" ,&nNIPtrk  , "nIPtrk/I");							       
+  newTree->Branch("nselIPtrk" ,&nNselIPtrk  , "nselIPtrk/I");						       
+  newTree->Branch("nIP" ,&nNIP  , "nIP/I");								       
+  if(doTracks)												       
+    {													       
+      newTree->Branch("ipJetIndex" ,&nIPJetIndex  , "ipJetIndex[nIP]/I");				       
+      newTree->Branch("ipPt" ,&nIPPt  , "ipPt[nIP]/I");							       
+      newTree->Branch("ipProb0" ,&nIPProb0  , "ipProb0[nIP]/I");					       
+      //newTree->Branch("ipProb1" ,&nIPProb1  , "ipProb1[nIP]/I");					       
+      newTree->Branch("ip2d" ,&nIP2d  ," ip2d[nIP]/D");							       
+      newTree->Branch("ip2dSig",&nIP2dsig , "ip2dSig[nIP]/D");						       
+      newTree->Branch("ip3d" ,&nIP3d  , "ip3d[nIP]/D");							       
+      newTree->Branch("ip3dSig",&nIP3dsig , "ip3dSig[nIP]/D");						       
+      newTree->Branch("ipDist2Jet",&nIPDist2Jet , "ipDist2Jet[nIP]/D");					       
+      //newTree->Branch("ipDist2JetSig",&nIPDist2JetSig , "ipDist2JetSig[nIP]/D");			       
+      newTree->Branch("ipCloset2Jet",&nIPClosest2Jet , "ipClosest2Jet[nIP]/D");				       
+      newTree->Branch("ipNHitPixel" ,&nIpNHitPixel  , "ipNHitPixel[nIP]/I");				       
+      newTree->Branch("ipNHitStrip" ,&nIpNHitStrip  , "ipNHitStrip[nIP]/I");				       
+													       
+      //new track variables from ppTrack tree								       
+      newTree->Branch( "trkChi2" , &nTrkChi2, "trkChi2[nIP]/D" );					       
+      newTree->Branch( "trkPt"   , &nTrkPt  , "trkPt[nIP]/D"   );					       
+      newTree->Branch( "trkEta"  , &nTrkEta , "trkEta[nIP]/D"  );					       
+      newTree->Branch( "trkPhi"  , &nTrkPhi , "trkPhi[nIP]/D"  );					       
+      newTree->Branch( "trkDz1"  , &nTrkDz  , "trkDz1[nIP]/D"  );					       
+      newTree->Branch( "trkDxy1" , &nTrkDz  , "trkDxy1[nIP]/D" );					       
+      newTree->Branch( "deltaRtrk2Jet" , &nDeltaRtrk2Jet  , "deltaRtrk2Jet[nIP]/D" );			       
+      newTree->Branch( "deltaPhitrk2Jet" , &nDeltaPhi  , "deltaPhitrk2Jet[nIP]/D" );			       
+      newTree->Branch( "deltaEtatrk2Jet" , &nDeltaEta  , "deltaEtatrk2Jet[nIP]/D" );			       
+													       
+      if(doMostSignificantTracks)									       
+	{												       
+	  newTree->Branch("1stMost2dSigTrk",&n1stMost2dSigTrk ,"1stMost2dSigTrk/D");			       
+	  newTree->Branch("2ndMost2dSigTrk",&n2ndMost2dSigTrk ,"2ndMost2dSigTrk/D");			       
+	  newTree->Branch("3rdMost2dSigTrk",&n3rdMost2dSigTrk ,"3rdMost2dSigTrk/D");			       
+	  newTree->Branch("1stIP2dTrk"     ,&n1stIP2dTrk      ,"1stIP2dTrk/D"     );			       
+	  newTree->Branch("2ndIP2dTrk"     ,&n2ndIP2dTrk      ,"2ndIP2dTrk/D"     );			       
+	  newTree->Branch("3rdIP2dTrk"     ,&n3rdIP2dTrk      ,"3rdIP2dTrk/D"     );			       
+	  newTree->Branch("1stMost3dSigTrk",&n1stMost3dSigTrk ,"1stMost3dSigTrk/D");			       
+	  newTree->Branch("2ndMost3dSigTrk",&n2ndMost3dSigTrk ,"2ndMost3dSigTrk/D");			       
+	  newTree->Branch("3rdMost3dSigTrk",&n3rdMost3dSigTrk ,"3rdMost3dSigTrk/D");			       
+	  newTree->Branch("1stIP3dTrk"     ,&n1stIP3dTrk      ,"1stIP3dTrk/D"     );			       
+	  newTree->Branch("2ndIP3dTrk"     ,&n2ndIP3dTrk      ,"2ndIP3dTrk/D"     );			       
+	  newTree->Branch("3rdIP3dTrk"     ,&n3rdIP3dTrk      ,"3rdIP3dTrk/D"     );			       
+	}												       
+  } 													       
+  //HLT													       
+  newTree->Branch("HLT_PAMu3_v1", &HLT_PAMu3_v1, "HLT_PAMu3_v1/I");					       
+  newTree->Branch("HLT_PAMu7_v1", &HLT_PAMu7_v1, "HLT_PAMu7_v1/I");					       
+  newTree->Branch("HLT_PAMu12_v1", &HLT_PAMu12_v1, "HLT_PAMu12_v1/I");					       
+  newTree->Branch("HLT_PAMu3PFJet20_v1", &HLT_PAMu3PFJet20_v1, "HLT_PAMu3PFJet20_v1/I");		       
+  newTree->Branch("HLT_PAMu3PFJet40_v1", &HLT_PAMu3PFJet40_v1, "HLT_PAMu3PFJet40_v1/I");		       
+  newTree->Branch("HLT_PAMu7PFJet20_v1", &HLT_PAMu7PFJet20_v1, "HLT_PAMu7PFJet20_v1/I");		       
+  newTree->Branch("HLT_PABTagMu_Jet20_Mu4_v1",&HLT_PABTagMu_Jet20_Mu4_v1,"HLT_PABTagMu_Jet20_Mu4_v1/I");                      
+													       
+  return;												       
+}                                                                                                              
 
 // Set all the input branch addresses for the input files
 static inline void branchAddresses(TTree *akPu3) 
@@ -1179,7 +1210,13 @@ static inline void branchAddresses(TTree *akPu3)
   return;
 }
 
+
+
 //int impactParameterExploration(int type)
+
+
+
+
 //{
 //  //double paranoiaCheck=0;
 //  string fileName;
