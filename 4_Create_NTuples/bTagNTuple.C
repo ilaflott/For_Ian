@@ -45,6 +45,7 @@ using namespace std;
 // Function declarations
 int makeNTuple(int type);
 int MCCounts(int type);
+int ApplyWeights(int type);
 //static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
@@ -101,7 +102,7 @@ const string B_NBJetsFile  = "BJets_NBJets.txt";
 
 //Output Files
 const string dataOutFile   = "data_NTuple_TEST.root";
-const string QCDOutFile    = "QCDJets_NTuple_TEST.root";
+const string QCDOutFile    = "QCDJets_NTuple_noVsJets_8.3.15.root";
 const string BJetOutFile   = "BJets_NTuple_TEST.root";
 const string CJetOutFile   = "CJets_NTuple_TEST.root";
 
@@ -330,19 +331,13 @@ int bTagNTuple(int job, int type)
     case 1: fileList = fileListPath + QCDFileList  ; printf("\n you chose QCDJet filelist\n") ;   break ;
     case 2: fileList = fileListPath + BJetFileList ; printf("\n you chose BJet filelist\n")   ;   break ;
     case 3: fileList = fileListPath + CJetFileList ; printf("\n you chose CJet filelist\n")   ;   break ;
-    //case 4: fileList = fileListPath + QCDFileList  ; printf("\n you chose to calculate QCD weights\n")  ;  result = MCWeights(type) ; break ;
-    //case 5: fileList = fileListPath + BJetFileList ; printf("\n you chose to calculate BJet weights\n") ;  result = MCWeights(type) ; break ;
-    //case 6: fileList = fileListPath + CJetFileList ; printf("\n you chose to calculate CJet weights\n") ;  result = MCWeights(type) ; break ;
-    //case 7: fileList = fileListPath + QCDFileList  ; printf("\n you chose QCD\n")  ;  result = ApplyWeights(type); break ;
-    //case 8: fileList = fileListPath + BJetFileList ; printf("\n you chose BJets\n");  result = ApplyWeights(type); break ;
-    //case 9: fileList = fileListPath + CJetFileList ; printf("\n you chose CJets\n");  result = ApplyWeights(type); break ;
     default: cerr << "Type must be from {0,1,2,3}" << endl ; return -1 ;
     }
   switch (job)
     {
     case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type) ; break ; 
     case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
-    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = ApplyNTupleWeights(type) ; break ; 
+    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = ApplyWeights(type) ; break ; 
     default: cerr << "Job must be from {0,1}" << endl; return -1 ;
     }
   return result;
@@ -384,19 +379,18 @@ int makeNTuple(int type)
   //TStopwatch * clock = new TStopwatch(); /*debug*/
   //clock->Start();                        /*debug*/
 
-  for(int kkk = 0 ; kkk < 10 ; kkk++)/*debug*/
-    //  while (!fileStream.eof()) 
+  //for(int kkk = 0 ; kkk < 10 ; kkk++)/*debug*/
+  while (!fileStream.eof()) 
     {
       // Open input file
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
-      //cout << "fileName is: " << fileName << endl;
+      if(file_number%100==0 ) cout << "fileName is: " << fileName << endl;
       //if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;
-      if(file_number%1==0 ) cout << "Opening the " << file_number<< "th file" << endl;/*debug*/
+      if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;/*debug*/
       file_number++;
-
-      // Open trees
-      //      if(file_number%100==0 )cout << "Opening Trees..." << endl;
-      if(file_number%10==0 )cout << "Opening Trees..." << endl;/*debug*/
+      
+      //Open trees
+      //if(file_number%1000==0 )cout << "Opening Trees..." << endl;/*debug*/
       TTree *akPu3 = (TTree *)inFile->Get("akPu3PFJetAnalyzer/t");
 
       akPu3->AddFriend("hlt=hltanalysis/HltTree");
@@ -411,12 +405,10 @@ int makeNTuple(int type)
       int nEvents = akPu3->GetEntries();
       if(file_number%100==0 )cout << nEvents << " events to loop over in " << fileName << endl;
 
-
-
       //nEvents = 10;/*debug*/
       for (int i=0; i<nEvents; i++) 
 	{
-	  if (i%10000 == 0 && i != 0) cout << "Processing Event " << i << endl;
+	  //if (i%10000 == 0 && i != 0) cout << "Processing Event " << i << endl;
 	  akPu3->GetEntry(i);
 
 	  // Event Level Selection
@@ -426,9 +418,9 @@ int makeNTuple(int type)
 
 	  // Set weight
 	  nWeight = 1.0;
-//	  else nWeight = MCWeights(pthat);
-//	  if ( !(std::ifstream(weights_file.c_str())) );
-//        This is where the weight recognizing goes later!
+	  //else nWeight = MCWeights(pthat);
+	  //if ( !(std::ifstream(weights_file.c_str())) );
+	  //This is where the weight recognizing goes later!
 
 	  //Event Info
 	  nVz    = vz;
@@ -671,9 +663,9 @@ int makeNTuple(int type)
 	}//eventloop
       
       // Cleanup
-      if(file_number%100==0)cout << "closing " << fileName << endl;
+      if(file_number%1000==0)cout << "closing " << fileName << endl;
       inFile->Close();
-      gROOT->GetListOfFiles()->Remove(inFile);
+      //gROOT->GetListOfFiles()->Remove(inFile);
       fileStream >> fileName;
       
     }
@@ -715,17 +707,20 @@ int MCCounts(int type)
   switch(type)
     {
     case 1:  //QCD
-      NEventsFile = weightFilePath + QCD_NEventsFile ; 
-      NbJetsFile  = weightFilePath + QCD_NBJetsFile  ; 
-      NcJetsFile  = weightFilePath + QCD_NCJetsFile  ; 
+      //NEventsFile = weightFilePath + QCD_NEventsFile ; 
+      //NbJetsFile  = weightFilePath + QCD_NBJetsFile  ; 
+      //NcJetsFile  = weightFilePath + QCD_NCJetsFile  ; 
+      NEventsFile = QCD_NEventsFile ; 
+      NbJetsFile  = QCD_NBJetsFile  ; 
+      NcJetsFile  = QCD_NCJetsFile  ; 
       doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
       doCJetCountFile  = !(std::ifstream(NbJetsFile.c_str()) );
       doBJetCountFile  = !(std::ifstream(NcJetsFile.c_str()) );
       loopOverFiles = doCJetCountFile || doBJetCountFile || doEventCountFile;
       break ;
     case 2:  //B
-      NEventsFile = weightFilePath + B_NEventsFile ; 
-      NbJetsFile  = weightFilePath + B_NBJetsFile  ; 
+      NEventsFile =  B_NEventsFile ; 
+      NbJetsFile  =  B_NBJetsFile  ; 
       NcJetsFile  = "";
       doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
       doCJetCountFile  = false;
@@ -733,9 +728,9 @@ int MCCounts(int type)
       loopOverFiles =  doBJetCountFile || doEventCountFile;
       break ;
     case 3:  //C
-      NEventsFile = weightFilePath + C_NEventsFile ; 
+      NEventsFile =  C_NEventsFile ; 
       NbJetsFile  = "";
-      NcJetsFile  = weightFilePath + C_NCJetsFile  ; 
+      NcJetsFile  =  C_NCJetsFile  ; 
       doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
       doCJetCountFile  = !(std::ifstream(NbJetsFile.c_str()) );
       doBJetCountFile  = false;
@@ -766,8 +761,8 @@ int MCCounts(int type)
   inStr >> fileName;     
   
   //If you're not at the end of the list, and there's stuff to be calculated, loop over the files
-  //  while ( !inStr.eof()) 
-  for(int kkk = 0;kkk < 50; kkk++)
+  while ( !inStr.eof()) 
+  //for(int kkk = 0;kkk < 50; kkk++)/*debug*/
     {
       //cout <<"test weight computation for 5 files" << endl;/*debug*/
       TFile *inFile=TFile::Open(Form("%s",fileName.c_str()));
@@ -798,7 +793,7 @@ int MCCounts(int type)
 	      ch->Draw("jtpt>>CJetHist",Form("%s&&abs(jteta)<2&&abs(vz)<15&&refpt>0&&abs(refparton_flavorForB)==%d",pthatCut[i].c_str(),4),"goff");//draw cjet histo
 	      numCJets = (double)CJetHist->Integral();
 	      NCJets[i] += numCJets;
-	      if (NCJets[i]==NCJets[i]&&NCJets[i]!=NCJets[i]) cout <<"C NaN!!!"<<endl;
+	      if (NCJets[i]==NCJets[i]&&NCJets[i]!=NCJets[i]) cout <<"C NaN!!!"<<endl;/*debug*/
 	      CJetHist->Reset();
 	    }
 	  if(doBJetCountFile )
@@ -814,9 +809,6 @@ int MCCounts(int type)
       inFile->Close();
     }//loop over files
   
-
-  delete CJetHist;
-  delete BJetHist;
   inStr.close();        
 
   ofstream EventCountOutput( NEventsFile.c_str() , ofstream::out ); 
@@ -851,6 +843,27 @@ int MCCounts(int type)
   
   return 0;
 }
+
+int ApplyWeights(int type)
+{
+  string NTupleFile;
+  switch(type)
+    {
+  case 1: NTupleFile  =  break;
+  case 2: NTupleFile  =  break;
+  case 3: NTupleFile  =  break;
+    default:cerr<<"dataType must be 1,2,3 to apply weights (MC Only)"<<endl; return -1;      
+    }  
+return 0;
+}
+
+
+
+
+
+
+
+
 
 //static void heavyJetWeights(double *pthatEntries)
 //{
