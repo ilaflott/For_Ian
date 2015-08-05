@@ -868,6 +868,7 @@ int ComputeAndApplyWeights(int type)
   double QCDNHFJets[QCDBins+1];
   double HFNEvents[QCDBins+1];
   double NHFJets[QCDBins+1];
+  double HFWeights[QCDBins+1];
     
   switch(type)
     {
@@ -884,26 +885,66 @@ int ComputeAndApplyWeights(int type)
   if(type==1)//QCD
     {
       allInfo = (std::ifstream(QCD_NEventsFile.c_str())) || weightsExist;
+      if(!allInfo){ cout << "not enough info to compute QCD weights" << endl; return -1; }
+    
+      if(weightsExist)//check for already computed weights.
+	{
+	  ifstream inWeights(weightFile.c_str(),ifstream::in);
+	  for(int j=0;j<QCDBins+1;j++) inWeights >> weights[j];
+	  inWeights.close();
+	}
+      else//weights not there, must compute
+	{
+	  ifstream inQCDEvents(QCD_NEventsFile.c_str(),ifstream::in);
+	  ofstream outWeights(weightFile.c_str(),ofstream::out);
+	  for(int j=0;j<QCDBins+1;j++) 
+	    {
+	      inQCDEvents >> QCDNEvents[j];
+	      if(j!=QCDBins)weights[j]=(xsection[j]-xsection[j+1])/(QCDNEvents[j];
+	      else weights[j]=xsection[j]/QCDNEvents[j];
+	      outWeights << weights[j] << endl;
+	    }
+	  inQCDEvents.close();
+	  outWeights.close();
+	}
+    }
+  else//HF
+    {
+      allInfo = (std::ifstream(QCD_NEventsFile.c_str())&& std::ifstream(QCDHFNJetsFile.c_str()) &&std::ifstream(HFNEventsFile.c_str()) && std::ifstream(HFNJetsFile.c_str())) || weightsExist;
       if(!allInfo){ cout << "not enough info to compute HF weights" << endl; return -1; }
     
       if(weightsExist)//check for already computed weights.
 	{
 	  ifstream inWeights(weightFile.c_str(),ifstream::in);
 	  for(int j=0;j<QCDBins+1;j++) inWeights >> weights[j];
+	  inWeights.close();
 	}
       else//weights not there, must compute
 	{
+	  ifstream inQCDEvents(QCD_NEventsFile.c_str(),ifstream::in);
+	  ifstream inQCDHFJets(QCDNHFJetsFile.c_str(),ifstream::in);
+	  ifstream inHFEvents(HFNEventsFile.c_str(),ifstream::in);
+	  ifstream inHFJets(HFNJetsFile.c_str(),ifstream::in);
+	  
+	  ofstream outWeights(weightFile.c_str(),ofstream::out);
+	  
+	  for(int j=0;j<QCDBins+1;j++) 
+	    {
+	      inQCDEvents >> QCDNEvents[j];
+	      inQCDHFJets >> QCDNHFJets[j];
+	      inHFEvents  >> HFNEvents[j];
+	      inHFJets    >> HFNJets[j];
+	      HFWeights[j]= (HFNJets[j]/HFNEvents[j])/(QCDNHFJets[j]/QCDNEvents[j]);
+	      if(j!=QCDBins)weights[j]=(xsection[j]-xsection[j+1])/(QCDNEvents[j]+HFWeights[j]*HFNEvents[j]);
+	      else weights[j]=xsection[j]/(QCDNEvents[j]+HFWeights[j]*HFNEvents[j]);
+	      outWeights << weights[j] << endl;
+	    }
+	  inQCDEvents.close();
+	  inQCDHFJets.close();
+	  inHFEvents.close();
+	  inHFJets.close();
+	  outWeights.close();
 	}
-    }
-  else//HF
-    {
-
-      if(!allInfo){ cout << "not enough info to compute HF weights" << endl; return -1; }
-      
-      if()//check for already computed weights
-  	{
-  	}
-      else//weights not there, must be computed.
     }
   
   TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"UPDATE");
