@@ -45,7 +45,7 @@ using namespace std;
 // Function declarations
 int makeNTuple(int type);
 int MCCounts(int type);
-int ApplyWeights(int type);
+int ComputeAndApplyWeights(int type);
 //static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
@@ -348,7 +348,7 @@ int bTagNTuple(int job, int type)
     {
     case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type) ; break ; 
     case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
-    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = ApplyWeights(type) ; break ; 
+    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = ComputeAndApplyWeights(type) ; break ; 
     default: cerr << "Job must be from {0,1}" << endl; return -1 ;
     }
   return result;
@@ -855,17 +855,56 @@ int MCCounts(int type)
   return 0;
 }
 
-int ApplyWeights(int type)
+int ComputeAndApplyWeights(int type)
 {
-  string NTupleFile = "";
-  
+  string NTupleFile    = "";
+  string weightFile    = "";
+  string QCDHFNJetsFile = "";
+  string HFNEventsFile  = "";
+  string HFNJetsFile    = "";
+
+  double weights[QCDBins+1];
+  double QCDNEvents[QCDBins+1];
+  double QCDNHFJets[QCDBins+1];
+  double HFNEvents[QCDBins+1];
+  double NHFJets[QCDBins+1];
+    
   switch(type)
     {
-    case 1: NTupleFile = NTuplePath + QCDNTuple; break;
-    case 2: NTupleFile = NTuplePath + BJetNTuple; break;
-    case 3: NTupleFile = NTuplePath + CJetNTuple; break;
+    case 1: NTupleFile = NTuplePath + QCDNTuple  ; weightFile = weightFilePath + QCDWeightsFile  ; break;
+    case 2: NTupleFile = NTuplePath + BJetNTuple ; weightFile = weightFilePath + BJetWeightsFile ; HFNEventsFile = B_NEventsFile; HFNJetsFile = B_NJetsFile; QCDHFNJetsFile = QCD_NBJetsFile; break;
+    case 3: NTupleFile = NTuplePath + CJetNTuple ; weightFile = weightFilePath + CJetWeightsFile ; HFNEventsFile = C_NEventsFile; HFNJetsFile = C_NJetsFile; QCDHFNJetsFile = QCD_NCJetsFile; break;
     default:cerr<<"dataType must be 1,2,3 to apply weights (MC Only)"<<endl; return -1;      
     }  
+
+  bool allInfo;
+  bool weightsExist = (std::ifstream(weightFile.c_str()));
+
+  //compute weights
+  if(type==1)//QCD
+    {
+      allInfo = (std::ifstream(QCD_NEventsFile.c_str())) || weightsExist;
+      if(!allInfo){ cout << "not enough info to compute HF weights" << endl; return -1; }
+    
+      if(weightsExist)//check for already computed weights.
+	{
+	  ifstream inWeights(weightFile.c_str(),ifstream::in);
+	  for(int j=0;j<QCDBins+1;j++) inWeights >> weights[j];
+	}
+      else//weights not there, must compute
+	{
+	}
+    }
+  else//HF
+    {
+
+      if(!allInfo){ cout << "not enough info to compute HF weights" << endl; return -1; }
+      
+      if()//check for already computed weights
+  	{
+  	}
+      else//weights not there, must be computed.
+    }
   
   TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"UPDATE");
   TTree* nt = (TTree * )NTuple->Get("nt");
@@ -1046,7 +1085,7 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtxdl", &nSvtxdl, "svtxdl/D");							       
   newTree->Branch("svtxdls", &nSvtxdls, "svtxdls/D");							       
   newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
-  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
+7  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
   newTree->Branch("svtxm", &nSvtxm, "svtxm/D");								       
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");							       
   newTree->Branch("svtxeta", &nSvtxEta, "svtxeta/D");							       
