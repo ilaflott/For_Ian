@@ -888,14 +888,6 @@ int ApplyWeights(int type)
   return 0;
 }
 
-
-
-
-
-
-
-
-
 //static void heavyJetWeights(double *pthatEntries)
 //{
 //  // Add heavy flavor MC files to chain
