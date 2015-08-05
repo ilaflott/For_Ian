@@ -873,10 +873,10 @@ int ComputeAndApplyWeights(int type)
   switch(type)
     {
     case 1: NTupleFile = NTuplePath + QCDNTuple  ; weightFile = weightFilePath + QCDWeightsFile  ; break;
-    case 2: NTupleFile = NTuplePath + BJetNTuple ; weightFile = weightFilePath + BJetWeightsFile ; HFNEventsFile = B_NEventsFile; HFNJetsFile = B_NJetsFile; QCDHFNJetsFile = QCD_NBJetsFile; break;
-    case 3: NTupleFile = NTuplePath + CJetNTuple ; weightFile = weightFilePath + CJetWeightsFile ; HFNEventsFile = C_NEventsFile; HFNJetsFile = C_NJetsFile; QCDHFNJetsFile = QCD_NCJetsFile; break;
+    case 2: NTupleFile = NTuplePath + BJetNTuple ; weightFile = weightFilePath + BJetWeightsFile ; HFNEventsFile = B_NEventsFile; HFNJetsFile = B_NBJetsFile; QCDHFNJetsFile = QCD_NBJetsFile; break;
+    case 3: NTupleFile = NTuplePath + CJetNTuple ; weightFile = weightFilePath + CJetWeightsFile ; HFNEventsFile = C_NEventsFile; HFNJetsFile = C_NCJetsFile; QCDHFNJetsFile = QCD_NCJetsFile; break;
     default:cerr<<"dataType must be 1,2,3 to apply weights (MC Only)"<<endl; return -1;      
-    }  
+    }
 
   bool allInfo;
   bool weightsExist = (std::ifstream(weightFile.c_str()));
@@ -889,23 +889,25 @@ int ComputeAndApplyWeights(int type)
     
       if(weightsExist)//check for already computed weights.
 	{
+	  cout<<"QCDWeights exist, using them..."<<endl;
 	  ifstream inWeights(weightFile.c_str(),ifstream::in);
 	  for(int j=0;j<QCDBins+1;j++) inWeights >> weights[j];
 	  inWeights.close();
 	}
       else//weights not there, must compute
 	{
+	  cout<<"QCDWeights do not exist, computing them..."<<endl;
 	  ifstream inQCDEvents(QCD_NEventsFile.c_str(),ifstream::in);
 	  ofstream outWeights(weightFile.c_str(),ofstream::out);
 	  for(int j=0;j<QCDBins+1;j++) 
 	    {
 	      inQCDEvents >> QCDNEvents[j];
-	      if(j!=QCDBins)weights[j]=(xsection[j]-xsection[j+1])/(QCDNEvents[j];
+	      if(j!=QCDBins)weights[j]=(xsection[j]-xsection[j+1])/(QCDNEvents[j]);
 	      else weights[j]=xsection[j]/QCDNEvents[j];
 	      outWeights << weights[j] << endl;
-	    }
+	    }							    
 	  inQCDEvents.close();
-	  outWeights.close();
+	  outWeights.close();	  
 	}
     }
   else//HF
@@ -915,14 +917,16 @@ int ComputeAndApplyWeights(int type)
     
       if(weightsExist)//check for already computed weights.
 	{
+	  cout<<"HFWeights exist, using them..."<<endl;
 	  ifstream inWeights(weightFile.c_str(),ifstream::in);
 	  for(int j=0;j<QCDBins+1;j++) inWeights >> weights[j];
 	  inWeights.close();
 	}
       else//weights not there, must compute
 	{
+	  cout<<"HFWeights do not exist, computing them..."<<endl;
 	  ifstream inQCDEvents(QCD_NEventsFile.c_str(),ifstream::in);
-	  ifstream inQCDHFJets(QCDNHFJetsFile.c_str(),ifstream::in);
+	  ifstream inQCDHFJets(QCDHFNJetsFile.c_str(),ifstream::in);
 	  ifstream inHFEvents(HFNEventsFile.c_str(),ifstream::in);
 	  ifstream inHFJets(HFNJetsFile.c_str(),ifstream::in);
 	  
@@ -933,8 +937,8 @@ int ComputeAndApplyWeights(int type)
 	      inQCDEvents >> QCDNEvents[j];
 	      inQCDHFJets >> QCDNHFJets[j];
 	      inHFEvents  >> HFNEvents[j];
-	      inHFJets    >> HFNJets[j];
-	      HFWeights[j]= (HFNJets[j]/HFNEvents[j])/(QCDNHFJets[j]/QCDNEvents[j]);
+	      inHFJets    >> NHFJets[j];
+	      HFWeights[j]= (NHFJets[j]/HFNEvents[j])/(QCDNHFJets[j]/QCDNEvents[j]);
 	      if(j!=QCDBins)weights[j]=(xsection[j]-xsection[j+1])/(QCDNEvents[j]+HFWeights[j]*HFNEvents[j]);
 	      else weights[j]=xsection[j]/(QCDNEvents[j]+HFWeights[j]*HFNEvents[j]);
 	      outWeights << weights[j] << endl;
@@ -946,27 +950,43 @@ int ComputeAndApplyWeights(int type)
 	  outWeights.close();
 	}
     }
+
+  cout<<"the weights are.."<<endl;
+  for(int j=0;j<QCDBins+1;j++)cout<<"for pthatbin " << pthatBin[j] << " weight is "<<weights[j]<<endl; 
   
+  //Open Ntuple (filled once per jet w/ pthat info) for weighting
   TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"UPDATE");
   TTree* nt = (TTree * )NTuple->Get("nt");
-  nt->SetBranchAddress("pthat",&pthat);
-
+  nt->SetBranchAddress("pthat",&nPthat);
+  
+  //open new weight tree
   TTree* weightTree = new TTree("weightTree","weightTree");
   weightTree->Branch("Weight",&nWeight,"Weight/D");
-
+  nt->AddFriend(weightTree);
+  
   int NEntries = nt->GetEntries();
   cout << "NEntries = " << NEntries <<endl;
+  
+  //loop over jets
   for (int i = 0; i<NEntries; i++)
-  //for (int i = 0; i<10; i++)
+    //for (int i = 0; i<10; i++)
     {
+      //grab a jet
       nt->GetEntry(i);
       //nWeight=2.0;
-      
+      //figure out which pthat bin the jet belongs to
+      int j = 0;
+      while(nPthat>pthatBin[j] && j>QCDBins)j++;
+      nWeight = weights[j];
+      //fill the weight tree once per jet
+      weightTree->Fill();	  
     }
-  nt->AddFriend(weightTree);
+  
+  //write the new info to the old file, hence "UPDATE" option
   NTuple->Write();
   return 0;
 }
+
 
 // Create the branches for the new output tree
 static inline void newBranches(TTree *newTree) 								       
@@ -1006,7 +1026,7 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtxdl", &nSvtxdl, "svtxdl/D");							       
   newTree->Branch("svtxdls", &nSvtxdls, "svtxdls/D");							       
   newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
-7  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
+  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
   newTree->Branch("svtxm", &nSvtxm, "svtxm/D");								       
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");							       
   newTree->Branch("svtxeta", &nSvtxEta, "svtxeta/D");							       
