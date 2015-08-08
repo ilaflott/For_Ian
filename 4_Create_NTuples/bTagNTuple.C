@@ -45,7 +45,8 @@ using namespace std;
 // Function declarations
 int makeNTuple(int type);
 int MCCounts(int type);
-int ComputeAndApplyWeights(int type);
+int NTupleWeights(int type);
+int NTupleTest(int type);//crude script, doesn't even use the type
 //static void heavyJetWeights(double *pthatEntries);
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
@@ -77,8 +78,8 @@ const double pi = 3.141592653589793238462643383279502884197169399375105820974944
 const string fileListPath   = "filelists/";
 const string weightFilePath = "weight_info/";
 const string outFilePath    = "";
-//const string NTuplePath = "good_NTuples/";
-const string NTuplePath = "";/*debug*/
+const string NTuplePath = "good_NTuples/";
+//const string NTuplePath = "";/*debug*/
 
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
 const string QCDFileList  = "QCDJets_noVsJets_filelist.txt";
@@ -103,19 +104,19 @@ const string C_NCJetsFile  = "CJets_NCJets.txt";
 const string B_NEventsFile = "BJets_NEvents.txt";	  
 const string B_NBJetsFile  = "BJets_NBJets.txt";
 
-////NTuple Files
-//const string dataNTuple   = "data_NTuple_7.23.15.root";
-////const string QCDNTuple    = "QCDJets_NTuple_noVsJets_8.3.15.root";
-//const string QCDNTuple    = "QCDJets_NTuple_7.23.15_noWeight.root";
-//const string BJetNTuple   = "BJets_NTuple_7.23.15_noWeight.root";
-//const string CJetNTuple   = "CJets_NTuple_7.23.15_noWeight.root";
+//NTuple Files
+const string dataNTuple   = "data_NTuple_7.23.15.root";
+//const string QCDNTuple    = "QCDJets_NTuple_noVsJets_8.3.15.root";
+const string QCDNTuple    = "QCDJets_NTuple_8.3.15_noWeight.root";
+const string BJetNTuple   = "BJets_NTuple_7.23.15_noWeight.root";
+const string CJetNTuple   = "CJets_NTuple_7.23.15_noWeight.root";
 
-/*debug*/
-const string dataNTuple   = "data_NTuple_TEST.root";
-const string QCDNTuple    = "QCDJets_NTuple_TEST.root";
-const string BJetNTuple   = "BJets_NTuple_TEST.root";
-const string CJetNTuple   = "CJets_NTuple_TEST.root";
-/*debug*/
+///*debug*/
+//const string dataNTuple   = "data_NTuple_TEST.root";
+//const string QCDNTuple    = "QCDJets_NTuple_TEST.root";
+//const string BJetNTuple   = "BJets_NTuple_TEST.root";
+//const string CJetNTuple   = "CJets_NTuple_TEST.root";
+///*debug*/
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -336,21 +337,24 @@ int dataType;
 int bTagNTuple(int job, int type)
 {
   dataType = type;  
+  switch (job)
+    {
+    case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type) ; break ; 
+    case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
+    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = NTupleWeights(type) ; break ; 
+    case 3:cout << "You Chose to Test NTuple" << endl; result = NTupleTest(type) ; break ; 
+    default: cerr << "Job must be from {0,1}" << endl; return -1 ;
+    }
   switch (type) 
     {
+      //notice: string fileList is compatible with const char*, which has the + operator overloaded
     case 0: fileList = fileListPath + dataFileList ; printf("\n you chose data filelist\n")   ;   break ;
     case 1: fileList = fileListPath + QCDFileList  ; printf("\n you chose QCDJet filelist\n") ;   break ;
     case 2: fileList = fileListPath + BJetFileList ; printf("\n you chose BJet filelist\n")   ;   break ;
     case 3: fileList = fileListPath + CJetFileList ; printf("\n you chose CJet filelist\n")   ;   break ;
     default: cerr << "Type must be from {0,1,2,3}" << endl ; return -1 ;
     }
-  switch (job)
-    {
-    case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type) ; break ; 
-    case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
-    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = ComputeAndApplyWeights(type) ; break ; 
-    default: cerr << "Job must be from {0,1}" << endl; return -1 ;
-    }
+
   return result;
 }
 
@@ -855,7 +859,7 @@ int MCCounts(int type)
   return 0;
 }
 
-int ComputeAndApplyWeights(int type)
+int NTupleWeights(int type)
 {
   string NTupleFile    = "";
   string weightFile    = "";
@@ -934,11 +938,14 @@ int ComputeAndApplyWeights(int type)
 	  
 	  for(int j=0;j<QCDBins+1;j++) 
 	    {
+	      //grab all details needed for one bin
 	      inQCDEvents >> QCDNEvents[j];
 	      inQCDHFJets >> QCDNHFJets[j];
 	      inHFEvents  >> HFNEvents[j];
 	      inHFJets    >> NHFJets[j];
+	      //heavy flavor event weight wrt to QCD event
 	      HFWeights[j]= (NHFJets[j]/HFNEvents[j])/(QCDNHFJets[j]/QCDNEvents[j]);
+	      //overall event weight wrt to distribution
 	      if(j!=QCDBins)weights[j]=(xsection[j]-xsection[j+1])/(QCDNEvents[j]+HFWeights[j]*HFNEvents[j]);
 	      else weights[j]=xsection[j]/(QCDNEvents[j]+HFWeights[j]*HFNEvents[j]);
 	      outWeights << weights[j] << endl;
@@ -952,7 +959,7 @@ int ComputeAndApplyWeights(int type)
     }
 
   cout<<"the weights are.."<<endl;
-  for(int j=0;j<QCDBins+1;j++)cout<<"for pthatbin " << pthatBin[j] << " weight is "<<weights[j]<<endl; 
+  for(int j=0;j<QCDBins+1;j++)cout<<"for " << pthatCut[j] << " weight is "<<weights[j]<<endl; 
   
   //Open Ntuple (filled once per jet w/ pthat info) for weighting
   TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"UPDATE");
@@ -984,6 +991,38 @@ int ComputeAndApplyWeights(int type)
   
   //write the new info to the old file, hence "UPDATE" option
   NTuple->Write();
+  return 0;
+}
+
+//a crude macro quickly written to make sure the weights and pthat of the jet are lined up appropriately
+int NTupleTest(int type)
+{
+  int worthless = type;
+  string file = NTuplePath + QCDNTuple;
+  string theWeights = weightFilePath + QCDWeightsFile ;
+  double weightArray[QCDBins+1];
+
+  //read in weights here
+  ifstream inWeights(theWeights.c_str(),ifstream::in);
+  for(int j=0;j<QCDBins+1;j++) inWeights >> weightArray[j];
+  inWeights.close();
+
+  TFile *inFile = TFile::Open(Form("%s",file.c_str()));
+  TTree *theTree = (TTree*)inFile->Get("weightTree");
+  theTree->AddFriend("nt");
+  theTree->SetBranchAddress("Weight",&nWeight);
+  theTree->SetBranchAddress("pthat",&nPthat);
+  int NEvents = theTree->GetEntries();
+  for (int i =0; i<NEvents; i++)
+    {
+      theTree->GetEvent();//grab pthat and weight
+      double actualWeight;
+      int j = 0;
+      while(nPthat>pthatBin[j] && j>QCDBins)j++;
+      actualWeight = weightArray[j];
+      if(actualWeight!=nWeight)cout<<"weight is incorrect!" << endl;
+      //compare weight the tree gave us to what the weight SHOULD be
+    }
   return 0;
 }
 

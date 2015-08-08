@@ -34,16 +34,18 @@ const float int_lumi = 4209000000;//inverse millibarns of data. according to lum
 const char *data_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/data_leo/";
 const char *MC_file_path   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/augmented_Samples/";
 const char* QCD_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/QCDMC_kurts/";
-const char* QCD_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_kurts/";
-const char* QCD_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_kurts/";
-const char *hist_file_path = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
-const char *pdf_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
+//const char* QCD_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_kurts/";
+//const char* QCD_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/NTuples/HFMC_kurts/";
 
+const char *hist_file_path   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
+const char *pdf_file_path    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
+const char *NTuple_file_path = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/good_NTuples";
 //filenames
-const char *data_file_name = "data_6.1.15";
-const char *MC_file_name   = "MC_HFaugmented_halfOfficial_6.1.15";
-const char* QCD_file_name  = "QCD_6.1.15";
-const char *hist_file_name = "bTagPlots_pp";
+BJets_NTuple_7.23.15_noWeight.root  CJets_NTuple_7.23.15_noWeight.root  
+const char *data_file_name = "data_NTuple_7.23.15.root";
+const char *MC_file_name   = "QCDJets_NTuple_8.3.15_noWeight.root";
+const char* QCD_file_name  = 
+const char *hist_file_name = 
 
 //plot formatting parameters
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};
