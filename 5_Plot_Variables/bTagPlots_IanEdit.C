@@ -41,11 +41,11 @@ const char *hist_file_path   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_
 const char *pdf_file_path    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
 const char *NTuple_file_path = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/good_NTuples";
 //filenames
-BJets_NTuple_7.23.15_noWeight.root  CJets_NTuple_7.23.15_noWeight.root  
+//BJets_NTuple_7.23.15_noWeight.root  CJets_NTuple_7.23.15_noWeight.root  
 const char *data_file_name = "data_NTuple_7.23.15.root";
-const char *MC_file_name   = "QCDJets_NTuple_8.3.15_noWeight.root";
-const char* QCD_file_name  = 
-const char *hist_file_name = 
+const char *MC_file_name   = "TotalMCNTuple_WithWeights.root";
+const char* QCD_file_name  = "QCDJets_NTuple_8.3.15_WithWeights.root";
+const char *hist_file_name = "hist_Test.root";
 
 //plot formatting parameters
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};
@@ -160,34 +160,35 @@ const char *default_version ="default_Cuts";
 //be taken in as an input value to cutsVersion, even if what you really wanted to change is the cuts 
 void bTagPlots_IanEdit( int option = 0 ,const char* cutsVersion = default_version, const char* cuts = default_cut , int stackOption = 1)
 {
-  printf("\nYour cuts are:\n %s\n",cuts);
-  printf("\nYour version is:\n %s\n",cutsVersion);
+
+  cout << "Your cuts are: " << cuts << endl; 
+  cout << "Your version is: " << cutsVersion << endl; 
   
   char outputFile[1000];
   sprintf(outputFile,"%s%s_HFaugmented_halfOfficial_%s",hist_file_path,hist_file_name,cutsVersion);
   
   switch(stackOption)
     {
-    case 0:  printf("\nyou aren't stacking.\n"); break;
-    case 1:  printf("\nyou are stacking.\n"); break;
+    case 0:  cout << "you aren't stacking" << endl ; break;
+    case 1:  cout << "you are stacking" << endl; break;
     default: 
-      printf("\nnot stacking, not NOT stacking... what are you doing?!\n"); 
+      cout << "not stacking, not NOT stacking... what are you doing?!" <<endl;
       break;
     }
   switch(option)
     {
     case 0:  
-      printf("\nMaking+formatting plots.\n");
+      cout << "Making+formatting plots." << endl;
       makeQAPlots(cuts,(const char*)outputFile);
       formatQAPlots((const char*)outputFile,stackOption); break;
     case 1:
-      printf("Only making plots.\n");
+      cout << "Only making plots." << endl;
       makeQAPlots(cuts,(const char*)outputFile); break;
     case 2:
-      printf("Only formatting plots.\n");
+      cout << "Only formatting plots.\n" << endl;;
       formatQAPlots((const char*)outputFile,stackOption); break;
     default:
-      printf("ERROR: 0 for making+formatting plots, 1 for formating only, what are you doing?!\n");
+      cout << "ERROR: 0 for making+formatting plots, 1 for formating only, what are you doing?!" << endl;;
       break;
     }
 }
@@ -195,24 +196,30 @@ void bTagPlots_IanEdit( int option = 0 ,const char* cutsVersion = default_versio
 void makeQAPlots(const char* cuts, const char* outputFile)
 {
   // Open files and trees
-  printf("\nopening data ntuple : %s%s.root\n",data_file_path,data_file_name);
-  TFile *data_file = TFile::Open(Form("%s%s.root",data_file_path,data_file_name));
+  cout << "opening data ntuple : " << data_file_path << data_file_name << endl;
+
+  TFile *data_file = TFile::Open(Form("%s%s",data_file_path,data_file_name));
   TTree *data_tree = (TTree *)data_file->Get("nt");
   data_tree->SetMakeClass(1);
   
-  printf("opening MC ntuple : %s%s.root\n",MC_file_path,MC_file_name);
+  cout << "opening MC ntuple : " << MC_file_path << MC_file_name << endl;
+
   TFile *MC_file = TFile::Open(Form("%s%s.root",MC_file_path,MC_file_name));
   TTree *MC_tree = (TTree *)MC_file->Get("nt");
+  MC_Tree->AddFriend("Weight");
   MC_tree->SetMakeClass(1);
 
-  TFile *QCD_file = TFile::Open(Form("%s%s.root",QCD_file_path,QCD_file_name));
+  cout << "opening QCD ntuple : " << QCD_file_path << QCD_file_name << endl;
+
+  TFile *QCD_file = TFile::Open(Form("%s%s",QCD_file_path,QCD_file_name));
   TTree *QCD_tree = (TTree *)QCD_file->Get("nt");
+  QCD_tree->AddFriend("Weight");  
   QCD_tree->SetMakeClass(1);
 
   // Output file
-  TFile *out_file = new TFile(Form("%s.root",outputFile), "RECREATE");
-  printf("\nthe output file is %s.root \n",outputFile);
+  cout << "Opening output file : " << outputFile << endl; 
 
+  TFile *out_file = new TFile(Form("%s",outputFile), "RECREATE");
   out_file->cd();
   
   // Declare histograms arrays
@@ -237,7 +244,7 @@ void makeQAPlots(const char* cuts, const char* outputFile)
 
 	  // Fill/draw histogram
 	  if (i_type == 0) data_tree->Draw(Form("%s>>hist_%d_%d",var[i_var],i_var,i_type), Form("%s",cuts), "goff");
-	  else /*i_type!=0*/ MC_tree->Draw(Form("%s>>hist_%d_%d",var[i_var],i_var,i_type), Form("weight*(%s&&%s)", particle_cut[i_type],cuts), "goff");
+	  else /*i_type!=0*/ MC_tree->Draw(Form("%s>>hist_%d_%d",var[i_var],i_var,i_type), Form("Weight*(%s&&%s)", particle_cut[i_type],cuts), "goff");
 	    
 	  integrals[i_var][i_type]=hist[i_var][i_type]->Integral();
 	  
@@ -246,7 +253,7 @@ void makeQAPlots(const char* cuts, const char* outputFile)
 	    {
 	      QCDhist[i_var][i_type] = new TH1D(Form("QCDhist_%d_%d",i_var,i_type), Form("QCDhist_%d_%d",i_var,i_type), nbinsX[i_var], lowX[i_var], highX[i_var]);
 	      QCDhist[i_var][i_type]->Sumw2();
-	      QCD_tree->Draw(Form("%s>>QCDhist_%d_%d",var[i_var],i_var,i_type), Form("weight*(%s&&%s)", particle_cut[i_type],cuts), "goff");
+	      QCD_tree->Draw(Form("%s>>QCDhist_%d_%d",var[i_var],i_var,i_type), Form("Weight*(%s&&%s)", particle_cut[i_type],cuts), "goff");
 	      QCD_HFintegral = QCDhist[i_var][i_type]->Integral();
 	      delete QCDhist[i_var][i_type];//gotta clean up, lest there exist memory leaks
 
@@ -273,6 +280,7 @@ void makeQAPlots(const char* cuts, const char* outputFile)
       //if this is not done, we get potential memory leak warninigs
       TObject* old=gDirectory->GetList()->FindObject(Form("hist_%d_1",i_var));
       gDirectory->GetList()->Remove(old);
+
       //now remake the MC histogram by adding up appropriately scaled histogram types
       TH1D* newMCHist = new TH1D( Form("hist_%d_1",i_var), Form("hist_%d_1",i_var), nbinsX[i_var], lowX[i_var], highX[i_var]);
       newMCHist->Sumw2();
@@ -312,7 +320,7 @@ static void formatQAPlots(const char* input_file_name, int stackOption)
   //TFile *hist_file = TFile::Open(Form("%s%s_%s.root",pdf_file_path,hist_file_name,version));
   
   printf("opening %s.root\n", input_file_name);
-  TFile *hist_file = TFile::Open(Form("%s.root",input_file_name));
+  TFile *hist_file = TFile::Open(Form("%s",input_file_name));
   printf("Formatting %s.root\n", input_file_name);
   
   //const char* out_file_name;
