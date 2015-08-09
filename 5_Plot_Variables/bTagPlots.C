@@ -27,7 +27,6 @@ static void formatHist(TH1 *, const char *, const char *);
 
 //GLOBAL VARIABLES
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
-const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 const float int_lumi = 4209000000;//inverse millibarns of data. according to lumiCalc2.py, golden lumimask for HLT_PAMu3_v1, 4.209 pb of data.
 
 //file paths
@@ -40,12 +39,24 @@ const char* QCD_file_path  = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_fo
 const char *hist_file_path   = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
 const char *pdf_file_path    = "/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Histograms/6.1.15_muTagbJetRpA_pp_QAplots/";
 const char *NTuple_file_path = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/good_NTuples";
+
 //filenames
-//BJets_NTuple_7.23.15_noWeight.root  CJets_NTuple_7.23.15_noWeight.root  
 const char *data_file_name = "data_NTuple_7.23.15.root";
 const char *MC_file_name   = "TotalMCNTuple_WithWeights.root";
 const char* QCD_file_name  = "QCDJets_NTuple_8.3.15_WithWeights.root";
 const char *hist_file_name = "hist_Test.root";
+
+//cuts and naming, defualt values
+const char *default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.0";
+const char *default_version ="default_Cuts";
+
+//n_vars parameters
+const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
+const int n_vars_low   = 0  ;//starting variable for formatting
+const int n_vars_high  = 30 ;//ending variable for formatting
+const int n_vars       = (n_vars_high - n_vars_low) + 1;//for formatting plots, reflects total number of plots being formatted
+const int n_vars_TOTAL = 31;//for making plots, always make plots of all variables
+//const int n_vars_TOTAL = 1;/*debug*/
 
 //plot formatting parameters
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};
@@ -66,13 +77,6 @@ const char *x_label[] =
     "IP3dSig 1st Trk"   ,  "IP3dSig 2nd Trk"   , "IP3dSig 3rd Trk"   ,
     "IP3d 1st Trk (cm)" ,  "IP3d 2nd Trk (cm)" , "IP3d 3rd Trk (cm)" 
   };
-
-//n_vars parameters
-const int n_vars_low   = 0  ;//starting variable for formatting
-const int n_vars_high  = 30 ;//ending variable for formatting
-const int n_vars       = (n_vars_high - n_vars_low) + 1;//for formatting plots, reflects total number of plots being formatted
-const int n_vars_TOTAL = 31;//for making plots, always make plots of all variables
-//const int n_vars_TOTAL = 1;/*debug*/
 
 //tree branch names
 const char *var[] =
@@ -148,12 +152,7 @@ const bool  doLogy[] =
     1, 1, 1
   };
 
-const char *default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.0";
-const char *default_version ="default_Cuts";
 
-//MAIN FUNCTIONS
-//stackOption == 0 -> Overlaid flavor curves
-//stackOption == 1 -> stacked flavor curves
 //NOTE fields which arent specified default to the values here. If one only wants to change one or two of the parameters,
 //then they must be submitted in order and one after the other. Ex. you want to change the cuts, but because of the order
 //of the arguments and the ambiguity inherent, one must also specify a version and an option. Just specifying one string as an input will
@@ -163,10 +162,11 @@ void bTagPlots_IanEdit( int option = 0 ,const char* cutsVersion = default_versio
 
   cout << "Your cuts are: " << cuts << endl; 
   cout << "Your version is: " << cutsVersion << endl; 
-  
-  char outputFile[1000];
-  sprintf(outputFile,"%s%s_HFaugmented_halfOfficial_%s",hist_file_path,hist_file_name,cutsVersion);
-  
+  string outputFile=hist_file_path + hist_file_name + "_HFaugmented_halfOfficial_" + cutsVersion;
+
+  //char outputFile[1000];
+  //sprintf(outputFile,"%s%s_HFaugmented_halfOfficial_%s",hist_file_path,hist_file_name,cutsVersion);  
+    
   switch(stackOption)
     {
     case 0:  cout << "you aren't stacking" << endl ; break;
