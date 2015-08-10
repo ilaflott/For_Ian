@@ -108,8 +108,8 @@ const string B_NBJetsFile  = "BJets_NBJets.txt";
 const string dataNTuple   = "data_NTuple_7.23.15.root";
 //const string QCDNTuple    = "QCDJets_NTuple_noVsJets_8.3.15.root";
 const string QCDNTuple    = "QCDJets_NTuple_8.3.15_noWeight.root";
-const string BJetNTuple   = "BJets_NTuple_7.23.15_noWeight.root";
-const string CJetNTuple   = "CJets_NTuple_7.23.15_noWeight.root";
+const string BJetNTuple   = "BJets_NTuple_8.9.15_noWeight.root";
+const string CJetNTuple   = "CJets_NTuple_8.9.15_noWeight.root";
 
 ///*debug*/
 //const string dataNTuple   = "data_NTuple_TEST.root";
@@ -337,14 +337,6 @@ int dataType;
 int bTagNTuple(int job, int type)
 {
   dataType = type;  
-  switch (job)
-    {
-    case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type) ; break ; 
-    case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
-    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = NTupleWeights(type) ; break ; 
-    case 3:cout << "You Chose to Test NTuple" << endl; result = NTupleTest(type) ; break ; 
-    default: cerr << "Job must be from {0,1}" << endl; return -1 ;
-    }
   switch (type) 
     {
       //notice: string fileList is compatible with const char*, which has the + operator overloaded
@@ -353,6 +345,15 @@ int bTagNTuple(int job, int type)
     case 2: fileList = fileListPath + BJetFileList ; printf("\n you chose BJet filelist\n")   ;   break ;
     case 3: fileList = fileListPath + CJetFileList ; printf("\n you chose CJet filelist\n")   ;   break ;
     default: cerr << "Type must be from {0,1,2,3}" << endl ; return -1 ;
+
+    }
+  switch (job)
+    {
+    case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type) ; break ; 
+    case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
+    case 2:cout << "You Chose Apply NTuple Weights" << endl; result = NTupleWeights(type) ; break ; 
+    case 3:cout << "You Chose to Test NTuple" << endl; result = NTupleTest(type) ; break ; 
+    default: cerr << "Job must be from {0,1}" << endl; return -1 ;
     }
 
   return result;
@@ -362,8 +363,6 @@ int bTagNTuple(int job, int type)
 int makeNTuple(int type)
 {
   // Set global data/QCD/BJet/CJet switch
-  
-
   // Initialize output file
 
   TFile *outFile;
@@ -371,10 +370,10 @@ int makeNTuple(int type)
   string outFileName;
   switch (dataType) 
     {
-    case 0: outFileName = outFilePath + dataNTuple ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 1: outFileName = outFilePath + QCDNTuple  ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 2: outFileName = outFilePath + BJetNTuple ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 3: outFileName = outFilePath + CJetNTuple ; cout << outFileName << endl ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 0: outFileName = outFilePath + dataNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 1: outFileName = outFilePath + QCDNTuple  ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 2: outFileName = outFilePath + BJetNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 3: outFileName = outFilePath + CJetNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
   cout << "decalring new tree+branches" << endl;
@@ -394,8 +393,8 @@ int makeNTuple(int type)
   //TStopwatch * clock = new TStopwatch(); /*debug*/
   //clock->Start();                        /*debug*/
 
-  for(int kkk = 0 ; kkk < 10 ; kkk++)/*debug*/
-  //while (!fileStream.eof()) 
+  //for(int kkk = 0 ; kkk < 10 ; kkk++)/*debug*/
+  while (!fileStream.eof()) 
     {
       // Open input file
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
@@ -691,8 +690,8 @@ int makeNTuple(int type)
   // Write to output file
   outFile->cd();
   cout << "writing tree..." << newTree.GetName() <<endl;
-  
-  //kOverwrite overwrites backup/partially finished tree
+  cout << "writing file : " << outFileName << endl;
+  //kOverrwrite overwrites backup/partially finished tree
   newTree.Write(newTree.GetName(), TObject::kOverwrite);
   
   // Cleanup

@@ -51,7 +51,7 @@ const string default_version ="defaul_test";
 //n_vars parameters
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 const int n_vars_low   = 0  ;//starting variable for formatting
-const int n_vars_high  = 0 ;//ending variable for formatting
+const int n_vars_high  = 1 ;//ending variable for formatting
 const int n_vars       = (n_vars_high - n_vars_low) + 1;//for formatting plots, reflects total number of plots being formatted
 const int n_vars_TOTAL = 31;//for making plots, always make plots of all variables
 
@@ -260,20 +260,27 @@ void makeQAPlots(string cuts, string outputFileName)
 	    }
 	  if (i_type==0) hist[i_var][i_type]->Scale(1/int_lumi);//no need to scale MC by int_lumi, weighted by cross section
 	  integrals[i_var][i_type]=hist[i_var][i_type]->Integral();
-	}
+	  if(i_type==4)cout << "type loop Integral = " <<  integrals[i_var][i_type] << endl;
+	}//type loop for filling
       
       //second loop to renormalize MC distributions to data
       double scale_factor = (integrals[i_var][0])/(integrals[i_var][2]+integrals[i_var][3]+integrals[i_var][4]);
       cout << "renormalizing MC distributions to data" << endl;
       for (int i_type = 2; i_type < n_types; i_type++)
 	{
+	  if(i_type==4)
+	    {
+	      cout << "i_type = 4" << endl;
+	      cout << "scale_factor = " << scale_factor << endl;
+	    }
 	  hist[i_var][i_type]->Scale(scale_factor);
 	  integrals[i_var][i_type]=hist[i_var][i_type]->Integral();
 	  numEntries = hist[i_var][i_type]->GetEntries(); 
 	  cout << "i_type = " << i_type << endl; 
-	  cout << "Entries = " << numEntries << endl;
-	  cout << "Integral = " <<  integrals[i_var][i_type] << endl;
+	  if(i_type==4)cout << "Entries = " << numEntries << endl;
+	  if(i_type==4)cout << "Integral = " <<  integrals[i_var][i_type] << endl;
 	}
+
       //we're going to remake the MC hist, so we de-register from current directory
       //if this is not done, we get potential memory leak warninigs
       TObject* old=gDirectory->GetList()->FindObject(Form("hist_%d_1",variableIndex));
