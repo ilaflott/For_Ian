@@ -83,6 +83,17 @@ const string NTuplePath = "good_NTuples/";
 
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
 const string QCDFileList  = "QCDJets_noVsJets_filelist.txt";
+const string QCDFileList_1   = "QCDJets_noVsJets_filelist_1.txt";
+const string QCDFileList_2   = "QCDJets_noVsJets_filelist_2.txt";
+const string QCDFileList_3   = "QCDJets_noVsJets_filelist_3.txt";
+const string QCDFileList_4   = "QCDJets_noVsJets_filelist_4.txt";
+const string QCDFileList_5   = "QCDJets_noVsJets_filelist_5.txt";
+const string QCDFileList_6   = "QCDJets_noVsJets_filelist_6.txt";
+const string QCDFileList_7   = "QCDJets_noVsJets_filelist_7.txt";
+const string QCDFileList_8   = "QCDJets_noVsJets_filelist_8.txt";
+const string QCDFileList_9   = "QCDJets_noVsJets_filelist_9.txt";
+const string QCDFileList_10  = "QCDJets_noVsJets_filelist_10.txt";
+const string QCDFileList_11  = "QCDJets_noVsJets_filelist_11.txt";
 const string BJetFileList = "BJets_filelist.txt";
 const string CJetFileList = "CJets_filelist.txt";
 
@@ -334,16 +345,27 @@ int dataType;
 // Main functions
 // Mode: 0-makeNTuple(), 1-mergeMCSamples()
 // Type: 0-data, 1-QCD, 2-BJet, 3-CJet
-int bTagNTuple(int job, int type)
+nt bTagNTuple(int job, int type)
 {
   dataType = type;  
   switch (type) 
     {
       //notice: string fileList is compatible with const char*, which has the + operator overloaded
-    case 0: fileList = fileListPath + dataFileList ; printf("\n you chose data filelist\n")   ;   break ;
-    case 1: fileList = fileListPath + QCDFileList  ; printf("\n you chose QCDJet filelist\n") ;   break ;
-    case 2: fileList = fileListPath + BJetFileList ; printf("\n you chose BJet filelist\n")   ;   break ;
-    case 3: fileList = fileListPath + CJetFileList ; printf("\n you chose CJet filelist\n")   ;   break ;
+    case 0 : fileList = fileListPath + dataFileList    ; cout << "you chose " << dataFileList   << endl   ;   break ;
+    case 1 : fileList = fileListPath + QCDFileList     ; cout << "you chose " << QCDFileList    << endl   ;   break ;
+    case 2 : fileList = fileListPath + BJetFileList    ; cout << "you chose " << BJetFileList   << endl   ;   break ;
+    case 3 : fileList = fileListPath + CJetFileList    ; cout << "you chose " << CJetFileList   << endl   ;   break ;
+    case 4 : fileList = fileListPath + QCDFileList_1   ; cout << "you chose " << QCDFileList_1  << endl   ;   break ;
+    case 5 : fileList = fileListPath + QCDFileList_2   ; cout << "you chose " << QCDFileList_2  << endl   ;   break ;
+    case 6 : fileList = fileListPath + QCDFileList_3   ; cout << "you chose " << QCDFileList_3  << endl   ;   break ;
+    case 7 : fileList = fileListPath + QCDFileList_4   ; cout << "you chose " << QCDFileList_4  << endl   ;   break ;
+    case 8 : fileList = fileListPath + QCDFileList_5   ; cout << "you chose " << QCDFileList_5  << endl   ;   break ;
+    case 9 : fileList = fileListPath + QCDFileList_6   ; cout << "you chose " << QCDFileList_6  << endl   ;   break ;
+    case 10: fileList = fileListPath + QCDFileList_7   ; cout << "you chose " << QCDFileList_7  << endl   ;   break ;
+    case 11: fileList = fileListPath + QCDFileList_8   ; cout << "you chose " << QCDFileList_8  << endl   ;   break ;
+    case 12: fileList = fileListPath + QCDFileList_9   ; cout << "you chose " << QCDFileList_9  << endl   ;   break ;
+    case 13: fileList = fileListPath + QCDFileList_10  ; cout << "you chose " << QCDFileList_10 << endl   ;   break ;
+    case 14: fileList = fileListPath + QCDFileList_11  ; cout << "you chose " << QCDFileList_11 << endl   ;   break ;
     default: cerr << "Type must be from {0,1,2,3}" << endl ; return -1 ;
 
     }
@@ -370,10 +392,22 @@ int makeNTuple(int type)
   string outFileName;
   switch (dataType) 
     {
-    case 0: outFileName = outFilePath + dataNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 1: outFileName = outFilePath + QCDNTuple  ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 2: outFileName = outFilePath + BJetNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 3: outFileName = outFilePath + CJetNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 0 : outFileName = outFilePath + dataNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+      //    case 1: outFileName = outFilePath + QCDNTuple  ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 1 : cout << "consider submitting makeNTuple in 11 pieces using types 4-14..." << endl; return -1;
+    case 2 : outFileName = outFilePath + BJetNTuple ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 3 : outFileName = outFilePath + CJetNTuple ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 4 : outFileName = outFilePath + "P_1"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 5 : outFileName = outFilePath + "P_2"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 6 : outFileName = outFilePath + "P_3"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 7 : outFileName = outFilePath + "P_4"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 8 : outFileName = outFilePath + "P_5"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 9 : outFileName = outFilePath + "P_6"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 10: outFileName = outFilePath + "P_7"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 11: outFileName = outFilePath + "P_8"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 12: outFileName = outFilePath + "P_9"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 13: outFileName = outFilePath + "P_10" + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 14: outFileName = outFilePath + "P_11" + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
   cout << "decalring new tree+branches" << endl;

@@ -45,15 +45,17 @@ const string QCD_file_name  = "QCDJets_NTuple_8.3.15_WithWeights.root";
 //const string pdf_file_name = hist_file_name;
 
 //cuts and naming, defualt values
-const string default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.0";
-const string default_version ="defaul_test";
+//const string default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.0";
+//vz cut, jteta cut, jtpt cut, HLT cut, mupt!=0 cut, W cut for data
+const string default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>20&&mupt!=0";
+const string default_version ="vz15_jteta2_jtpt20_1mu";
 
 //n_vars parameters
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 const int n_vars_low   = 0  ;//starting variable for formatting
-const int n_vars_high  = 1 ;//ending variable for formatting
+const int n_vars_high  = 2  ;//ending variable for formatting
 const int n_vars       = (n_vars_high - n_vars_low) + 1;//for formatting plots, reflects total number of plots being formatted
-const int n_vars_TOTAL = 31;//for making plots, always make plots of all variables
+const int n_vars_TOTAL = 33;//for making plots, always make plots of all variables
 
 //plot formatting parameters
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};
@@ -67,7 +69,7 @@ const string x_label[] =
     "jtpt (GeV)" , "jteta" , "jtphi (rad)" ,         
     "mupt (Gev)" , "muptrel (GeV)" , "mueta" , "muphi (rad)" , "mudr" , 
     "discr_ssvHighEff" , "discr_ssvHighPur" ,
-    "nsvtx" , "svtxntrk" , "svtxdl (cm)" , "svtxdls" ,
+    "nsvtx" , "svtxntrk" , "svtx2Ddl (cm)" , "svtx2Ddls" , "svtxm (GeV)","svtxDeltaR2Jet",
     "IP2d (cm)" , "IP2sSig" , "IP3d (cm)" , "IP3dSig" , "deltaRtrk2Jet",
     "IP2dSig 1st Trk"   ,  "IP2dSig 2nd Trk"   , "IP2dSig 3rd Trk"   ,
     "IP2d 1st Trk (cm)" ,  "IP2d 2nd Trk (cm)" , "IP2d 3rd Trk (cm)" ,
@@ -78,12 +80,12 @@ const string x_label[] =
 //tree branch names
 const string var[] =
   {
-    "jtpt",    "jteta",  "jtphi",                                  //jets, vars 0-2			  
-    "mupt", "muptrel","mueta",    "muphi",   "mudr",               //muons, vars 3-7			  
-    "discr_ssvHighEff", "discr_ssvHighPur",                        //discriminators, 8-9		  
-    "nsvtx", "svtxntrk", "svtxdl", "svtxdls",                      //secondary vertex, vars 10-14	  
-    "ip2d","ip2dSig","ip3d","ip3dSig","deltaRtrk2Jet",             //impact parameters+deltaR, vars 15-19 
-    "1stMost2dSigTrk",    "2ndMost2dSigTrk",    "3rdMost2dSigTrk", //most significant tracks, vars 20-30  
+    "jtpt",    "jteta",  "jtphi",                                                               //jets, vars 0-2		       	  
+    "mupt", "muptrel","mueta",    "muphi",   "mudr",                                            //muons, vars 3-7		       	  
+    "discr_ssvHighEff", "discr_ssvHighPur",                                                     //discriminators, 8-9		       
+    "nsvtx", "svtxntrk", "svtx2Ddl", "svtx2Ddls", "svtxm","svtxDeltaR2Jet",                     //secondary vertex, vars 12-16	       
+    "ip2d","ip2dSig","ip3d","ip3dSig","deltaRtrk2Jet",                                          //impact parameters+deltaR, vars 17-21 
+    "1stMost2dSigTrk",    "2ndMost2dSigTrk",    "3rdMost2dSigTrk",                              //most significant tracks, vars 22-32  
     "1stIP2dTrk"     ,    "2ndIP2dTrk"     ,    "3rdIP2dTrk"     ,
     "1stMost3dSigTrk",    "2ndMost3dSigTrk",    "3rdMost3dSigTrk",
     "1stIP3dTrk"     ,    "2ndIP3dTrk"     ,    "3rdIP3dTrk"          
@@ -102,48 +104,48 @@ const string particle_cut[] =
 //plot parameters                                                                                     
 const int   nbinsX[] = 
   {   
-    25, 15, 15,             //jets, vars 0-2			  
-    20, 25, 15, 15, 15,     //muons, vars 3-7			  
-    6,   6, 		    //discriminators, 8-9		  
-    5,  12,  8, 16, 	    //secondary vertex, vars 10-14	  
-    20, 20, 20, 20, 7,	    //impact parameters+deltaR, vars 15-19 
-    16, 16, 16,		    //most significant tracks, vars 20-31  
+    54, 15, 15,              //jets, vars 0-2		       
+    20, 25, 15, 15, 15,      //muons, vars 3-7		       
+    12,   12, 		     //discriminators, 8-9		       
+    5,  12,  8, 16, 14,10,    //secondary vertex, vars 12-16	       	  
+    20, 20, 20, 20, 7,	     //impact parameters+deltaR, vars 17-21 
+    16, 16, 16,		     //most significant tracks, vars 22-32  
     8, 8, 8,
     16, 16, 16,
     8, 8, 8
   };
 const double  lowX[] = 
   { 
-      20,  -3,  -pi,            //jets, vars 0-2			  
-       0,   0,   -3, -pi, 0,  	//muons, vars 3-7			  
-       0,   0,       	  	//discriminators, 8-9		  
-       0,   0,    0,   0, 	//secondary vertex, vars 10-14	  
-      -0.1, -30, -0.1, -30, 0,  //impact parameters+deltaR, vars 15-19 
-      -30,-30,-30,   		//most significant tracks, vars 20-31  
+      0,  -3,  -pi,              //jets, vars 0-2		       
+       0,   0,   -3, -pi, 0,  	 //muons, vars 3-7		        
+       0,   0,       	      	 //discriminators, 8-9		       
+      0,   0,    0,   0, 0,0, 	 //secondary vertex, vars 12-16	       
+      -0.1, -30, -0.1, -30, 0, 	 //impact parameters+deltaR, vars 17-21 
+      -30,-30,-30,   	       	 //most significant tracks, vars 22-32  
       -0.1,-0.1,-0.1,
       -30,-30,-30,   
       -0.1,-0.1,-0.1 
   };
 const double highX[] = 
   {   
-    270 ,  3  ,  pi,            //jets, vars 0-2			  
-     80 ,  10 ,   3,  pi, 0.5,  //muons, vars 3-7			  
-      6 ,   6 ,  		//discriminators, 8-9		  
-      5 ,  12 ,   4, 240, 	//secondary vertex, vars 10-14	  
-    0.1 ,  30 , 0.1,  30, 0.7,	//impact parameters+deltaR, vars 15-19 
-    30  ,  30 , 30 ,   		//most significant tracks, vars 20-31  
+    270 ,  3  ,  pi,           	   //jets, vars 0-2		       
+     80 ,  10 ,   3,  pi, 0.5, 	   //muons, vars 3-7		       
+      6 ,   6 ,  	       	   //discriminators, 8-9		       
+    5 ,  12 ,   4, 240, 7,5,  	   //secondary vertex, vars 12-16	       
+    0.1 ,  30 , 0.1,  30, 0.7, 	   //impact parameters+deltaR, vars 17-21 
+    30  ,  30 , 30 ,   	       	   //most significant tracks, vars 22-32  
     0.1 , 0.1 , 0.1,
     30  ,  30 , 30 ,   
     0.1 , 0.1 , 0.1 
   };
 const bool  doLogy[] = 
   { 
-    1, 1, 0,                    //jets, vars 0-2			  
-    1, 1, 1, 0, 1,  		//muons, vars 3-7			  
-    1, 1, 			//discriminators, 8-9		  
-    1, 1, 1, 1, 		//secondary vertex, vars 10-14	  
-    1,1,1,1, 1,		//impact parameters+deltaR, vars 15-19 
-    1, 1, 1,			//most significant tracks, vars 20-31  
+    1, 1, 0,               //jets, vars 0-2		       
+    1, 1, 1, 0, 1,  	   //muons, vars 3-7		       
+    1, 1, 		   //discriminators, 8-9		       
+    1, 1, 1, 1,1, 1, 	   //secondary vertex, vars 12-16	       
+    1,1,1,1, 1,		   //impact parameters+deltaR, vars 17-21 
+    1, 1, 1,		   //most significant tracks, vars 22-32  
     1, 1, 1,
     1, 1, 1,
     1, 1, 1
@@ -154,10 +156,22 @@ const bool  doLogy[] =
 //then they must be submitted in order and one after the other. Ex. you want to change the cuts, but because of the order
 //of the arguments and the ambiguity inherent, one must also specify a version and an option. Just specifying one string as an input will
 //be taken in as an input value to cutsVersion, even if what you really wanted to change is the cuts 
-int bTagPlots( int option = 0 , string cutsVersion = default_version, string cuts = default_cut , int stackOption = 1)
+int bTagPlots( int option = 0 , int stackOption = 1 , string cutsVersion = default_version , string cuts = default_cut  )
 {
-  const string outputFile = hist_file_path + "bTagPlots_pp_" + cutsVersion ;//
+  string finalCuts = "";
+  string finalVersion="";
+
+  if(cutsVersion==default_version) finalVersion = default_version;
+  else finalVersion = default_version + "_" + cutsVersion;
+
+  const string outputFile = hist_file_path + "bTagPlots_pp_" + finalVersion ;//
   
+  if(cuts==default_cut) finalCuts = default_cut ;
+  else finalCuts = default_cut + "&&" + cuts;
+
+  cout << "your final version is " << finalVersion << endl;
+  cout << "your final cuts are " << finalCuts << endl;
+
   if (stackOption==0)       cout << "you aren't stacking" << endl ; 
   else if (stackOption==1)  cout << "you are stacking" << endl;
   else                      cout << "not stacking, not NOT stacking... what are you doing?!" <<endl;
@@ -166,12 +180,12 @@ int bTagPlots( int option = 0 , string cutsVersion = default_version, string cut
     {
     case 0:  
       cout << "Making plots..." << endl;
-      makeQAPlots(cuts,outputFile);
+      makeQAPlots(finalCuts,outputFile);
       cout << "Formatting plots..." << endl;
       formatQAPlots(outputFile,stackOption); break;
     case 1:
       cout << "Only making plots..." << endl;
-      makeQAPlots(cuts,outputFile); break;
+      makeQAPlots(finalCuts,outputFile); break;
     case 2:
       cout << "Only formatting plots..." << endl;;
       formatQAPlots(outputFile,stackOption); break;
@@ -222,6 +236,7 @@ void makeQAPlots(string cuts, string outputFileName)
   
   double QCD_HFintegral = 0;
   int numEntries = 0;
+  
   cout <<"creating histogram for each variable in range.."<< n_vars_low << " to " << n_vars_high << endl;
   for (int i_var = 0; i_var < n_vars; i_var++)
     {
@@ -237,7 +252,7 @@ void makeQAPlots(string cuts, string outputFileName)
 	  hist[i_var][i_type]->Sumw2();
 
 	  // Fill/draw histogram
-	  if (i_type == 0) data_tree->Draw(Form("%s>>hist_%d_%d",var[variableIndex].c_str(),variableIndex,i_type), Form("%s",cuts.c_str()), "goff");
+	  if (i_type == 0) data_tree->Draw(Form("%s>>hist_%d_%d",var[variableIndex].c_str(),variableIndex,i_type), Form("%s&&mupt/rawpt<0.95",cuts.c_str()), "goff");
 	  else /*i_type!=0*/ MC_tree->Draw(Form("%s>>hist_%d_%d",var[variableIndex].c_str(),variableIndex,i_type), Form("Weight*(%s&&%s)", particle_cut[i_type].c_str(),cuts.c_str()), "goff");
 	    
 	  integrals[i_var][i_type]=hist[i_var][i_type]->Integral();
@@ -253,8 +268,7 @@ void makeQAPlots(string cuts, string outputFileName)
 	      delete QCDhist[i_var][i_type];//gotta clean up, lest there exist memory leaks
 
 	      double HFscale_factor = QCD_HFintegral/integrals[i_var][i_type];
-	      cout << "QCD HF Integral for i_type == "<< i_type<< " is "  << QCD_HFintegral << endl;
-	      cout << "HF Scale factor is: " << HFscale_factor << endl;
+	      cout << "QCD HF Integral for i_type == "<< i_type<< " is "  << QCD_HFintegral << endl;	      cout << "HF Scale factor is: " << HFscale_factor << endl;
 	      
 	      hist[i_var][i_type]->Scale(HFscale_factor);
 	    }
