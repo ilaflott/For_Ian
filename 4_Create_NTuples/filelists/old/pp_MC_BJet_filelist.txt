@@ -1,0 +1,5 @@
+root://xrootd.cmsaf.mit.edu//store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet30output.root
+root://xrootd.cmsaf.mit.edu//store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet50output.root
+root://xrootd.cmsaf.mit.edu//store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet80output.root
+root://xrootd.cmsaf.mit.edu//store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet120output.root
+root://xrootd.cmsaf.mit.edu//store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet170output.root

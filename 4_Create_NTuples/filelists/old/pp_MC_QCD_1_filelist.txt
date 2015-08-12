@@ -1,0 +1,3 @@
+root://xrootd.cmsaf.mit.edu//store/user/kjung/pp_Fix3_QCDJetMerged/pp_Fix3_MCBForest30output.root
+root://xrootd.cmsaf.mit.edu//store/user/kjung/pp_Fix3_QCDJetMerged/pp_Fix3_MCBForest50output.root
+root://xrootd.cmsaf.mit.edu//store/user/kjung/pp_Fix3_QCDJetMerged/pp_Fix3_MCBForest80output.root

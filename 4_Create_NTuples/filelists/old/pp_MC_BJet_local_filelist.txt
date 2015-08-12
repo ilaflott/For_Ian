@@ -1,0 +1,5 @@
+/mnt/hadoop/cms/store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet30output.root
+/mnt/hadoop/cms/store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet50output.root
+/mnt/hadoop/cms/store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet80output.root
+/mnt/hadoop/cms/store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet120output.root
+/mnt/hadoop/cms/store/user/kjung/pp_Fix3_BJetMerged/pp_Fix3_BJet170output.root
