@@ -345,7 +345,7 @@ int dataType;
 // Main functions
 // Mode: 0-makeNTuple(), 1-mergeMCSamples()
 // Type: 0-data, 1-QCD, 2-BJet, 3-CJet
-nt bTagNTuple(int job, int type)
+int bTagNTuple(int job, int type)
 {
   dataType = type;  
   switch (type) 
