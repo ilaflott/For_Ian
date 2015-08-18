@@ -526,7 +526,7 @@ int makeNTuple(int type)
 	      nSvtxntrk = svtxntrk[j];
 	      nSvtxdl   = svtxdl[j];
 	      nSvtxdls  = svtxdls[j];
-	      nSvtx2Ddls  = svtx2Ddls[j];
+	      nSvtx2Ddl  = svtx2Ddl[j];
 	      nSvtx2Ddls  = svtx2Ddls[j];
 	      nSvtxm    = svtxm[j];
 	      nSvtxpt   = svtxpt[j];           
@@ -1097,7 +1097,7 @@ static inline void newBranches(TTree *newTree)
   newTree->Branch("svtxntrk", &nSvtxntrk, "svtxntrk/I");						       
   newTree->Branch("svtxdl", &nSvtxdl, "svtxdl/D");							       
   newTree->Branch("svtxdls", &nSvtxdls, "svtxdls/D");							       
-  newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
+  newTree->Branch("svtx2Ddl", &nSvtx2Ddl, "svtx2Ddl/D");						       
   newTree->Branch("svtx2Ddls", &nSvtx2Ddls, "svtx2Ddls/D");						       
   newTree->Branch("svtxm", &nSvtxm, "svtxm/D");								       
   newTree->Branch("svtxpt", &nSvtxpt, "svtxpt/D");							       
@@ -1244,7 +1244,7 @@ static inline void branchAddresses(TTree *akPu3)
   akPu3->SetBranchAddress("svtxntrk", &svtxntrk );
   akPu3->SetBranchAddress("svtxdl"  , &svtxdl   );
   akPu3->SetBranchAddress("svtxdls" , &svtxdls  );
-  akPu3->SetBranchAddress("svtx2Ddls" , &svtx2Ddls  );
+  akPu3->SetBranchAddress("svtx2Ddl" , &svtx2Ddl  );
   akPu3->SetBranchAddress("svtx2Ddls" , &svtx2Ddls  );
   akPu3->SetBranchAddress("svtxm"   , &svtxm    );
   akPu3->SetBranchAddress("svtxpt"  , &svtxpt   );
