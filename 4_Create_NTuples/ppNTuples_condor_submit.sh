@@ -11,6 +11,7 @@ job=$1
 flavor=$2
 max=$3
 NJOBS=$(($(($max + 1)) - $flavor)) 
+
 echo "$NJOBS being submitted"
 
     if [ $job -eq 0 ]; then
