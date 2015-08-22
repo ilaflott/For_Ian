@@ -118,10 +118,14 @@ const string B_NBJetsFile  = "BJets_NBJets.txt";
 //NTuple Files
 const string dataNTuple   = "data_NTuple_7.23.15.root";
 //const string QCDNTuple    = "QCDJets_NTuple_noVsJets_8.3.15.root";
-const string QCDNTuple    = "QCDJets_NTuple_8.3.15_noWeight.root";
-const string BJetNTuple   = "BJets_NTuple_8.9.15_noWeight.root";
-const string CJetNTuple   = "CJets_NTuple_8.9.15_noWeight.root";
-
+////if no weights yet
+//const string QCDNTuple    = "QCDJets_NTuple_8.3.15_noWeight.root";
+//const string BJetNTuple   = "BJets_NTuple_8.9.15_noWeight.root";
+//const string CJetNTuple   = "CJets_NTuple_8.9.15_noWeight.root";
+//if the weights need to be redone...
+const string QCDNTuple    = "QCDJets_NTuple_8.22.15_withWeights.root";
+const string BJetNTuple   = "BJets_NTuple_8.22.15_withWeights.root";
+const string CJetNTuple   = "BJets_NTuple_8.22.15_withWeights.root";
 ///*debug*/
 //const string dataNTuple   = "data_NTuple_TEST.root";
 //const string QCDNTuple    = "QCDJets_NTuple_TEST.root";
@@ -1016,7 +1020,7 @@ int NTupleWeights(int type)
       //nWeight=2.0;
       //figure out which pthat bin the jet belongs to
       int j = 0;
-      while(nPthat>pthatBin[j] && j>QCDBins)j++;
+      while(nPthat>pthatBin[j] && j<QCDBins)j++;
       nWeight = weights[j];
       //fill the weight tree once per jet
       weightTree->Fill();	  

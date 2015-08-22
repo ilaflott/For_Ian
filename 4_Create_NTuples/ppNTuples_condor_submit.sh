@@ -27,8 +27,12 @@ do
         echo "Data Job Being Submitted"
       fi
       if [ $flavor -eq 1 ]; then
-        echo "FULL QCDJet Job Being Submitted"
-        echo "Are you sure you want to do this?!"
+	  if [ $job -eq 0 ]; then
+	      echo "FULL QCDJet makeNTuple Job Submitted"
+	      echo "are you sure you want to do this?!"
+	  else
+	      echo "Full QCDJet Job Submitted"
+	  fi
       fi
       if [ $flavor -eq 2 ]; then
         echo "BJet Being Submitted"

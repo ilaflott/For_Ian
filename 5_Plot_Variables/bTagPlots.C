@@ -1,7 +1,7 @@
 /*
 Plot maker+formatter. Written for muon-tagged b-jet RpA + RAA
 Inherited from: Leo Yu
-HeavilyE dited: Ian Laflotte
+Heavily Edited: Ian Laflotte
 */
 
 #include <iostream>
@@ -40,22 +40,24 @@ const string QCD_file_path    = NTuple_file_path;
 //filenames
 const string data_file_name = "data_NTuple_7.23.15.root";
 const string MC_file_name   = "TotalMCNTuple_WithWeights.root";
-const string QCD_file_name  = "QCDJets_NTuple_8.3.15_WithWeights.root";
+const string QCD_file_name  = "QCDJets_NTuple_8.3.15_withWeights.root";
 //const string hist_file_name = "hist_Test";
 //const string pdf_file_name = hist_file_name;
 
 //cuts and naming, defualt values
 //const string default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>40&&HLT_PAMu3_v1&&mupt!=0&&mupt/rawpt<0.95&&svtxdl>0.01&&svtxdl<2.5&&svtxdls>3.0&&svtxm<6.0";
 //vz cut, jteta cut, jtpt cut, HLT cut, mupt!=0 cut, W cut for data
-const string default_cut ="vz<15&&vz>-15&&jteta<2&&jteta>-2&&jtpt>20&&mupt!=0";
-const string default_version ="vz15_jteta2_jtpt20_1mu";
+const string default_cut ="jteta<2&&jteta>-2&&jtpt>20";
+const string default_version ="AllPlots_jteta2_jtpt20";
 
 //n_vars parameters
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
-const int n_vars_low   = 0  ;//starting variable for formatting
-const int n_vars_high  = 2  ;//ending variable for formatting
-const int n_vars       = (n_vars_high - n_vars_low) + 1;//for formatting plots, reflects total number of plots being formatted
 const int n_vars_TOTAL = 33;//for making plots, always make plots of all variables
+const int n_vars_low   = 0  ;//starting variable
+//const int n_vars_high  = 2  ;//ending variable 
+const int n_vars_high  = n_vars_TOTAL - 1  ;//for all plots
+const int n_vars       = (n_vars_high - n_vars_low) + 1;//reflects total number of plots being made/formattex
+
 
 //plot formatting parameters
 const int       color[]  = { kBlack, kGray+3, kRed-7, kGreen-6, kBlue-7};

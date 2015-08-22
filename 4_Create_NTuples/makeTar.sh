@@ -11,4 +11,4 @@ EOF
 rm run_ppNTuples.tar
 
 #tar [options] tarballname  input_files  macro-code+dependencies from compilation
-tar -zcvf run_ppNTuples.tar filelists/*Jets_filelist*.txt filelists/ppMuon2013A_runForest_filelist.txt weight_info/*.txt bTagNTuple.C bTagNTuple_C.* *Jets_N*.txt
+tar -zcvf run_ppNTuples.tar filelists/*Jets_filelist*.txt filelists/ppMuon2013A_runForest_filelist.txt weight_info/*.txt bTagNTuple.C bTagNTuple_C.* 
