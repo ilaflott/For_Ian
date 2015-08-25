@@ -125,7 +125,7 @@ const string dataNTuple   = "data_NTuple_7.23.15.root";
 //if the weights need to be redone...
 const string QCDNTuple    = "QCDJets_NTuple_8.22.15_withWeights.root";
 const string BJetNTuple   = "BJets_NTuple_8.22.15_withWeights.root";
-const string CJetNTuple   = "BJets_NTuple_8.22.15_withWeights.root";
+const string CJetNTuple   = "CJets_NTuple_8.22.15_withWeights.root";
 ///*debug*/
 //const string dataNTuple   = "data_NTuple_TEST.root";
 //const string QCDNTuple    = "QCDJets_NTuple_TEST.root";
@@ -1019,6 +1019,7 @@ int NTupleWeights(int type)
       nt->GetEntry(i);
       //nWeight=2.0;
       //figure out which pthat bin the jet belongs to
+      if(i%1000000==0)cout << "weighting jet #" << i << endl;
       int j = 0;
       while(nPthat>pthatBin[j] && j<QCDBins)j++;
       nWeight = weights[j];

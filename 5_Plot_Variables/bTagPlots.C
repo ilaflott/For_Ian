@@ -40,7 +40,7 @@ const string QCD_file_path    = NTuple_file_path;
 //filenames
 const string data_file_name = "data_NTuple_7.23.15.root";
 const string MC_file_name   = "TotalMCNTuple_WithWeights.root";
-const string QCD_file_name  = "QCDJets_NTuple_8.3.15_withWeights.root";
+const string QCD_file_name  = "QCDJets_NTuple_8.22.15_withWeights.root";
 //const string hist_file_name = "hist_Test";
 //const string pdf_file_name = hist_file_name;
 
@@ -54,8 +54,8 @@ const string default_version ="AllPlots_jteta2_jtpt20";
 const int n_types = 5; // data, MC, b, c, udsg (0,1,2,3,4...)
 const int n_vars_TOTAL = 33;//for making plots, always make plots of all variables
 const int n_vars_low   = 0  ;//starting variable
-//const int n_vars_high  = 2  ;//ending variable 
-const int n_vars_high  = n_vars_TOTAL - 1  ;//for all plots
+const int n_vars_high  = 0  ;//ending variable 
+//const int n_vars_high  = n_vars_TOTAL - 1  ;//for all plots
 const int n_vars       = (n_vars_high - n_vars_low) + 1;//reflects total number of plots being made/formattex
 
 
