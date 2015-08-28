@@ -79,7 +79,8 @@ Queue
 EOF
     #submit the job
     echo "submitting subfile..."
-    condor_submit -name "bTNT_${job}_${flavor}" subfile
+    #bTNT->bTagNTuple
     echo "Condor Job name is bTNT_${job}_${flavor}"
+    condor_submit -name "bTNT_${job}_${flavor}" subfile
     flavor=$(($flavor + 1))
 done

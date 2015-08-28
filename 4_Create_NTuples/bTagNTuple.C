@@ -77,8 +77,9 @@ const double pi = 3.141592653589793238462643383279502884197169399375105820974944
 
 const string fileListPath   = "filelists/";
 const string weightFilePath = "weight_info/";
-const string outFilePath    = "";
-const string NTuplePath = "good_NTuples/";
+//const string outFilePath    = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/";
+const string outFilePath    = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
+const string NTuplePath = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
 //const string NTuplePath = "";/*debug*/
 
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
@@ -116,22 +117,17 @@ const string B_NEventsFile = "BJets_NEvents.txt";
 const string B_NBJetsFile  = "BJets_NBJets.txt";
 
 //NTuple Files
-const string dataNTuple   = "data_NTuple_7.23.15.root";
-//const string QCDNTuple    = "QCDJets_NTuple_noVsJets_8.3.15.root";
-////if no weights yet
-//const string QCDNTuple    = "QCDJets_NTuple_8.3.15_noWeight.root";
-//const string BJetNTuple   = "BJets_NTuple_8.9.15_noWeight.root";
-//const string CJetNTuple   = "CJets_NTuple_8.9.15_noWeight.root";
-//if the weights need to be redone...
-const string QCDNTuple    = "QCDJets_NTuple_8.22.15_withWeights.root";
-const string BJetNTuple   = "BJets_NTuple_8.22.15_withWeights.root";
-const string CJetNTuple   = "CJets_NTuple_8.22.15_withWeights.root";
-///*debug*/
-//const string dataNTuple   = "data_NTuple_TEST.root";
+const string dataNTuple   = "data_NTuple_8.27.15.root";
+//if no weights yet
+const string QCDNTuple    = "QCDJets_NTuple_8.27.15.root";
+//const string BJetNTuple   = "BJets_NTuple_8.27.15.root";
+const string CJetNTuple   = "CJets_NTuple_8.27.15.root";
+
+/////*debug*/
+//const string dataNTuple   = "data_NTuple_TEST0.root";
 //const string QCDNTuple    = "QCDJets_NTuple_TEST.root";
-//const string BJetNTuple   = "BJets_NTuple_TEST.root";
+const string BJetNTuple   = "BJets_NTuple_TEST.root";
 //const string CJetNTuple   = "CJets_NTuple_TEST.root";
-///*debug*/
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
 //const int weightsMode = -1;
@@ -379,7 +375,7 @@ int bTagNTuple(int job, int type)
     case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
     case 2:cout << "You Chose Apply NTuple Weights" << endl; result = NTupleWeights(type) ; break ; 
     case 3:cout << "You Chose to Test NTuple" << endl; result = NTupleTest(type) ; break ; 
-    default: cerr << "Job must be from {0,1}" << endl; return -1 ;
+    default: cerr << "Job must be from {0,1,2,3}" << endl; return -1 ;
     }
 
   return result;
@@ -415,14 +411,20 @@ int makeNTuple(int type)
     default:cerr<<"dataType not found"<<endl; return -1;
     }
   cout << "decalring new tree+branches" << endl;
-  // New tree, new branches
-  TTree newTree("nt","nt");
-  newBranches(&newTree);
+  // Jet tree
+  TTree * newTree = new TTree("nt","nt");
+  newBranches(newTree);
+  newTree->SetDirectory(0);
+  // vtx tree for weighting
+  TTree * vtxTree = new TTree("vertex","vertex");
+  vtxTree->Branch("evtVz", &nVz ,"evtVz/D");									       
+  vtxTree->SetDirectory(0);
+
   cout << "fileList is: " << fileList << endl;
   //grab filename
   ifstream fileStream(fileList.c_str(), ifstream::in);
   string fileName;      
-  fileStream >> fileName;
+  fileStream >> fileName;//this needed before loop so we don't miss the last file available
   int file_number = 0;
 
   // For every file in file list, process trees
@@ -431,8 +433,8 @@ int makeNTuple(int type)
   //TStopwatch * clock = new TStopwatch(); /*debug*/
   //clock->Start();                        /*debug*/
 
-  //for(int kkk = 0 ; kkk < 10 ; kkk++)/*debug*/
-  while (!fileStream.eof()) 
+  for(int kkk = 0 ; kkk < 1 ; kkk++)/*debug*/
+    //while (!fileStream.eof()) 
     {
       // Open input file
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
@@ -444,7 +446,6 @@ int makeNTuple(int type)
       //Open trees
       //if(file_number%1000==0 )cout << "Opening Trees..." << endl;/*debug*/
       TTree *akPu3 = (TTree *)inFile->Get("akPu3PFJetAnalyzer/t");
-
       akPu3->AddFriend("hlt=hltanalysis/HltTree");
       akPu3->AddFriend("hiEvt=hiEvtAnalyzer/HiTree");
       akPu3->AddFriend("skim=skimanalysis/HltTree");
@@ -456,23 +457,17 @@ int makeNTuple(int type)
       // Process every event
       int nEvents = akPu3->GetEntries();
       if(file_number%100==0 )cout << nEvents << " events to loop over in " << fileName << endl;
-
-      //nEvents = 10;/*debug*/
+      
+      nEvents = 10;/*debug*/
       for (int i=0; i<nEvents; i++) 
 	{
 	  //if (i%10000 == 0 && i != 0) cout << "Processing Event " << i << endl;
 	  akPu3->GetEntry(i);
 
 	  // Event Level Selection
-	  if ((dataType == 0) && (0 || !pPAcollisionEventSelectionPA || !pHBHENoiseFilter || abs(vz)>15)) continue;
-	  else if(abs(vz)>15)continue;// (dataType >= 1) 
-	  //cout << "dataType=" << dataType<<endl;  	  
-
-	  // Set weight
-	  nWeight = 1.0;
-	  //else nWeight = MCWeights(pthat);
-	  //if ( !(std::ifstream(weights_file.c_str())) );
-	  //This is where the weight recognizing goes later!
+	  //used to only apply  pPAcollisionEventSelectionPA+pHBHENoiseFileter to data.... 
+	  //but they should apply to MC as well!
+	  if ( !pPAcollisionEventSelectionPA || !pHBHENoiseFilter || abs(vz)>15)) continue;
 
 	  //Event Info
 	  nVz    = vz;
@@ -500,7 +495,7 @@ int makeNTuple(int type)
 		}
 	      
 	      ////jet level selection, might never apply it at this level...
-	      //if(abs(jteta[j])<2.0||jtpt<40)continue;
+	      //if(abs(jteta[j])>2.0||jtpt<40)continue;
 
 	      //jet parameters
 	      nJtpt  = jtpt[j];
@@ -580,7 +575,7 @@ int makeNTuple(int type)
 	      if(doTracks)//tracks take awhile to run, may want to turn it off in the future?
 		{
 		  counter = 0;
-		  n1stMost2dSigTrk = 0;//kurt just stuck non-existant tracks in the 0 bin, i'm going to do it differently.
+		  n1stMost2dSigTrk = 0;
 		  n2ndMost2dSigTrk = 0;
 		  n3rdMost2dSigTrk = 0;
 		  n1stMost3dSigTrk = 0;
@@ -709,9 +704,10 @@ int makeNTuple(int type)
 	      	      											
 	      	    }//doMostSignificantTracks loop							
 	      	}//doMostSignificanTracks Check                                                         
-	      newTree.Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
+	      newTree->Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
 	                     //may be problematic for vz weighting?
 	    }//jetloop
+	  vtxTree->Fill();
 	}//eventloop
       
       // Cleanup
@@ -727,11 +723,12 @@ int makeNTuple(int type)
   
   // Write to output file
   outFile->cd();
-  cout << "writing tree..." << newTree.GetName() <<endl;
-  cout << "writing file : " << outFileName << endl;
+  cout << "writing jet tree to file" << outFileName << endl;
   //kOverrwrite overwrites backup/partially finished tree
-  newTree.Write(newTree.GetName(), TObject::kOverwrite);
-  
+  newTree->Write(newTree->GetName(), TObject::kOverwrite);
+  cout << "writing vtx tree to file" << outFileName << endl;
+  vtxTree->Write(vtxTree->GetName(), TObject::kOverwrite);
+
   // Cleanup
   cout << "cleaning up..." << endl;
   outFile->Close();
@@ -1064,18 +1061,18 @@ int NTupleTest(int type)
   return 0;
 }
 
-
 // Create the branches for the new output tree
 static inline void newBranches(TTree *newTree) 								       
 {													       
   //event specific											       
-  newTree->Branch("weight", &nWeight, "weight/D");  							       
+  //newTree->Branch("weight", &nWeight, "weight/D");  							       
   newTree->Branch("vz", &nVz ,"vz/D");									       
-  if(dataType>=1)newTree->Branch("pthat", &nPthat, "pthat/D"); // TEMPORARY				       
+  if(dataType>=1)newTree->Branch("pthat", &nPthat, "pthat/D");
   newTree->Branch("nref"  , &nNref ,"nref/I");								       
   newTree->Branch("evt"   , &Evt  ,"evt/I" );								       
   //  newTree->Branch("lumi"  , &Lumi ,"lumi/I");							       
-  newTree->Branch("run"   , &Run  ,"run/I" );								       
+  newTree->Branch("run"   , &Run  ,"run/I" );		
+						       
   //jet variables											       
   newTree->Branch("jtpt", &nJtpt, "jtpt/D");								       
   newTree->Branch("jteta", &nJteta, "jteta/D");								       

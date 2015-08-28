@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 #this macro makes the tarball that the submit script points condor to
 
 #compile the macro

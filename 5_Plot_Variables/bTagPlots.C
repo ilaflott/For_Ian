@@ -30,9 +30,15 @@ const double pi = 3.141592653589793238462643383279502884197169399375105820974944
 const float int_lumi = 4209000000;//inverse millibarns of data. according to lumiCalc2.py, golden lumimask for HLT_PAMu3_v1, 4.209 pb of data.
 
 //file paths
-const string hist_file_path   = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/5_Plot_Variables/Histograms/";
-const string pdf_file_path    = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/5_Plot_Variables/Histograms/";
-const string NTuple_file_path = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/good_NTuples/";
+//const string hist_file_path   = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/5_Plot_Variables/Histograms/";
+//const string pdf_file_path    = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/5_Plot_Variables/Histograms/";
+//const string NTuple_file_path = "/net/hisrv0001/home/ilaflott/Leos_Analysis/CMSSW_5_3_20_FOREST_PLOTS/src/For_Ian/4_Create_NTuples/good_NTuples/";
+
+//for batch running tests
+const string hist_file_path   = "";
+const string pdf_file_path   = "";
+const string NTuple_file_path = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
+
 const string data_file_path   = NTuple_file_path;
 const string MC_file_path     = NTuple_file_path;
 const string QCD_file_path    = NTuple_file_path;

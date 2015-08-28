@@ -25,23 +25,22 @@ echo "Processing..."
 job=$1
 flavor=$2
 
-echo "whoami"
-whoami
-echo "running hadoop permissions test..."
-echo "attempting to make directory..."
-mkdir /mnt/hadoop/cms/store/user/ilaflott/test
-echo "attempting to touch"
-touch /mnt/hadoop/cms/store/user/ilaflott/test.txt
-echo "attempting a simple copy commmand"
-cp filelists/QCDJets_noVsJets_filelist_1.txt /mnt/hadoop/cms/store/user/ilaflott
+#mkdir /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
+#chmod a+rxw /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
+#mkdir /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info
+#chmod a+rxw /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info
+#rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/*.root
 
 #execute the script like this...
-#root -b -l <<EOF
-#.x bTagNTuple.C+($job, $flavor)
-#.q
-#EOF
-##...not like this
-# root -b -q bTagNTuple_Original.C\+\($flavor\) 
+root -b -l <<EOF
+.x bTagNTuple.C+(0, 2)
+.q
+EOF
+#execute the script like this...
+root -b -l <<EOF
+.x bTagNTuple.C+(2, 2)
+.q
+EOF
 
-echo "Done!"
 
+#mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
