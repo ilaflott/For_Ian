@@ -76,10 +76,10 @@ const double pi = 3.141592653589793238462643383279502884197169399375105820974944
 // Macro settings/constants
 
 const string fileListPath   = "filelists/";
-const string weightFilePath = "weight_info/";
 //const string outFilePath    = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/";
-const string outFilePath    = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
-const string NTuplePath = "/net/hidsk0001/d00/scratch/ilaflott/Leos_Analysis/pp_NTuples/";
+const string outFilePath = "";
+const string weightFilePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info/";
+const string NTuplePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/";
 //const string NTuplePath = "";/*debug*/
 
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
@@ -118,15 +118,17 @@ const string B_NBJetsFile  = "BJets_NBJets.txt";
 
 //NTuple Files
 const string dataNTuple   = "data_NTuple_8.27.15.root";
-//if no weights yet
-const string QCDNTuple    = "QCDJets_NTuple_8.27.15.root";
-//const string BJetNTuple   = "BJets_NTuple_8.27.15.root";
-const string CJetNTuple   = "CJets_NTuple_8.27.15.root";
+const string QCDNTuple_noWeights    = "QCDJets_NTuple_noWeights.root";
+const string BJetNTuple_noWeights   =   "BJets_NTuple_noWeights.root";
+const string CJetNTuple_noWeights   =   "CJets_NTuple_noWeights.root";
+const string QCDNTuple_withWeights    = "QCDJets_NTuple_withWeights.root";
+const string BJetNTuple_withWeights   =   "BJets_NTuple_withWeights.root";
+const string CJetNTuple_withWeights   =   "CJets_NTuple_withWeights.root";
 
 /////*debug*/
 //const string dataNTuple   = "data_NTuple_TEST0.root";
 //const string QCDNTuple    = "QCDJets_NTuple_TEST.root";
-const string BJetNTuple   = "BJets_NTuple_TEST.root";
+//const string BJetNTuple   = "BJets_NTuple_TEST.root";
 //const string CJetNTuple   = "CJets_NTuple_TEST.root";
 
 const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
@@ -355,6 +357,7 @@ int bTagNTuple(int job, int type)
     case 1 : fileList = fileListPath + QCDFileList     ; cout << "you chose " << QCDFileList    << endl   ;   break ;
     case 2 : fileList = fileListPath + BJetFileList    ; cout << "you chose " << BJetFileList   << endl   ;   break ;
     case 3 : fileList = fileListPath + CJetFileList    ; cout << "you chose " << CJetFileList   << endl   ;   break ;
+      //QCD PIECES
     case 4 : fileList = fileListPath + QCDFileList_1   ; cout << "you chose " << QCDFileList_1  << endl   ;   break ;
     case 5 : fileList = fileListPath + QCDFileList_2   ; cout << "you chose " << QCDFileList_2  << endl   ;   break ;
     case 6 : fileList = fileListPath + QCDFileList_3   ; cout << "you chose " << QCDFileList_3  << endl   ;   break ;
@@ -395,19 +398,19 @@ int makeNTuple(int type)
     case 0 : outFileName = outFilePath + dataNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
       //    case 1: outFileName = outFilePath + QCDNTuple  ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
     case 1 : cout << "consider submitting makeNTuple in 11 pieces using types 4-14..." << endl; return -1;
-    case 2 : outFileName = outFilePath + BJetNTuple ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 3 : outFileName = outFilePath + CJetNTuple ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 4 : outFileName = outFilePath + "P_1"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 5 : outFileName = outFilePath + "P_2"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 6 : outFileName = outFilePath + "P_3"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 7 : outFileName = outFilePath + "P_4"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 8 : outFileName = outFilePath + "P_5"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 9 : outFileName = outFilePath + "P_6"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 10: outFileName = outFilePath + "P_7"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 11: outFileName = outFilePath + "P_8"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 12: outFileName = outFilePath + "P_9"  + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 13: outFileName = outFilePath + "P_10" + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 14: outFileName = outFilePath + "P_11" + QCDNTuple  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 2 : outFileName = outFilePath + BJetNTuple_noWeights ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 3 : outFileName = outFilePath + CJetNTuple_noWeights ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 4 : outFileName = outFilePath + "P_1"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 5 : outFileName = outFilePath + "P_2"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 6 : outFileName = outFilePath + "P_3"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 7 : outFileName = outFilePath + "P_4"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 8 : outFileName = outFilePath + "P_5"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 9 : outFileName = outFilePath + "P_6"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 10: outFileName = outFilePath + "P_7"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 11: outFileName = outFilePath + "P_8"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 12: outFileName = outFilePath + "P_9"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 13: outFileName = outFilePath + "P_10" + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 14: outFileName = outFilePath + "P_11" + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
   cout << "decalring new tree+branches" << endl;
@@ -762,26 +765,26 @@ int MCCounts(int type)
       NEventsFile = QCD_NEventsFile ; 
       NbJetsFile  = QCD_NBJetsFile  ; 
       NcJetsFile  = QCD_NCJetsFile  ; 
-      doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
-      doCJetCountFile  = !(std::ifstream(NbJetsFile.c_str()) );
-      doBJetCountFile  = !(std::ifstream(NcJetsFile.c_str()) );
+      doEventCountFile = !(std::ifstream( (weightFilePath + NEventsFile).c_str() ) );
+      doCJetCountFile  = !(std::ifstream( (weightFilePath + NbJetsFile ).c_str() ) );
+      doBJetCountFile  = !(std::ifstream( (weightFilePath + NcJetsFile ).c_str() ) );
       loopOverFiles = doCJetCountFile || doBJetCountFile || doEventCountFile;
       break ;
     case 2:  //B
       NEventsFile =  B_NEventsFile ; 
       NbJetsFile  =  B_NBJetsFile  ; 
       NcJetsFile  = "";
-      doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
+      doEventCountFile = !(std::ifstream( (weightFilePath + NEventsFile).c_str() ) );
       doCJetCountFile  = false;
-      doBJetCountFile  = !(std::ifstream(NcJetsFile.c_str()) );
+      doBJetCountFile  = !(std::ifstream( (weightFilePath + NcJetsFile ).c_str() ) );
       loopOverFiles =  doBJetCountFile || doEventCountFile;
       break ;
     case 3:  //C
       NEventsFile =  C_NEventsFile ; 
       NbJetsFile  = "";
       NcJetsFile  =  C_NCJetsFile  ; 
-      doEventCountFile = !(std::ifstream(NEventsFile.c_str()));
-      doCJetCountFile  = !(std::ifstream(NbJetsFile.c_str()) );
+      doEventCountFile = !(std::ifstream( (weightFilePath + NEventsFile).c_str() ) );
+      doCJetCountFile  = !(std::ifstream( (weightFilePath + NbJetsFile ).c_str() ) );
       doBJetCountFile  = false;
       loopOverFiles = doCJetCountFile || doEventCountFile;
       break ;
@@ -895,24 +898,47 @@ int MCCounts(int type)
 
 int NTupleWeights(int type)
 {
-  string NTupleFile    = "";
-  string weightFile    = "";
-  string QCDHFNJetsFile = "";
-  string HFNEventsFile  = "";
-  string HFNJetsFile    = "";
+  string NTupleFile     = "" ;
+  string outNTupleFile  = "" ;
+  string weightFile     = "" ;
+  string outWeightFile  = "" ;
+  string QCDHFNJetsFile = "" ;
+  string HFNEventsFile  = "" ;
+  string HFNJetsFile    = "" ;
 
-  double weights[QCDBins+1];
+  double weights[QCDBins+1]   ;
   double QCDNEvents[QCDBins+1];
   double QCDNHFJets[QCDBins+1];
-  double HFNEvents[QCDBins+1];
-  double NHFJets[QCDBins+1];
-  double HFWeights[QCDBins+1];
+  double HFNEvents[QCDBins+1] ;
+  double NHFJets[QCDBins+1]   ;
+  double HFWeights[QCDBins+1] ;
     
   switch(type)
     {
-    case 1: NTupleFile = NTuplePath + QCDNTuple  ; weightFile = weightFilePath + QCDWeightsFile  ; break;
-    case 2: NTupleFile = NTuplePath + BJetNTuple ; weightFile = weightFilePath + BJetWeightsFile ; HFNEventsFile = B_NEventsFile; HFNJetsFile = B_NBJetsFile; QCDHFNJetsFile = QCD_NBJetsFile; break;
-    case 3: NTupleFile = NTuplePath + CJetNTuple ; weightFile = weightFilePath + CJetWeightsFile ; HFNEventsFile = C_NEventsFile; HFNJetsFile = C_NCJetsFile; QCDHFNJetsFile = QCD_NCJetsFile; break;
+    case 1: 
+      NTupleFile    = NTuplePath     + QCDNTuple_noWeights       ; 
+      outNTupleFile = QCDNTuple_withWeights       ; 
+      weightFile    = weightFilePath + QCDWeightsFile  ; 
+      outWeightFile = QCDWeightsFile  ; 
+      break;
+    case 2: 
+      NTupleFile     = NTuplePath     + BJetNTuple_noWeights      ;
+      outNTupleFile  = BJetNTuple_withWeights       ;  
+      weightFile     = weightFilePath + BJetWeightsFile ; 
+      outWeightFile  = BJetWeightsFile ; 
+      HFNEventsFile  = weightFilePath + B_NEventsFile   ; 
+      HFNJetsFile    = weightFilePath + B_NBJetsFile    ; 
+      QCDHFNJetsFile = weightFilePath + QCD_NBJetsFile  ; 
+      break;
+    case 3: 
+      NTupleFile       = NTuplePath     + CJetNTuple_noWeights      ; 
+      outNTupleFile    = CJetNTuple_withWeights       ;  
+      weightFile       = weightFilePath + CJetWeightsFile ; 
+      outWeightFile    = CJetWeightsFile ; 
+      HFNEventsFile    = weightFilePath + C_NEventsFile   ; 
+      HFNJetsFile      = weightFilePath + C_NCJetsFile    ; 
+      QCDHFNJetsFile   = weightFilePath + QCD_NCJetsFile  ; 
+      break;
     default:cerr<<"dataType must be 1,2,3 to apply weights (MC Only)"<<endl; return -1;      
     }
 
@@ -936,7 +962,7 @@ int NTupleWeights(int type)
 	{
 	  cout<<"QCDWeights do not exist, computing them..."<<endl;
 	  ifstream inQCDEvents(QCD_NEventsFile.c_str(),ifstream::in);
-	  ofstream outWeights(weightFile.c_str(),ofstream::out);
+	  ofstream outWeights(outWeightFile.c_str(),ofstream::out);
 	  for(int j=0;j<QCDBins+1;j++) 
 	    {
 	      inQCDEvents >> QCDNEvents[j];
@@ -968,7 +994,7 @@ int NTupleWeights(int type)
 	  ifstream inHFEvents(HFNEventsFile.c_str(),ifstream::in);
 	  ifstream inHFJets(HFNJetsFile.c_str(),ifstream::in);
 	  
-	  ofstream outWeights(weightFile.c_str(),ofstream::out);
+	  ofstream outWeights(outWeightFile.c_str(),ofstream::out);
 	  
 	  for(int j=0;j<QCDBins+1;j++) 
 	    {
@@ -995,17 +1021,28 @@ int NTupleWeights(int type)
   cout<<"the weights are.."<<endl;
   for(int j=0;j<QCDBins+1;j++)cout<<"for " << pthatCut[j] << " weight is "<<weights[j]<<endl; 
   
+//  a0->ls();
+//  TTree *tinput = (TTree*)a0->Get("tinput");
+//  a -> cd();
+//  tinput->CloneTree()->Write();
+
   //Open Ntuple (filled once per jet w/ pthat info) for weighting
-  TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"UPDATE");
+  //filled once per event w/ vz info for vz weighting
+  //  TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"UPDATE");
+  TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"");
   TTree* nt = (TTree * )NTuple->Get("nt");
-  nt->SetBranchAddress("pthat",&nPthat);
-  
+  //  nt->SetBranchAddress("pthat",&nPthat);
+  TFile * outNTuple = TFile::Open(Form("%s",outNTupleFile.c_str()),"RECREATE");
+  outNTuple->cd();
+  nt->CloneTree()->Write();
+  TTree* newNt = (TTree *)outNTuple->Get("nt");
+
   //open new weight tree
   TTree* weightTree = new TTree("weightTree","weightTree");
   weightTree->Branch("Weight",&nWeight,"Weight/D");
-  nt->AddFriend(weightTree);
+  newNt->AddFriend(weightTree);
   
-  int NEntries = nt->GetEntries();
+  int NEntries = newNt->GetEntries();
   cout << "NEntries = " << NEntries <<endl;
   
   //loop over jets
@@ -1013,7 +1050,7 @@ int NTupleWeights(int type)
     //for (int i = 0; i<10; i++)
     {
       //grab a jet
-      nt->GetEntry(i);
+      newNt->GetEntry(i);
       //nWeight=2.0;
       //figure out which pthat bin the jet belongs to
       if(i%1000000==0)cout << "weighting jet #" << i << endl;
@@ -1025,39 +1062,7 @@ int NTupleWeights(int type)
     }
   
   //write the new info to the old file, hence "UPDATE" option
-  NTuple->Write();
-  return 0;
-}
-
-//a crude macro quickly written to make sure the weights and pthat of the jet are lined up appropriately
-int NTupleTest(int type)
-{
-  int worthless = type;
-  string file = NTuplePath + QCDNTuple;
-  string theWeights = weightFilePath + QCDWeightsFile ;
-  double weightArray[QCDBins+1];
-
-  //read in weights here
-  ifstream inWeights(theWeights.c_str(),ifstream::in);
-  for(int j=0;j<QCDBins+1;j++) inWeights >> weightArray[j];
-  inWeights.close();
-
-  TFile *inFile = TFile::Open(Form("%s",file.c_str()));
-  TTree *theTree = (TTree*)inFile->Get("weightTree");
-  theTree->AddFriend("nt");
-  theTree->SetBranchAddress("Weight",&nWeight);
-  theTree->SetBranchAddress("pthat",&nPthat);
-  int NEvents = theTree->GetEntries();
-  for (int i =0; i<NEvents; i++)
-    {
-      theTree->GetEvent();//grab pthat and weight
-      double actualWeight;
-      int j = 0;
-      while(nPthat>pthatBin[j] && j>QCDBins)j++;
-      actualWeight = weightArray[j];
-      if(actualWeight!=nWeight)cout<<"weight is incorrect!" << endl;
-      //compare weight the tree gave us to what the weight SHOULD be
-    }
+  outNTuple->Write();
   return 0;
 }
 
@@ -1257,4 +1262,36 @@ static inline void branchAddresses(TTree *akPu3)
 }
 
 
+
+//a crude macro quickly written to make sure the weights and pthat of the jet are lined up appropriately
+int NTupleTest(int type)
+{
+  int worthless = type;
+  string file = NTuplePath + QCDNTuple;
+  string theWeights = weightFilePath + QCDWeightsFile ;
+  double weightArray[QCDBins+1];
+
+  //read in weights here
+  ifstream inWeights(theWeights.c_str(),ifstream::in);
+  for(int j=0;j<QCDBins+1;j++) inWeights >> weightArray[j];
+  inWeights.close();
+
+  TFile *inFile = TFile::Open(Form("%s",file.c_str()));
+  TTree *theTree = (TTree*)inFile->Get("weightTree");
+  theTree->AddFriend("nt");
+  theTree->SetBranchAddress("Weight",&nWeight);
+  theTree->SetBranchAddress("pthat",&nPthat);
+  int NEvents = theTree->GetEntries();
+  for (int i =0; i<NEvents; i++)
+    {
+      theTree->GetEvent();//grab pthat and weight
+      double actualWeight;
+      int j = 0;
+      while(nPthat>pthatBin[j] && j>QCDBins)j++;
+      actualWeight = weightArray[j];
+      if(actualWeight!=nWeight)cout<<"weight is incorrect!" << endl;
+      //compare weight the tree gave us to what the weight SHOULD be
+    }
+  return 0;
+}
 

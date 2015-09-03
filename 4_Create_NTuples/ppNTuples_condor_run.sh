@@ -6,7 +6,7 @@ tar -zxvf run_ppNTuples.tar > /dev/null
 
 #cmsenv
 echo "cmsenv"
-export SCRAM_ARCH=slc6_amd64_gcc472
+#export SCRAM_ARCH=slc6_amd64_gcc472
 source /osg/app/cmssoft/cms/cmsset_default.sh
 
 #something i'll leave here for now
@@ -33,14 +33,9 @@ flavor=$2
 
 #execute the script like this...
 root -b -l <<EOF
-.x bTagNTuple.C+(0, 2)
-.q
-EOF
-#execute the script like this...
-root -b -l <<EOF
-.x bTagNTuple.C+(2, 2)
+.x bTagNTuple.C+(${job}, ${flavor})
 .q
 EOF
 
-
-#mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
+mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
+mv *.txt  /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info
