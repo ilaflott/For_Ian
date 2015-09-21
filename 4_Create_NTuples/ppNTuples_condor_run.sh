@@ -25,17 +25,34 @@ echo "Processing..."
 job=$1
 flavor=$2
 
-#mkdir /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
-#chmod a+rxw /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
-#mkdir /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info
-#chmod a+rxw /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info
+###for redoing pieces of the analysis
+#rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info/*.txt
 #rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/*.root
 
-#execute the script like this...
+#for makentuple
 root -b -l <<EOF
 .x bTagNTuple.C+(${job}, ${flavor})
 .q
 EOF
-
 mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
-mv *.txt  /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info
+
+##For full QCD NTuplle
+#rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_NTuple_noWeights_TEST.root
+#hadd QCDJets_NTuple_noWeights_TEST.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/*QCDJets_NTuple_noWeights_TEST.root
+#mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
+#rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/P*QCDJets_NTuple_noWeights_TEST.root
+
+##for MCCounts TEST
+#root -b -l <<EOF
+#.x bTagNTuple.C+(${job}, ${flavor})
+#.q
+#EOF
+#mv *.txt  /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info
+
+##for ntupleweights loop
+#root -b -l <<EOF
+#.x bTagNTuple.C+(${job}, ${flavor})
+#.q
+#EOF
+#mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
+#mv *.txt  /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info

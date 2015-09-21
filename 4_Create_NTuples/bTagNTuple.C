@@ -47,14 +47,9 @@ int makeNTuple(int type);
 int MCCounts(int type);
 int NTupleWeights(int type);
 int NTupleTest(int type);//crude script, doesn't even use the type
-//static void heavyJetWeights(double *pthatEntries);
+
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
-
-//int impactParameterExploration(int type);
-//int mergeMCSamples();
-//int calculateWeights(int type);
-//int forestStatistics(int type);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -72,18 +67,23 @@ static inline void branchAddresses(TTree *akPu3);
 const bool doTracks=true;
 const bool doMostSignificantTracks=true;
 
+//constant
 const double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
-// Macro settings/constants
 
+//paths
 const string fileListPath   = "filelists/";
-//const string outFilePath    = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/";
 const string outFilePath = "";
 const string weightFilePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info/";
 const string NTuplePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/";
 //const string NTuplePath = "";/*debug*/
+//const string weightFilePath = "";/*debug*/
 
+//filelists
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
 const string QCDFileList  = "QCDJets_noVsJets_filelist.txt";
+const string BJetFileList = "BJets_filelist.txt";
+const string CJetFileList = "CJets_filelist.txt";
+
 const string QCDFileList_1   = "QCDJets_noVsJets_filelist_1.txt";
 const string QCDFileList_2   = "QCDJets_noVsJets_filelist_2.txt";
 const string QCDFileList_3   = "QCDJets_noVsJets_filelist_3.txt";
@@ -95,44 +95,32 @@ const string QCDFileList_8   = "QCDJets_noVsJets_filelist_8.txt";
 const string QCDFileList_9   = "QCDJets_noVsJets_filelist_9.txt";
 const string QCDFileList_10  = "QCDJets_noVsJets_filelist_10.txt";
 const string QCDFileList_11  = "QCDJets_noVsJets_filelist_11.txt";
-const string BJetFileList = "BJets_filelist.txt";
-const string CJetFileList = "CJets_filelist.txt";
-
-//Weight Files
-//the weights only change if i change the event selection, i.e. the weights i've already calculated should be fine for any NTuples i make in the future
-const string dataWeightsFile = "data_weights.txt";
-const string QCDWeightsFile  = "QCDJets_weights.txt";
-const string BJetWeightsFile = "BJets_weights.txt";
-const string CJetWeightsFile = "CJets_weights.txt";
 
 //Weight Information Files,  #Events per pthat bin, #BJets per pthat bin, #Cjets per pthat bin
-const string QCD_NEventsFile = "QCDJets_NEvents.txt";	  
-const string QCD_NBJetsFile  = "QCDJets_NBJets.txt";
-const string QCD_NCJetsFile  = "QCDJets_NCJets.txt";
+const string QCDWeightsFile  = "QCDJets_weights_FULL_TEST.txt";
+const string BJetWeightsFile = "BJets_weights_FULL_TEST.txt";
+const string CJetWeightsFile = "CJets_weights_FULL_TEST.txt";
 
-const string C_NEventsFile = "CJets_NEvents.txt";	  
-const string C_NCJetsFile  = "CJets_NCJets.txt";
+const string QCD_NEventsFile = "QCDJets_NEvents_FULL_TEST.txt";	  
+const string QCD_NBJetsFile  = "QCDJets_NBJets_FULL_TEST.txt";
+const string QCD_NCJetsFile  = "QCDJets_NCJets_FULL_TEST.txt";
 
-const string B_NEventsFile = "BJets_NEvents.txt";	  
-const string B_NBJetsFile  = "BJets_NBJets.txt";
+const string C_NEventsFile = "CJets_NEvents_FULL_TEST.txt";	  
+const string C_NCJetsFile  = "CJets_NCJets_FULL_TEST.txt";
+
+const string B_NEventsFile = "BJets_NEvents_FULL_TEST.txt";	  
+const string B_NBJetsFile  = "BJets_NBJets_FULL_TEST.txt";
 
 //NTuple Files
-const string dataNTuple   = "data_NTuple_8.27.15.root";
-const string QCDNTuple_noWeights    = "QCDJets_NTuple_noWeights.root";
-const string BJetNTuple_noWeights   =   "BJets_NTuple_noWeights.root";
-const string CJetNTuple_noWeights   =   "CJets_NTuple_noWeights.root";
-const string QCDNTuple_withWeights    = "QCDJets_NTuple_withWeights.root";
-const string BJetNTuple_withWeights   =   "BJets_NTuple_withWeights.root";
-const string CJetNTuple_withWeights   =   "CJets_NTuple_withWeights.root";
+const string dataNTuple   = "data_NTuple_FULL_TEST.root";			  
 
-/////*debug*/
-//const string dataNTuple   = "data_NTuple_TEST0.root";
-//const string QCDNTuple    = "QCDJets_NTuple_TEST.root";
-//const string BJetNTuple   = "BJets_NTuple_TEST.root";
-//const string CJetNTuple   = "CJets_NTuple_TEST.root";
+const string QCDNTuple_noWeights    = "QCDJets_NTuple_noWeights_FULL_TEST.root";	  
+const string BJetNTuple_noWeights   =   "BJets_NTuple_noWeights_FULL_TEST.root";	  
+const string CJetNTuple_noWeights   =   "CJets_NTuple_noWeights_FULL_TEST.root";	  
 
-const int weightsMode = 1; //1 for weight scheme A, anything else for scheme B
-//const int weightsMode = -1;
+const string QCDNTuple_withWeights    = "QCDJets_NTuple_withWeights_FULL_TEST.root";
+const string BJetNTuple_withWeights   =   "BJets_NTuple_withWeights_FULL_TEST.root";
+const string CJetNTuple_withWeights   =   "CJets_NTuple_withWeights_FULL_TEST.root";
 
 const int QCDBins = 10;
 //const int HFBins = 5;
@@ -308,7 +296,6 @@ double nDeltaRtrk2Jet[10000];
 int nIpNHitPixel[10000];
 int nIpNHitStrip[10000];
 
-
 int    nNsvtx;
 int    nSvtxntrk;
 double nSvtxdl;
@@ -340,13 +327,10 @@ double nWeight;
 string weights_file;
 string fileList; 
 
-
 int result;
 int dataType;
 
 // Main functions
-// Mode: 0-makeNTuple(), 1-mergeMCSamples()
-// Type: 0-data, 1-QCD, 2-BJet, 3-CJet
 int bTagNTuple(int job, int type)
 {
   dataType = type;  
@@ -387,12 +371,9 @@ int bTagNTuple(int job, int type)
 // Processes files and outputs an ntuple
 int makeNTuple(int type)
 {
-  // Set global data/QCD/BJet/CJet switch
-  // Initialize output file
-
   TFile *outFile;
-
   string outFileName;
+
   switch (dataType) 
     {
     case 0 : outFileName = outFilePath + dataNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
@@ -413,15 +394,20 @@ int makeNTuple(int type)
     case 14: outFileName = outFilePath + "P_11" + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
+
   cout << "decalring new tree+branches" << endl;
+
   // Jet tree
-  TTree * newTree = new TTree("nt","nt");
-  newBranches(newTree);
-  newTree->SetDirectory(0);
+  TTree * jetTree = new TTree("jet","jet");
+  newBranches(jetTree);
+  jetTree->SetDirectory(0);
+
   // vtx tree for weighting
-  TTree * vtxTree = new TTree("vertex","vertex");
-  vtxTree->Branch("evtVz", &nVz ,"evtVz/D");									       
-  vtxTree->SetDirectory(0);
+  TTree * evtTree = new TTree("evt","evt");
+  evtTree->Branch("vz", &nVz ,"vz/D");									       
+  evtTree->Branch("evt", &Evt ,"evt/D");									       
+  evtTree->Branch("pthat", &nPthat ,"pthat/D");									       
+  evtTree->SetDirectory(0);
 
   cout << "fileList is: " << fileList << endl;
   //grab filename
@@ -430,14 +416,10 @@ int makeNTuple(int type)
   fileStream >> fileName;//this needed before loop so we don't miss the last file available
   int file_number = 0;
 
-  // For every file in file list, process trees
   cout << "beginning file loop" << endl;
 
-  //TStopwatch * clock = new TStopwatch(); /*debug*/
-  //clock->Start();                        /*debug*/
-
-  for(int kkk = 0 ; kkk < 1 ; kkk++)/*debug*/
-    //while (!fileStream.eof()) 
+  //  for(int kkk = 0 ; kkk < 250 ; kkk++)/*debug*/
+  while (!fileStream.eof()) 
     {
       // Open input file
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
@@ -470,7 +452,7 @@ int makeNTuple(int type)
 	  // Event Level Selection
 	  //used to only apply  pPAcollisionEventSelectionPA+pHBHENoiseFileter to data.... 
 	  //but they should apply to MC as well!
-	  if ( !pPAcollisionEventSelectionPA || !pHBHENoiseFilter || abs(vz)>15)) continue;
+	  if ( !pPAcollisionEventSelectionPA || !pHBHENoiseFilter || abs(vz)>15 ) continue;
 
 	  //Event Info
 	  nVz    = vz;
@@ -536,22 +518,12 @@ int makeNTuple(int type)
 	      nSvtxYPos = svtxYPos[j];
 	      nSvtxZPos = svtxZPos[j];
 
-	      //compute secondary vertex eta, phi + deltaR to Jet
-//	      cout << "nSvtxZPos = " << nSvtxZPos << endl;
-//	      cout << "nSvtxYPos = " << nSvtxYPos << endl;
-//	      cout << "nSvtxXPos = " << nSvtxXPos << endl;
-//	      cout << "denominator = " << sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) << endl;
-//	      cout << "inside fracion = " << nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) << endl;
-//	      cout << "acos = " << acos( nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) ) << endl;
-//	      cout << "tan = " << tan( 0.5*acos( nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) ) )<< endl;//either 0 or nan, why?
-//	      cout << "log = " << -log( tan( 0.5*acos( nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) ) ) )<< endl;
-	      
 	      nSvtxEta = -log( tan( 0.5*acos( nSvtxZPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos+nSvtxZPos*nSvtxZPos) ) ) );
 	      nSvtxPhi = acos(nSvtxXPos/sqrt(nSvtxXPos*nSvtxXPos+nSvtxYPos*nSvtxYPos));
 	      if(nSvtxYPos<0) nSvtxPhi = -nSvtxPhi;
 	      
 	      //NaN check, IEEE method
-	      if(nSvtxEta!=nSvtxEta || nSvtxPhi!=nSvtxPhi)
+	      if(!std::isfinite(nSvtxEta) || !std::isfinite(nSvtxPhi) )
 		{
 		  //if NaN, stick in garbage values for later analysis of these events while not affecting the distributions I'll want to see
 		  nSvtxEta=-19;
@@ -568,12 +540,11 @@ int makeNTuple(int type)
 		  nSvtxDeltaEta = fabs(jteta[j]-nSvtxEta);
 		  nSvtxDeltaR2Jet = sqrt(nSvtxDeltaEta*nSvtxDeltaEta+nSvtxDeltaPhi*nSvtxDeltaPhi);
 		}
-	      //	      cout << nSvtxEta << endl;
+
 	      //discriminator values
 	      nDiscr_ssvHighEff = discr_ssvHighEff[j];
 	      nDiscr_ssvHighPur = discr_ssvHighPur[j];
 
-	      //cout << "doing tracks for this jet" << endl;
 	      //track based variables
 	      if(doTracks)//tracks take awhile to run, may want to turn it off in the future?
 		{
@@ -639,11 +610,6 @@ int makeNTuple(int type)
 		      //		      nDeltaRtrk2Jet[counter] = deltaRtrk2Jet[it];
 		      
 		      counter++;
-		      
-		      //cout << "it = " << it << endl;
-		      //cout << "trackPosition = " << trackPosition << endl ;
-		      //cout << "counter = " << counter << endl;
-
 		    }//track loop
 		}//doTracks check
 	      
@@ -707,10 +673,9 @@ int makeNTuple(int type)
 	      	      											
 	      	    }//doMostSignificantTracks loop							
 	      	}//doMostSignificanTracks Check                                                         
-	      newTree->Fill();//note this means the event information gets filled in as many times as there are jets in the event to loop over
-	                     //may be problematic for vz weighting?
+	      jetTree->Fill();
 	    }//jetloop
-	  vtxTree->Fill();
+	  evtTree->Fill();
 	}//eventloop
       
       // Cleanup
@@ -719,18 +684,16 @@ int makeNTuple(int type)
       //gROOT->GetListOfFiles()->Remove(inFile);
       fileStream >> fileName;
       
-    }
-  //clock->Stop();                                      /*debug*/
-  //cout << "Real Time: "<<clock->GetRealTime()<<endl;	/*debug*/
-  //cout << "CPU Time: "<<clock->GetCPUTime()<<endl;    /*debug*/
+    }//fileloop
   
   // Write to output file
   outFile->cd();
+
   cout << "writing jet tree to file" << outFileName << endl;
-  //kOverrwrite overwrites backup/partially finished tree
-  newTree->Write(newTree->GetName(), TObject::kOverwrite);
+  jetTree->Write(jetTree->GetName(), TObject::kOverwrite);  //kOverrwrite overwrites backup/partially finished tree
+  
   cout << "writing vtx tree to file" << outFileName << endl;
-  vtxTree->Write(vtxTree->GetName(), TObject::kOverwrite);
+  evtTree->Write(evtTree->GetName(), TObject::kOverwrite);
 
   // Cleanup
   cout << "cleaning up..." << endl;
@@ -741,10 +704,6 @@ int makeNTuple(int type)
   return 0;
 }
 
-//static basically means set once and then not again
-// Return the corresponding weight for an event based on pthat
-//static double MCWeights(double MCPthat)
-//int MCWeights(double MCPthat)'
 int MCCounts(int type)
 {
   bool doEventCountFile;
@@ -759,9 +718,6 @@ int MCCounts(int type)
   switch(type)
     {
     case 1:  //QCD
-      //NEventsFile = weightFilePath + QCD_NEventsFile ; 
-      //NbJetsFile  = weightFilePath + QCD_NBJetsFile  ; 
-      //NcJetsFile  = weightFilePath + QCD_NCJetsFile  ; 
       NEventsFile = QCD_NEventsFile ; 
       NbJetsFile  = QCD_NBJetsFile  ; 
       NcJetsFile  = QCD_NCJetsFile  ; 
@@ -812,9 +768,8 @@ int MCCounts(int type)
   string fileName;
   inStr >> fileName;     
   
-  //If you're not at the end of the list, and there's stuff to be calculated, loop over the files
   while ( !inStr.eof()) 
-  //for(int kkk = 0;kkk < 50; kkk++)/*debug*/
+  //  for(int kkk = 0;kkk < 250; kkk++)/*debug*/
     {
       //cout <<"test weight computation for 5 files" << endl;/*debug*/
       TFile *inFile=TFile::Open(Form("%s",fileName.c_str()));
@@ -948,7 +903,7 @@ int NTupleWeights(int type)
   //compute weights
   if(type==1)//QCD
     {
-      allInfo = (std::ifstream(QCD_NEventsFile.c_str())) || weightsExist;
+      allInfo = (std::ifstream((weightFilePath+QCD_NEventsFile).c_str())) || weightsExist;
       if(!allInfo){ cout << "not enough info to compute QCD weights" << endl; return -1; }
     
       if(weightsExist)//check for already computed weights.
@@ -961,13 +916,19 @@ int NTupleWeights(int type)
       else//weights not there, must compute
 	{
 	  cout<<"QCDWeights do not exist, computing them..."<<endl;
-	  ifstream inQCDEvents(QCD_NEventsFile.c_str(),ifstream::in);
+	  ifstream inQCDEvents((weightFilePath+QCD_NEventsFile).c_str(),ifstream::in);
 	  ofstream outWeights(outWeightFile.c_str(),ofstream::out);
 	  for(int j=0;j<QCDBins+1;j++) 
 	    {
 	      inQCDEvents >> QCDNEvents[j];
 	      if(j!=QCDBins)weights[j]=(xsection[j]-xsection[j+1])/(QCDNEvents[j]);
 	      else weights[j]=xsection[j]/QCDNEvents[j];
+	      cout << "weights[" << j << "] = " << weights[j] << endl;
+	      if ( !std::isfinite(weights[j]) )
+		{
+		  cout << "NaN detected!!! weights[" << j << "] = 0" << endl;
+		  weights[j]=0;//IEEE check for NaN
+		}
 	      outWeights << weights[j] << endl;
 	    }							    
 	  inQCDEvents.close();
@@ -976,7 +937,7 @@ int NTupleWeights(int type)
     }
   else//HF
     {
-      allInfo = (std::ifstream(QCD_NEventsFile.c_str())&& std::ifstream(QCDHFNJetsFile.c_str()) &&std::ifstream(HFNEventsFile.c_str()) && std::ifstream(HFNJetsFile.c_str())) || weightsExist;
+      allInfo = (std::ifstream((weightFilePath+QCD_NEventsFile).c_str())&& std::ifstream(QCDHFNJetsFile.c_str()) &&std::ifstream(HFNEventsFile.c_str()) && std::ifstream(HFNJetsFile.c_str())) || weightsExist;
       if(!allInfo){ cout << "not enough info to compute HF weights" << endl; return -1; }
     
       if(weightsExist)//check for already computed weights.
@@ -989,7 +950,7 @@ int NTupleWeights(int type)
       else//weights not there, must compute
 	{
 	  cout<<"HFWeights do not exist, computing them..."<<endl;
-	  ifstream inQCDEvents(QCD_NEventsFile.c_str(),ifstream::in);
+	  ifstream inQCDEvents((weightFilePath+QCD_NEventsFile).c_str(),ifstream::in);
 	  ifstream inQCDHFJets(QCDHFNJetsFile.c_str(),ifstream::in);
 	  ifstream inHFEvents(HFNEventsFile.c_str(),ifstream::in);
 	  ifstream inHFJets(HFNJetsFile.c_str(),ifstream::in);
@@ -1008,6 +969,12 @@ int NTupleWeights(int type)
 	      //overall event weight wrt to distribution
 	      if(j!=QCDBins)weights[j]=(xsection[j]-xsection[j+1])/(QCDNEvents[j]+HFWeights[j]*HFNEvents[j]);
 	      else weights[j]=xsection[j]/(QCDNEvents[j]+HFWeights[j]*HFNEvents[j]);
+	      cout << "weights[" << j << "] = " << weights[j] << endl;
+	      if ( !std::isfinite(weights[j]) )
+		{
+		  cout << "NaN/inf detected!!! weights[" << j << "] = 0" << endl;
+		  weights[j]=0;//IEEE check for NaN
+		}
 	      outWeights << weights[j] << endl;
 	    }
 	  inQCDEvents.close();
@@ -1021,43 +988,41 @@ int NTupleWeights(int type)
   cout<<"the weights are.."<<endl;
   for(int j=0;j<QCDBins+1;j++)cout<<"for " << pthatCut[j] << " weight is "<<weights[j]<<endl; 
   
-//  a0->ls();
-//  TTree *tinput = (TTree*)a0->Get("tinput");
-//  a -> cd();
-//  tinput->CloneTree()->Write();
-
   //Open Ntuple (filled once per jet w/ pthat info) for weighting
   //filled once per event w/ vz info for vz weighting
   //  TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"UPDATE");
   TFile * NTuple = TFile::Open(Form("%s",NTupleFile.c_str()),"");
-  TTree* nt = (TTree * )NTuple->Get("nt");
+  TTree* jetTree = (TTree * )NTuple->Get("jet");
+  TTree* evtTree = (TTree * )NTuple->Get("evt");
   //  nt->SetBranchAddress("pthat",&nPthat);
   TFile * outNTuple = TFile::Open(Form("%s",outNTupleFile.c_str()),"RECREATE");
   outNTuple->cd();
-  nt->CloneTree()->Write();
-  TTree* newNt = (TTree *)outNTuple->Get("nt");
+  jetTree->CloneTree()->Write();
+  evtTree->CloneTree()->Write();
+  TTree* newEvtTree = (TTree *)outNTuple->Get("evt");
 
   //open new weight tree
   TTree* weightTree = new TTree("weightTree","weightTree");
   weightTree->Branch("Weight",&nWeight,"Weight/D");
-  newNt->AddFriend(weightTree);
-  
-  int NEntries = newNt->GetEntries();
+  newEvtTree->AddFriend(weightTree);
+  newEvtTree->SetBranchAddress("pthat",&nPthat);
+
+  int NEntries = newEvtTree->GetEntries();
   cout << "NEntries = " << NEntries <<endl;
   
-  //loop over jets
+  //loop over events
   for (int i = 0; i<NEntries; i++)
     //for (int i = 0; i<10; i++)
     {
       //grab a jet
-      newNt->GetEntry(i);
-      //nWeight=2.0;
+      newEvtTree->GetEntry(i);
+
       //figure out which pthat bin the jet belongs to
-      if(i%1000000==0)cout << "weighting jet #" << i << endl;
+      if(i%100000==0)cout << "weighting evt #" << i << endl;
       int j = 0;
       while(nPthat>pthatBin[j] && j<QCDBins)j++;
       nWeight = weights[j];
-      //fill the weight tree once per jet
+      //fill the weight tree once per event
       weightTree->Fill();	  
     }
   
@@ -1071,10 +1036,10 @@ static inline void newBranches(TTree *newTree)
 {													       
   //event specific											       
   //newTree->Branch("weight", &nWeight, "weight/D");  							       
-  newTree->Branch("vz", &nVz ,"vz/D");									       
-  if(dataType>=1)newTree->Branch("pthat", &nPthat, "pthat/D");
+  //newTree->Branch("vz", &nVz ,"vz/D");									       
+  //if(dataType>=1)newTree->Branch("pthat", &nPthat, "pthat/D");
   newTree->Branch("nref"  , &nNref ,"nref/I");								       
-  newTree->Branch("evt"   , &Evt  ,"evt/I" );								       
+  //newTree->Branch("evt"   , &Evt  ,"evt/I" );								       
   //  newTree->Branch("lumi"  , &Lumi ,"lumi/I");							       
   newTree->Branch("run"   , &Run  ,"run/I" );		
 						       
@@ -1267,7 +1232,7 @@ static inline void branchAddresses(TTree *akPu3)
 int NTupleTest(int type)
 {
   int worthless = type;
-  string file = NTuplePath + QCDNTuple;
+  string file = NTuplePath + QCDNTuple_noWeights;
   string theWeights = weightFilePath + QCDWeightsFile ;
   double weightArray[QCDBins+1];
 
