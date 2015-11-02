@@ -361,7 +361,7 @@ int makeNTuple(int type, int theSeg, int NSeg)
   string outFileName;
   
   ostringstream oss;
-  //oss << "_" << theSeg << "_of_" << NSeg;
+  oss << "_" << theSeg << "_of_" << NSeg;
   string FileSegNumber = oss.str();
   //cout << "FileSegNumber = " << FileSegNumber << endl;
 
@@ -425,6 +425,7 @@ int makeNTuple(int type, int theSeg, int NSeg)
   cout << "jobsWFloorFilesPerJob = " <<jobsWFloorFilesPerJob  << endl<<endl;
 
   int filesRequested= jobsWCeilFilesPerJob * ceilLinesPerJob + jobsWFloorFilesPerJob * floorLinesPerJob;
+  if (ceilLinesPerJob==floorLinesPerJob)filesRequested=jobsWFloorFilesPerJob * floorLinesPerJob;
   cout <<"the number of files you're requesting = " << filesRequested << endl;
 
   //ifstream for text maneuvering has to come after the ifstream for line counting
@@ -532,7 +533,6 @@ int makeNTuple(int type, int theSeg, int NSeg)
 	  Evt  =evt;   
 	  //Lumi =lumi;  
 	  Run  =run; 
-
 
 	  int trackPosition=0;
 	  //Jet Processing	  

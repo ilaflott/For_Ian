@@ -24,6 +24,8 @@ ls
 echo "Processing..."
 job=$1
 flavor=$2
+JobNum=$3
+NJobs=$4
 
 ###for redoing pieces of the analysis
 #rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info/*.txt
@@ -31,28 +33,9 @@ flavor=$2
 
 #for makentuple
 root -b -l <<EOF
-.x bTagNTuple.C+(${job}, ${flavor})
+.x bTagNTuple.C+(${job}, ${flavor},${JobSeg},${NJobs})
 .q
 EOF
+
 mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
 
-##For full QCD NTuplle
-#rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_NTuple_noWeights_TEST.root
-#hadd QCDJets_NTuple_noWeights_TEST.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/*QCDJets_NTuple_noWeights_TEST.root
-#mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
-#rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/P*QCDJets_NTuple_noWeights_TEST.root
-
-##for MCCounts TEST
-#root -b -l <<EOF
-#.x bTagNTuple.C+(${job}, ${flavor})
-#.q
-#EOF
-#mv *.txt  /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info
-
-##for ntupleweights loop
-#root -b -l <<EOF
-#.x bTagNTuple.C+(${job}, ${flavor})
-#.q
-#EOF
-#mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples
-#mv *.txt  /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info

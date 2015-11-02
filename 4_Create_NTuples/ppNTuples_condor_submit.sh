@@ -6,13 +6,13 @@
 #job=0
 #flavor=4
 #max=14
-echo "inputs are \$job \$flavor \$maxFlavor"
+echo "inputs are \$job \$flavor \$NJobs"
 job=$1
 flavor=$2
-max=$3
-NJOBS=$(($(($max + 1)) - $flavor)) 
+#jobSegment=$3
+NJobs=$3
 
-echo "$NJOBS being submitted"
+echo "$NJobs being submitted"
 
     if [ $job -eq 0 ]; then
       echo "makeNTuple Jobs Being Submitted"
@@ -20,31 +20,24 @@ echo "$NJOBS being submitted"
     if [ $job -eq 1 ]; then
       echo "MCCounts Jobs Being Submitted"
     fi
-
-while [ $flavor -le $max ]
-do
-      if [ $flavor -eq 0 ]; then
+    if [ $flavor -eq 0 ]; then
         echo "Data Job Being Submitted"
-      fi
-      if [ $flavor -eq 1 ]; then
-	  if [ $job -eq 0 ]; then
-	      echo "FULL QCDJet makeNTuple Job Submitted"
-	      echo "are you sure you want to do this?!"
-	  else
-	      echo "Full QCDJet Job Submitted"
-	  fi
-      fi
-      if [ $flavor -eq 2 ]; then
-        echo "BJet Being Submitted"
-      fi
-      if [ $flavor -eq 3 ]; then
-        echo "CJet Being Submitted"
-      fi
-      if [ $flavor -ge 4 ]; then
-	Piece=$(($flavor - 3))  
-        echo "QCDJet $Piece Being Submitted"
-      fi
-  echo "submitting $flavor"
+    fi
+    if [ $flavor -eq 1 ]; then
+	echo "QCDJet Job Submitted"
+    fi
+    if [ $flavor -eq 2 ]; then
+        echo "BJet Job Being Submitted"
+    fi
+    if [ $flavor -eq 3 ]; then
+        echo "CJet Job Being Submitted"
+    fi
+
+JobNum=1
+while [ $JobNum -le $NJobs ]
+do
+
+  echo "submitting Job number $JobNum"
     
     cat > subfile <<EOF
 Universe       = vanilla
@@ -56,13 +49,13 @@ Environment = "HOSTNAME=$HOSTNAME"
 # run my script
 Executable     = ppNTuples_condor_run.sh
 +AccountingGroup = "group_cmshi.ilaflott"
-Arguments      = $job $flavor
+Arguments      = $job $flavor $JobNum $NJobs
 #input files. in this case, there are none.
 Input          = /dev/null
 # log files
-Error          = Condor_logs/Condor_Job_${job}_Flav_${flavor}.err
-Output         = Condor_logs/Condor_Job_${job}_Flav_${flavor}.out
-Log            = Condor_logs/Condor_Job_${job}_Flav_${flavor}.log
+Error          = Condor_logs/Condor_Job_${job}_Flav_${flavor}_p${JobNum}_of_${NJobs}.err
+Output         = Condor_logs/Condor_Job_${job}_Flav_${flavor}_p${JobNum}_of_${NJobs}.out
+Log            = Condor_logs/Condor_Job_${job}_Flav_${flavor}_p${JobNum}_of_${NJobs}.log
 # get the environment (path, variables set in this submit script etc.)
 Getenv         = True
 # prefer to run on fast computers
@@ -80,7 +73,7 @@ EOF
     #submit the job
     echo "submitting subfile..."
     #bTNT->bTagNTuple
-    echo "Condor Job name is bTNT_${job}_${flavor}"
-    condor_submit -name "bTNT_${job}_${flavor}" subfile
-    flavor=$(($flavor + 1))
+    echo "Condor Job name is bTNT_${job}_${flavor_p${JobNum}_of_${NJobs}}"
+    condor_submit -name "bTNT_${job}_${flavor}_p${JobNum}_of_${NJobs}" subfile
+    jobNum=$(($jobNum + 1))
 done
