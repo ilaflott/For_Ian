@@ -1,5 +1,0 @@
-/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Forests/OFFICIAL_HFMC/CJet/cJet_pthat30_FOREST.root
-/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Forests/OFFICIAL_HFMC/CJet/cJet_pthat50_FOREST.root
-/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Forests/OFFICIAL_HFMC/CJet/cJet_pthat80_FOREST.root
-/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Forests/OFFICIAL_HFMC/CJet/cJet_pthat120_FOREST.root
-/net/hisrv0001/home/ilaflott/pp_MC_2760GeV_bTag_forests_ntuples/Forests/OFFICIAL_HFMC/CJet/cJet_pthat170_FOREST.root

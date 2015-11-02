@@ -1,5 +1,0 @@
-/mnt/hadoop/cms/store/user/kjung/pp_Fix3_CJetMerged/pp_Fix3_CJet30output.root
-/mnt/hadoop/cms/store/user/kjung/pp_Fix3_CJetMerged/pp_Fix3_CJet50output.root
-/mnt/hadoop/cms/store/user/kjung/pp_Fix3_CJetMerged/pp_Fix3_CJet80output.root
-/mnt/hadoop/cms/store/user/kjung/pp_Fix3_CJetMerged/pp_Fix3_CJet120output.root
-/mnt/hadoop/cms/store/user/kjung/pp_Fix3_CJetMerged/pp_Fix3_CJet170output.root
