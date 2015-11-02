@@ -363,6 +363,16 @@ int makeNTuple(int type, int theSeg, int NSeg)
   //////////////////////////
   //BEGIN JOB SEGMENTATION//
   //////////////////////////
+
+  //fileList="testList.txt";/*debug*/
+  cout << endl <<"fileList is: " << fileList << endl<<endl;
+  
+  //this kills the file stream for some reason
+  ifstream tempfileStream(fileList.c_str(), ifstream::in);
+  int theLineCount = std::count(istreambuf_iterator<char>(tempfileStream),
+                                istreambuf_iterator<char>(), '\n');
+  cout << "# files = " << theLineCount << endl;
+
   if(theSeg==0||NSeg==0)
     {
       cerr<<"theSeg and NSeg can't be zero"<<endl;
@@ -372,17 +382,7 @@ int makeNTuple(int type, int theSeg, int NSeg)
     {
       cerr<<"job segment doesn't exist."<<endl;
       return-1;
-    }
-  
-  //fileList="testList.txt";/*debug*/
-  cout << endl <<"fileList is: " << fileList << endl<<endl;
-  
-  //this kills the file stream for some reason
-  ifstream tempfileStream(fileList.c_str(), ifstream::in);
-  int theLineCount = std::count(istreambuf_iterator<char>(tempfileStream),
-                                istreambuf_iterator<char>(), '\n');
-  cout << "# files = " << theLineCount << endl;
-  
+    }  
   if(NSeg>theLineCount)
     {
       cerr<<"can't have more jobs than files available" << endl;
