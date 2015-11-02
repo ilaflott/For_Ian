@@ -14,27 +14,29 @@ NJobs=$3
 
 echo "$NJobs being submitted"
 
-    if [ $job -eq 0 ]; then
-      echo "makeNTuple Jobs Being Submitted"
-    fi
-    if [ $job -eq 1 ]; then
-      echo "MCCounts Jobs Being Submitted"
-    fi
-    if [ $flavor -eq 0 ]; then
-        echo "Data Job Being Submitted"
-    fi
-    if [ $flavor -eq 1 ]; then
-	echo "QCDJet Job Submitted"
-    fi
-    if [ $flavor -eq 2 ]; then
-        echo "BJet Job Being Submitted"
-    fi
-    if [ $flavor -eq 3 ]; then
-        echo "CJet Job Being Submitted"
-    fi
+if [ $job -eq 0 ]; then
+    echo "makeNTuple Jobs Being Submitted"
+fi
+if [ $job -eq 1 ]; then
+    echo "MCCounts Jobs Being Submitted"
+fi
+if [ $flavor -eq 0 ]; then
+    echo "Data Job Being Submitted"
+fi
+if [ $flavor -eq 1 ]; then
+    echo "QCDJet Job Submitted"
+fi
+if [ $flavor -eq 2 ]; then
+    echo "BJet Job Being Submitted"
+fi
+if [ $flavor -eq 3 ]; then
+    echo "CJet Job Being Submitted"
+fi
 
 JobNum=1
+echo '${JobNum}'
 while [ $JobNum -le $NJobs ]
+#while [ $JobNum -le 5 ]
 do
 
   echo "submitting Job number $JobNum"
@@ -70,10 +72,11 @@ when_to_transfer_output = ON_EXIT
 # specify any extra input files (for example, an orcarc file)
 Queue
 EOF
+
     #submit the job
     echo "submitting subfile..."
     #bTNT->bTagNTuple
-    echo "Condor Job name is bTNT_${job}_${flavor_p${JobNum}_of_${NJobs}}"
+    echo "Condor Job name is bTNT_${job}_${flavor}_p${JobNum}_of_${NJobs}"
     condor_submit -name "bTNT_${job}_${flavor}_p${JobNum}_of_${NJobs}" subfile
-    jobNum=$(($jobNum + 1))
+    JobNum=$(($JobNum + 1))
 done

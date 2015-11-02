@@ -53,6 +53,7 @@ const double pi = 3.141592653589793238462643383279502884197169399375105820974944
 //paths
 const string fileListPath   = "filelists/";
 const string outFilePath = "";
+
 const string weightFilePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_weight_info/";
 const string NTuplePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/";
 //const string NTuplePath = "";/*debug*/
@@ -60,21 +61,18 @@ const string NTuplePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTu
 
 //filelists
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
-const string QCDFileList  = "QCDJets_noVsJets_filelist.txt";
-const string BJetFileList = "BJets_filelist.txt";
-const string CJetFileList = "CJets_filelist.txt";
+const string QCDFileList  = "QCDJets_noVsJets_OfficialForests.txt";
+const string BJetFileList = "BJets_unOfficialHighPt_addStat_Forests.txt";
+const string CJetFileList = "CJets_unOfficialHighPt_addStat_Forests.txt";
 
-//const string QCDFileList_1   = "QCDJets_noVsJets_filelist_1.txt";
-//const string QCDFileList_2   = "QCDJets_noVsJets_filelist_2.txt";
-//const string QCDFileList_3   = "QCDJets_noVsJets_filelist_3.txt";
-//const string QCDFileList_4   = "QCDJets_noVsJets_filelist_4.txt";
-//const string QCDFileList_5   = "QCDJets_noVsJets_filelist_5.txt";
-//const string QCDFileList_6   = "QCDJets_noVsJets_filelist_6.txt";
-//const string QCDFileList_7   = "QCDJets_noVsJets_filelist_7.txt";
-//const string QCDFileList_8   = "QCDJets_noVsJets_filelist_8.txt";
-//const string QCDFileList_9   = "QCDJets_noVsJets_filelist_9.txt";
-//const string QCDFileList_10  = "QCDJets_noVsJets_filelist_10.txt";
-//const string QCDFileList_11  = "QCDJets_noVsJets_filelist_11.txt";
+////Other Available FileLists
+//const string QCDFileList  = "QCDJets_withVsJets_OfficialForests.txt";
+//const string BJetFileList = "BJets_unOfficialHighPt_Forests.txt";
+//const string CJetFileList = "CJets_unOfficialHighPt_Forests.txt";
+//const string BJetFileList = "BJets_OfficialLowPt_Forests.txt";
+//const string CJetFileList = "CJets_OfficialLowPt_Forests.txt";
+//const string BJetFileList = "BJets_allAvailable_Forests.txt";
+//const string CJetFileList = "CJets_allAvailable_Forests.txt";
 
 //Weight Information Files,  #Events per pthat bin, #BJets per pthat bin, #Cjets per pthat bin
 const string QCDWeightsFile  = "QCDJets_weights_FULL_TEST.txt";
@@ -93,11 +91,11 @@ const string B_NBJetsFile  = "BJets_NBJets_FULL_TEST.txt";
 
 //NTuple Files
 //const string dataNTuple   = "data_NTuple_FULL_TEST.root";			  
-const string dataNTuple   = "data_NTuple_TEST";			  
-
-const string QCDNTuple   = "QCDJets_NTuple";	  
-const string BJetNTuple  =   "BJets_NTuple";	  
-const string CJetNTuple  =   "CJets_NTuple";	  
+const string dataNTuple   = "data_NTuple_11.1_";			  
+						
+const string QCDNTuple   = "QCDJets_NTuple_noVsJets_11.1_";	  
+const string BJetNTuple  =   "BJets_NTuple_addStat_11.1_";	  
+const string CJetNTuple  =   "CJets_NTuple_addStat_11.1_";	  
 
 const string QCDNTuple_noWeights    = "QCDJets_NTuple_noWeights_FULL_TEST";	  
 const string BJetNTuple_noWeights   =   "BJets_NTuple_noWeights_FULL_TEST";	  
@@ -326,18 +324,6 @@ int bTagNTuple(int job, int type, int theSeg=1, int NSeg = 1)
     case 1 : fileList = fileListPath + QCDFileList     ;  break ;
     case 2 : fileList = fileListPath + BJetFileList    ;  break ;
     case 3 : fileList = fileListPath + CJetFileList    ;  break ;
-      //QCD PIECES
-//    case 4 : fileList = fileListPath + QCDFileList_1   ;  break ;
-//    case 5 : fileList = fileListPath + QCDFileList_2   ;  break ;
-//    case 6 : fileList = fileListPath + QCDFileList_3   ;  break ;
-//    case 7 : fileList = fileListPath + QCDFileList_4   ;  break ;
-//    case 8 : fileList = fileListPath + QCDFileList_5   ;  break ;
-//    case 9 : fileList = fileListPath + QCDFileList_6   ;  break ;
-//    case 10: fileList = fileListPath + QCDFileList_7   ;  break ;
-//    case 11: fileList = fileListPath + QCDFileList_8   ;  break ;
-//    case 12: fileList = fileListPath + QCDFileList_9   ;  break ;
-//    case 13: fileList = fileListPath + QCDFileList_10  ;  break ;
-//    case 14: fileList = fileListPath + QCDFileList_11  ;  break ;
     default: cerr << "Type must be from {0,1,2,3}" << endl ; return -1 ;
     }
   cout << "your fileList is" << fileList << endl;
@@ -367,10 +353,10 @@ int makeNTuple(int type, int theSeg, int NSeg)
 
   switch (dataType) 
     {
-    case 0 : outFileName = dataNTuple           + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
-    case 1 : outFileName = QCDNTuple            + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
-    case 2 : outFileName = BJetNTuple_noWeights + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
-    case 3 : outFileName = CJetNTuple_noWeights + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
+    case 0 : outFileName = dataNTuple + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
+    case 1 : outFileName = QCDNTuple  + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
+    case 2 : outFileName = BJetNTuple + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
+    case 3 : outFileName = CJetNTuple + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
 
@@ -491,10 +477,10 @@ int makeNTuple(int type, int theSeg, int NSeg)
   //  while (!fileStream.eof())
   for(int kkk = 0 ; kkk < fileIndexLimit ; kkk++)
     {
-      //      if (kkk==2) break;
+      //if (kkk==10) break;/*debug*/
       // Open input file
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
-      if(file_number%1==0 ) cout << "fileName is: " << fileName << endl;
+      if(file_number%100==0 ) cout << "fileName is: " << fileName << endl;
       //if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;
       if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;/*debug*/
       file_number++;
@@ -514,12 +500,12 @@ int makeNTuple(int type, int theSeg, int NSeg)
       int nEvents = akPu3->GetEntries();
       if(file_number%100==0 )cout << nEvents << " events to loop over in " << fileName << endl;
       
-      nEvents = 10;/*debug*/
       for (int i=0; i<nEvents; i++) 
 	{
 	  //if (i%10000 == 0 && i != 0) cout << "Processing Event " << i << endl;
-	  akPu3->GetEntry(i);
+	  //if(i==10)break;/*debug*/
 
+	  akPu3->GetEntry(i);
 	  // Event Level Selection
 	  //used to only apply  pPAcollisionEventSelectionPA+pHBHENoiseFileter to data.... 
 	  //but they should apply to MC as well!
