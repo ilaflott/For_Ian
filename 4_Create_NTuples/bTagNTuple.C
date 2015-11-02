@@ -1,35 +1,19 @@
 /*
-  LAST EDITED: 02.11.2014
-
   DESCRIPTION:
   Produces an ntuple from data crab output or MC pthat files with
   some selections. Run once for each: data, QCD MC, BJet MC, CJet MC
 
   Input: crab output/MC pthat bin files
   Output: a ntuple/tree
-
-  EVENT SELECTION:
-  |hiEvt.vz| <= 15
-
-  DATA:
-  skim.pPAcollisionEventSelectionPA
-  skim.pHBHENoiseFilter
-  trackMax/jtpt > 0.01            << Actual collision event
-
-  JET SELECTION:
-  jtpt >= 20
-  |jteta| <= 2
-
-  MUON SELECTION:
-  (mupt!=0 || mueta!=0 || muphi!=0)
-  mupt/rawpt < 0.95                   << W event filtering
 */
 
 // C/C++ library includes
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <cmath>
+#include <algorithm>
 
 // Root includes
 #include "TFile.h"
@@ -42,26 +26,22 @@
 
 using namespace std;
 
-// Function declarations
-int makeNTuple(int type);
+//useful functions
+int makeNTuple(int type, int theSeg, int NSeg);
 int MCCounts(int type);
 int NTupleWeights(int type);
+//testbeds
 int NTupleTest(int type);//crude script, doesn't even use the type
+int testAnything(int type, int theSeg, int NSeg);//crude script, doesn't even use the type
 
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////
 //
+//      GLOBAL VARIABLES
 //
-//
-//
-//              GLOBAL VARIABLES
-//
-//
-//
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////
 
 // Switches
 const bool doTracks=true;
@@ -84,17 +64,17 @@ const string QCDFileList  = "QCDJets_noVsJets_filelist.txt";
 const string BJetFileList = "BJets_filelist.txt";
 const string CJetFileList = "CJets_filelist.txt";
 
-const string QCDFileList_1   = "QCDJets_noVsJets_filelist_1.txt";
-const string QCDFileList_2   = "QCDJets_noVsJets_filelist_2.txt";
-const string QCDFileList_3   = "QCDJets_noVsJets_filelist_3.txt";
-const string QCDFileList_4   = "QCDJets_noVsJets_filelist_4.txt";
-const string QCDFileList_5   = "QCDJets_noVsJets_filelist_5.txt";
-const string QCDFileList_6   = "QCDJets_noVsJets_filelist_6.txt";
-const string QCDFileList_7   = "QCDJets_noVsJets_filelist_7.txt";
-const string QCDFileList_8   = "QCDJets_noVsJets_filelist_8.txt";
-const string QCDFileList_9   = "QCDJets_noVsJets_filelist_9.txt";
-const string QCDFileList_10  = "QCDJets_noVsJets_filelist_10.txt";
-const string QCDFileList_11  = "QCDJets_noVsJets_filelist_11.txt";
+//const string QCDFileList_1   = "QCDJets_noVsJets_filelist_1.txt";
+//const string QCDFileList_2   = "QCDJets_noVsJets_filelist_2.txt";
+//const string QCDFileList_3   = "QCDJets_noVsJets_filelist_3.txt";
+//const string QCDFileList_4   = "QCDJets_noVsJets_filelist_4.txt";
+//const string QCDFileList_5   = "QCDJets_noVsJets_filelist_5.txt";
+//const string QCDFileList_6   = "QCDJets_noVsJets_filelist_6.txt";
+//const string QCDFileList_7   = "QCDJets_noVsJets_filelist_7.txt";
+//const string QCDFileList_8   = "QCDJets_noVsJets_filelist_8.txt";
+//const string QCDFileList_9   = "QCDJets_noVsJets_filelist_9.txt";
+//const string QCDFileList_10  = "QCDJets_noVsJets_filelist_10.txt";
+//const string QCDFileList_11  = "QCDJets_noVsJets_filelist_11.txt";
 
 //Weight Information Files,  #Events per pthat bin, #BJets per pthat bin, #Cjets per pthat bin
 const string QCDWeightsFile  = "QCDJets_weights_FULL_TEST.txt";
@@ -112,15 +92,20 @@ const string B_NEventsFile = "BJets_NEvents_FULL_TEST.txt";
 const string B_NBJetsFile  = "BJets_NBJets_FULL_TEST.txt";
 
 //NTuple Files
-const string dataNTuple   = "data_NTuple_FULL_TEST.root";			  
+//const string dataNTuple   = "data_NTuple_FULL_TEST.root";			  
+const string dataNTuple   = "data_NTuple_TEST";			  
 
-const string QCDNTuple_noWeights    = "QCDJets_NTuple_noWeights_FULL_TEST.root";	  
-const string BJetNTuple_noWeights   =   "BJets_NTuple_noWeights_FULL_TEST.root";	  
-const string CJetNTuple_noWeights   =   "CJets_NTuple_noWeights_FULL_TEST.root";	  
+const string QCDNTuple   = "QCDJets_NTuple";	  
+const string BJetNTuple  =   "BJets_NTuple";	  
+const string CJetNTuple  =   "CJets_NTuple";	  
 
-const string QCDNTuple_withWeights    = "QCDJets_NTuple_withWeights_FULL_TEST.root";
-const string BJetNTuple_withWeights   =   "BJets_NTuple_withWeights_FULL_TEST.root";
-const string CJetNTuple_withWeights   =   "CJets_NTuple_withWeights_FULL_TEST.root";
+const string QCDNTuple_noWeights    = "QCDJets_NTuple_noWeights_FULL_TEST";	  
+const string BJetNTuple_noWeights   =   "BJets_NTuple_noWeights_FULL_TEST";	  
+const string CJetNTuple_noWeights   =   "CJets_NTuple_noWeights_FULL_TEST";	  
+
+const string QCDNTuple_withWeights    = "QCDJets_NTuple_withWeights_FULL_TEST";
+const string BJetNTuple_withWeights   =   "BJets_NTuple_withWeights_FULL_TEST";
+const string CJetNTuple_withWeights   =   "CJets_NTuple_withWeights_FULL_TEST";
 
 const int QCDBins = 10;
 //const int HFBins = 5;
@@ -331,71 +316,163 @@ int result;
 int dataType;
 
 // Main functions
-int bTagNTuple(int job, int type)
+int bTagNTuple(int job, int type, int theSeg=1, int NSeg = 1)
 {
   dataType = type;  
   switch (type) 
     {
       //notice: string fileList is compatible with const char*, which has the + operator overloaded
-    case 0 : fileList = fileListPath + dataFileList    ; cout << "you chose " << dataFileList   << endl   ;   break ;
-    case 1 : fileList = fileListPath + QCDFileList     ; cout << "you chose " << QCDFileList    << endl   ;   break ;
-    case 2 : fileList = fileListPath + BJetFileList    ; cout << "you chose " << BJetFileList   << endl   ;   break ;
-    case 3 : fileList = fileListPath + CJetFileList    ; cout << "you chose " << CJetFileList   << endl   ;   break ;
+    case 0 : fileList = fileListPath + dataFileList    ;  break ;
+    case 1 : fileList = fileListPath + QCDFileList     ;  break ;
+    case 2 : fileList = fileListPath + BJetFileList    ;  break ;
+    case 3 : fileList = fileListPath + CJetFileList    ;  break ;
       //QCD PIECES
-    case 4 : fileList = fileListPath + QCDFileList_1   ; cout << "you chose " << QCDFileList_1  << endl   ;   break ;
-    case 5 : fileList = fileListPath + QCDFileList_2   ; cout << "you chose " << QCDFileList_2  << endl   ;   break ;
-    case 6 : fileList = fileListPath + QCDFileList_3   ; cout << "you chose " << QCDFileList_3  << endl   ;   break ;
-    case 7 : fileList = fileListPath + QCDFileList_4   ; cout << "you chose " << QCDFileList_4  << endl   ;   break ;
-    case 8 : fileList = fileListPath + QCDFileList_5   ; cout << "you chose " << QCDFileList_5  << endl   ;   break ;
-    case 9 : fileList = fileListPath + QCDFileList_6   ; cout << "you chose " << QCDFileList_6  << endl   ;   break ;
-    case 10: fileList = fileListPath + QCDFileList_7   ; cout << "you chose " << QCDFileList_7  << endl   ;   break ;
-    case 11: fileList = fileListPath + QCDFileList_8   ; cout << "you chose " << QCDFileList_8  << endl   ;   break ;
-    case 12: fileList = fileListPath + QCDFileList_9   ; cout << "you chose " << QCDFileList_9  << endl   ;   break ;
-    case 13: fileList = fileListPath + QCDFileList_10  ; cout << "you chose " << QCDFileList_10 << endl   ;   break ;
-    case 14: fileList = fileListPath + QCDFileList_11  ; cout << "you chose " << QCDFileList_11 << endl   ;   break ;
+//    case 4 : fileList = fileListPath + QCDFileList_1   ;  break ;
+//    case 5 : fileList = fileListPath + QCDFileList_2   ;  break ;
+//    case 6 : fileList = fileListPath + QCDFileList_3   ;  break ;
+//    case 7 : fileList = fileListPath + QCDFileList_4   ;  break ;
+//    case 8 : fileList = fileListPath + QCDFileList_5   ;  break ;
+//    case 9 : fileList = fileListPath + QCDFileList_6   ;  break ;
+//    case 10: fileList = fileListPath + QCDFileList_7   ;  break ;
+//    case 11: fileList = fileListPath + QCDFileList_8   ;  break ;
+//    case 12: fileList = fileListPath + QCDFileList_9   ;  break ;
+//    case 13: fileList = fileListPath + QCDFileList_10  ;  break ;
+//    case 14: fileList = fileListPath + QCDFileList_11  ;  break ;
     default: cerr << "Type must be from {0,1,2,3}" << endl ; return -1 ;
-
     }
+  cout << "your fileList is" << fileList << endl;
   switch (job)
     {
-    case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type) ; break ; 
+    case 0:cout << "You Chose makeNTuple" << endl; result = makeNTuple(type,theSeg,NSeg) ; break ; 
     case 1:cout << "You Chose MCCounts" << endl; result = MCCounts(type) ; break ; 
     case 2:cout << "You Chose Apply NTuple Weights" << endl; result = NTupleWeights(type) ; break ; 
     case 3:cout << "You Chose to Test NTuple" << endl; result = NTupleTest(type) ; break ; 
-    default: cerr << "Job must be from {0,1,2,3}" << endl; return -1 ;
+    case 4:cout << "You Chose to Test Anything" << endl; result = testAnything(type,theSeg,NSeg) ; break ; 
+    default: cerr << "Job must be from {0,1,2} for work and {3,4} for tests" << endl; return -1 ;
     }
 
   return result;
 }
 
 // Processes files and outputs an ntuple
-int makeNTuple(int type)
+int makeNTuple(int type, int theSeg, int NSeg)
 {
   TFile *outFile;
   string outFileName;
+  
+  ostringstream oss;
+  //oss << "_" << theSeg << "_of_" << NSeg;
+  string FileSegNumber = oss.str();
+  //cout << "FileSegNumber = " << FileSegNumber << endl;
 
   switch (dataType) 
     {
-    case 0 : outFileName = outFilePath + dataNTuple ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-      //    case 1: outFileName = outFilePath + QCDNTuple  ; cout << outFileName << endl ;  outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 1 : cout << "consider submitting makeNTuple in 11 pieces using types 4-14..." << endl; return -1;
-    case 2 : outFileName = outFilePath + BJetNTuple_noWeights ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 3 : outFileName = outFilePath + CJetNTuple_noWeights ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 4 : outFileName = outFilePath + "P_1"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 5 : outFileName = outFilePath + "P_2"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 6 : outFileName = outFilePath + "P_3"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 7 : outFileName = outFilePath + "P_4"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 8 : outFileName = outFilePath + "P_5"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 9 : outFileName = outFilePath + "P_6"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 10: outFileName = outFilePath + "P_7"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 11: outFileName = outFilePath + "P_8"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 12: outFileName = outFilePath + "P_9"  + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 13: outFileName = outFilePath + "P_10" + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
-    case 14: outFileName = outFilePath + "P_11" + QCDNTuple_noWeights  ;   outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ); break ;
+    case 0 : outFileName = dataNTuple           + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
+    case 1 : outFileName = QCDNTuple            + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
+    case 2 : outFileName = BJetNTuple_noWeights + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
+    case 3 : outFileName = CJetNTuple_noWeights + FileSegNumber + ".root" ; outFile = new TFile( Form( "%s" , outFileName.c_str() ) , "RECREATE" ) ; break ;
     default:cerr<<"dataType not found"<<endl; return -1;
     }
 
-  cout << "decalring new tree+branches" << endl;
+  //////////////////////////
+  //BEGIN JOB SEGMENTATION//
+  //////////////////////////
+  if(theSeg==0||NSeg==0)
+    {
+      cerr<<"theSeg and NSeg can't be zero"<<endl;
+      return-1;
+    }
+  if(theSeg>NSeg)
+    {
+      cerr<<"job segment doesn't exist."<<endl;
+      return-1;
+    }
+  
+  //fileList="testList.txt";/*debug*/
+  cout << endl <<"fileList is: " << fileList << endl<<endl;
+  
+  //this kills the file stream for some reason
+  ifstream tempfileStream(fileList.c_str(), ifstream::in);
+  int theLineCount = std::count(istreambuf_iterator<char>(tempfileStream),
+                                istreambuf_iterator<char>(), '\n');
+  cout << "# files = " << theLineCount << endl;
+  
+  if(NSeg>theLineCount)
+    {
+      cerr<<"can't have more jobs than files available" << endl;
+      return -1;
+    }//end common error condititons
+  
+  cout << "# jobs requested = "<<NSeg<<endl;
+
+  double linesPerJob = (theLineCount/(double)NSeg);
+  cout << "avg files per job = " << linesPerJob << endl<<endl;
+
+  int ceilLinesPerJob  = (int)ceil(theLineCount/(double)NSeg);
+  int floorLinesPerJob = (int)floor(theLineCount/(double)NSeg);
+
+  //cout << "ceilLinesPerJob  = " << ceilLinesPerJob << endl;
+  //cout << "floorLinesPerJob = " << floorLinesPerJob<< endl<<endl;
+
+  int jobsWFloorFilesPerJob  = NSeg*ceilLinesPerJob - theLineCount;
+  int jobsWCeilFilesPerJob = theLineCount - floorLinesPerJob*NSeg;
+  if(ceilLinesPerJob==floorLinesPerJob)
+    {
+      jobsWFloorFilesPerJob=theLineCount/linesPerJob;
+      jobsWCeilFilesPerJob=jobsWFloorFilesPerJob;
+    }
+  cout << "jobsWCeilFilesPerJob  = " <<jobsWCeilFilesPerJob   << endl;
+  cout << "jobsWFloorFilesPerJob = " <<jobsWFloorFilesPerJob  << endl<<endl;
+
+  int filesRequested= jobsWCeilFilesPerJob * ceilLinesPerJob + jobsWFloorFilesPerJob * floorLinesPerJob;
+  cout <<"the number of files you're requesting = " << filesRequested << endl;
+
+  //ifstream for text maneuvering has to come after the ifstream for line counting
+  ifstream fileStream(fileList.c_str(), ifstream::in);
+  string fileName;
+  fileStream >> fileName;//this needed before loop so we don't miss the last file available
+
+  cout<<"looping to start file..." << endl<<endl;
+  int jobNum=0;
+  int fileIndex1;
+  int fileIndex1Lim=(theSeg-1)*ceilLinesPerJob;
+  int fileIndex1LimMax=(jobsWCeilFilesPerJob)*ceilLinesPerJob;
+  for(fileIndex1=0 ;
+      fileIndex1<fileIndex1Lim && fileIndex1<fileIndex1LimMax;
+      fileIndex1++)//designed to loop over initial ceiling jobs
+    {
+      if((fileIndex1)%ceilLinesPerJob==0) jobNum++;
+      fileStream >> fileName;
+    }
+  cout <<"ending first loop ..."<<endl<<endl;
+
+  int fileIndex2Lim=(jobsWCeilFilesPerJob*ceilLinesPerJob + (theSeg-jobsWCeilFilesPerJob-1)*floorLinesPerJob);
+  int fileIndex2;
+  for(fileIndex2=fileIndex1 ;
+      fileIndex2<fileIndex2Lim && theSeg>jobsWCeilFilesPerJob ;
+      fileIndex2++)//loop over remaining floor jobs
+    {
+      if((fileIndex2-fileIndex1)%floorLinesPerJob==0) jobNum++;
+      fileStream >> fileName;
+      if(fileIndex2==fileIndex2Lim-1)cout << "ending second loop ..."<<endl<<endl;
+    }
+
+
+  int fileIndexLimit;
+  if( theSeg<=jobsWCeilFilesPerJob) fileIndexLimit=ceilLinesPerJob ;
+  else fileIndexLimit=floorLinesPerJob ;
+  cout <<"fileIndexLimit = "<<fileIndexLimit<<endl;
+
+  cout <<"the REAL loop i want, i'm running over the files of job #" <<(jobNum+1)<< endl;
+  //  for(int kkk = 0 ; kkk < 250 ; kkk++)/*debug*/
+  //  while (!fileStream.eof())
+  int file_number=fileIndex2+1;
+  
+  ////////////////////////
+  //END JOB SEGMENTATION//
+  ////////////////////////
+
+  cout << "declaring new tree+branches" << endl;
 
   // Jet tree
   TTree * jetTree = new TTree("jet","jet");
@@ -405,25 +482,18 @@ int makeNTuple(int type)
   // vtx tree for weighting
   TTree * evtTree = new TTree("evt","evt");
   evtTree->Branch("vz", &nVz ,"vz/D");									       
-  evtTree->Branch("evt", &Evt ,"evt/D");									       
-  evtTree->Branch("pthat", &nPthat ,"pthat/D");									       
+  evtTree->Branch("evt", &Evt ,"evt/D");									     
+  evtTree->Branch("pthat", &nPthat ,"pthat/D");								    
   evtTree->SetDirectory(0);
 
-  cout << "fileList is: " << fileList << endl;
-  //grab filename
-  ifstream fileStream(fileList.c_str(), ifstream::in);
-  string fileName;      
-  fileStream >> fileName;//this needed before loop so we don't miss the last file available
-  int file_number = 0;
-
-  cout << "beginning file loop" << endl;
-
   //  for(int kkk = 0 ; kkk < 250 ; kkk++)/*debug*/
-  while (!fileStream.eof()) 
+  //  while (!fileStream.eof())
+  for(int kkk = 0 ; kkk < fileIndexLimit ; kkk++)
     {
+      //      if (kkk==2) break;
       // Open input file
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
-      if(file_number%100==0 ) cout << "fileName is: " << fileName << endl;
+      if(file_number%1==0 ) cout << "fileName is: " << fileName << endl;
       //if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;
       if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;/*debug*/
       file_number++;
@@ -677,22 +747,20 @@ int makeNTuple(int type)
 	    }//jetloop
 	  evtTree->Fill();
 	}//eventloop
-      
       // Cleanup
       if(file_number%1000==0)cout << "closing " << fileName << endl;
       inFile->Close();
       //gROOT->GetListOfFiles()->Remove(inFile);
       fileStream >> fileName;
-      
     }//fileloop
   
   // Write to output file
   outFile->cd();
-
-  cout << "writing jet tree to file" << outFileName << endl;
+  
+  cout << "writing jet tree to file " << outFileName << endl;
   jetTree->Write(jetTree->GetName(), TObject::kOverwrite);  //kOverrwrite overwrites backup/partially finished tree
   
-  cout << "writing vtx tree to file" << outFileName << endl;
+  cout << "writing vtx tree to file " << outFileName << endl;
   evtTree->Write(evtTree->GetName(), TObject::kOverwrite);
 
   // Cleanup
@@ -871,14 +939,14 @@ int NTupleWeights(int type)
   switch(type)
     {
     case 1: 
-      NTupleFile    = NTuplePath     + QCDNTuple_noWeights       ; 
-      outNTupleFile = QCDNTuple_withWeights       ; 
+      NTupleFile    = NTuplePath     + QCDNTuple_noWeights+".root"       ; 
+      outNTupleFile = QCDNTuple_withWeights+".root"       ; 
       weightFile    = weightFilePath + QCDWeightsFile  ; 
       outWeightFile = QCDWeightsFile  ; 
       break;
     case 2: 
-      NTupleFile     = NTuplePath     + BJetNTuple_noWeights      ;
-      outNTupleFile  = BJetNTuple_withWeights       ;  
+      NTupleFile     = NTuplePath     + BJetNTuple_noWeights+".root"      ;
+      outNTupleFile  = BJetNTuple_withWeights+".root"       ;  
       weightFile     = weightFilePath + BJetWeightsFile ; 
       outWeightFile  = BJetWeightsFile ; 
       HFNEventsFile  = weightFilePath + B_NEventsFile   ; 
@@ -886,8 +954,8 @@ int NTupleWeights(int type)
       QCDHFNJetsFile = weightFilePath + QCD_NBJetsFile  ; 
       break;
     case 3: 
-      NTupleFile       = NTuplePath     + CJetNTuple_noWeights      ; 
-      outNTupleFile    = CJetNTuple_withWeights       ;  
+      NTupleFile       = NTuplePath     + CJetNTuple_noWeights+".root"      ; 
+      outNTupleFile    = CJetNTuple_withWeights+".root"       ;  
       weightFile       = weightFilePath + CJetWeightsFile ; 
       outWeightFile    = CJetWeightsFile ; 
       HFNEventsFile    = weightFilePath + C_NEventsFile   ; 
@@ -1014,7 +1082,7 @@ int NTupleWeights(int type)
   for (int i = 0; i<NEntries; i++)
     //for (int i = 0; i<10; i++)
     {
-      //grab a jet
+      //grab an evt
       newEvtTree->GetEntry(i);
 
       //figure out which pthat bin the jet belongs to
@@ -1232,7 +1300,7 @@ static inline void branchAddresses(TTree *akPu3)
 int NTupleTest(int type)
 {
   int worthless = type;
-  string file = NTuplePath + QCDNTuple_noWeights;
+  string file = NTuplePath + QCDNTuple_noWeights+".root";
   string theWeights = weightFilePath + QCDWeightsFile ;
   double weightArray[QCDBins+1];
 
@@ -1260,3 +1328,115 @@ int NTupleTest(int type)
   return 0;
 }
 
+//template for file splitting in jobs
+//Seg->Segment
+int testAnything(int type, int theSeg, int NSeg)//just a space to try stuff out in 
+{
+  if(theSeg==0||NSeg==0)
+    {
+      cout<<"I can't divide a file list into no segments and i can't compute the segment before the filelist starts!"<<endl;
+      return-1;
+    }
+  if(theSeg>NSeg)
+    {
+      cout<<"job segment doesn't exist. The segment number must be less than the total number of pieces"<<endl;
+      return-1;
+    }
+  
+  cout << endl;
+  
+  //fileList="testList.txt";
+  cout << "fileList is: " << fileList << endl<<endl;
+  
+  //this kills the file stream for some reason
+  ifstream tempfileStream(fileList.c_str(), ifstream::in);
+  int theLineCount = std::count(istreambuf_iterator<char>(tempfileStream), 
+				istreambuf_iterator<char>(), '\n');
+  cout << "# files = " << theLineCount << endl;
+  
+  if(NSeg>theLineCount)
+    {
+      cerr<<"can't have more jobs than files available" << endl;
+      return -1;
+    }
+  
+  cout << "# jobs requested = "<<NSeg<<endl;
+  
+  double linesPerJob = (theLineCount/(double)NSeg);
+  cout << "avg files per job = " << linesPerJob << endl<<endl;
+  
+  int ceilLinesPerJob  = (int)ceil(theLineCount/(double)NSeg);
+  int floorLinesPerJob = (int)floor(theLineCount/(double)NSeg);
+  
+  cout << "ceilLinesPerJob  = " << ceilLinesPerJob << endl;
+  cout << "floorLinesPerJob = " << floorLinesPerJob<< endl<<endl;
+  
+  int jobsWFloorFilesPerJob  = NSeg*ceilLinesPerJob - theLineCount;  
+  int jobsWCeilFilesPerJob = theLineCount - floorLinesPerJob*NSeg;
+  if(ceilLinesPerJob==floorLinesPerJob)
+    {
+      jobsWFloorFilesPerJob=theLineCount/linesPerJob;
+      jobsWCeilFilesPerJob=jobsWFloorFilesPerJob;
+    }
+  cout << "jobsWCeilFilesPerJob  = " <<jobsWCeilFilesPerJob   << endl;
+  cout << "jobsWFloorFilesPerJob = " <<jobsWFloorFilesPerJob  << endl<<endl;
+  
+  int filesRequested= jobsWCeilFilesPerJob * ceilLinesPerJob + jobsWFloorFilesPerJob * floorLinesPerJob;
+  cout <<"the number of files you're requesting = " << filesRequested << endl;
+
+  //ifstream for text maneuvering has to come after the ifstream for line counting
+  ifstream fileStream(fileList.c_str(), ifstream::in);
+  string fileName;      
+  fileStream >> fileName;//this needed before loop so we don't miss the last file available
+  
+  //  for(int kkk = 0 ; kkk < 250 ; kkk++)/*debug*/
+  //  while (!fileStream.eof()) 
+  cout<<"looping to start file..." << endl<<endl;  
+  int jobNum;
+  int fileIndex1;
+  int fileIndex1Lim=(theSeg-1)*ceilLinesPerJob;
+  int fileIndex1LimMax=(jobsWCeilFilesPerJob)*ceilLinesPerJob;
+  for(fileIndex1=0 ; 
+      fileIndex1<fileIndex1Lim && fileIndex1<fileIndex1LimMax;
+      fileIndex1++)//designed to loop over initial ceiling jobs
+    { 
+      if((fileIndex1)%ceilLinesPerJob==0)
+	{
+	  jobNum=(fileIndex1)/ceilLinesPerJob + 1;
+	  cout<<"looping over jobs # "<< jobNum << "'s files. " << endl;
+	  cout <<"fileIndex=" << fileIndex1 << endl;
+	}
+      //cout << fileName << endl;
+      fileStream >> fileName;
+    }
+
+  cout <<"ending first loop ..."<<endl<<endl;
+  int fileIndex2Lim=(jobsWCeilFilesPerJob*ceilLinesPerJob + (theSeg-jobsWCeilFilesPerJob-1)*floorLinesPerJob);
+  for(int fileIndex2=fileIndex1 ; 
+      fileIndex2<fileIndex2Lim && theSeg>jobsWCeilFilesPerJob ; 
+      fileIndex2++)//loop over remaining floor jobs
+    {
+      if((fileIndex2-fileIndex1)%floorLinesPerJob==0)
+	{
+	  jobNum=((fileIndex1/ceilLinesPerJob) + ((fileIndex2 - fileIndex1)/floorLinesPerJob + 1 ));
+	  cout<<"looping over jobs # "<< jobNum << "'s files. " << endl;
+	  cout <<"fileIndex=" << fileIndex2 << endl;
+	}
+      //cout << fileName << endl;
+      fileStream >> fileName;
+    }
+  cout << "ending second loop ..."<<endl<<endl;
+
+  int fileIndexLimit;
+  cout <<"the REAL loop i want, i run over the following files of job #" <<jobNum+1<< endl;
+  if( theSeg<=jobsWCeilFilesPerJob) fileIndexLimit=ceilLinesPerJob ;
+  else fileIndexLimit=floorLinesPerJob ;
+
+  for(int kkk = 0 ; kkk < fileIndexLimit ; kkk++)
+    {
+      //      cout << fileName << endl;
+      fileStream >> fileName;
+    }
+   
+  return 0;
+}
