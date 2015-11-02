@@ -71,8 +71,6 @@ const string CJetFileList = "CJets_unOfficialHighPt_addStat_Forests.txt";
 //const string CJetFileList = "CJets_unOfficialHighPt_Forests.txt";
 //const string BJetFileList = "BJets_OfficialLowPt_Forests.txt";
 //const string CJetFileList = "CJets_OfficialLowPt_Forests.txt";
-//const string BJetFileList = "BJets_allAvailable_Forests.txt";
-//const string CJetFileList = "CJets_allAvailable_Forests.txt";
 
 //Weight Information Files,  #Events per pthat bin, #BJets per pthat bin, #Cjets per pthat bin
 const string QCDWeightsFile  = "QCDJets_weights_FULL_TEST.txt";
@@ -363,16 +361,6 @@ int makeNTuple(int type, int theSeg, int NSeg)
   //////////////////////////
   //BEGIN JOB SEGMENTATION//
   //////////////////////////
-  if(theSeg==0||NSeg==0)
-    {
-      cerr<<"theSeg and NSeg can't be zero"<<endl;
-      return-1;
-    }
-  if(theSeg>NSeg)
-    {
-      cerr<<"job segment doesn't exist."<<endl;
-      return-1;
-    }
   
   //fileList="testList.txt";/*debug*/
   cout << endl <<"fileList is: " << fileList << endl<<endl;
@@ -382,7 +370,17 @@ int makeNTuple(int type, int theSeg, int NSeg)
   int theLineCount = std::count(istreambuf_iterator<char>(tempfileStream),
                                 istreambuf_iterator<char>(), '\n');
   cout << "# files = " << theLineCount << endl;
-  
+
+  if(theSeg==0||NSeg==0)
+    {
+      cerr<<"theSeg and NSeg can't be zero"<<endl;
+      return-1;
+    }
+  if(theSeg>NSeg)
+    {
+      cerr<<"job segment doesn't exist."<<endl;
+      return-1;
+    }  
   if(NSeg>theLineCount)
     {
       cerr<<"can't have more jobs than files available" << endl;
