@@ -40,29 +40,37 @@ EOF
 
 #rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING/*.root
 #mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING
-
+NTupleDir=""
 if [ $flavor -eq 0 ]; then
     echo "moving Data file to Data Folder..."
-    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_MaybeBadAndOldFiles_11.1
-#    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_addStat_11.1
+    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_MaybeBadAndOldFiles_11.1"
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_redo_11.1"
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING"
 fi
 if [ $flavor -eq 1 ]; then
     echo "moving QCDJets file to QCDJets Folder..."
-    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_Official_noVsJets_11.1
+    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_Official_noVsJets"
 fi
 if [ $flavor -eq 2 ]; then
     echo "moving BJets file to BJets Folder..."
-    rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_addStat_11.1/*_of_50.root
-    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_addStat_11.1
-#    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_OfficialLowPt_11.1
-#    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_HighPtOnly_11.1
+    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_addStat_11.1"
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_OfficialLowPt_11.1
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_HighPtOnly_11.1
 fi
 if [ $flavor -eq 3 ]; then
     echo "moving CJets file to CJets Folder..."
-    rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_addStat_11.1/*_of_50.root
-    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_addStat_11.1
-#    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPt_11.1
-#    mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_HighPtOnly_11.1
+    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_addStat_11.1"
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPt_11.1
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_HighPtOnly_11.1
+fi
+
+mv *.root "${NTupleDir}"
+#additional instructions for specific job...
+
+if [ $JobNum -eq 1 ]; then
+    echo "running other instructions too.."
+#    rm -rf /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING/*.root
+    rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_Official_noVsJets/*of_300.root
 fi
 
 echo "done!"

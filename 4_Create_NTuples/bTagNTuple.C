@@ -62,8 +62,8 @@ const string NTuplePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTu
 //filelists
 const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
 const string QCDFileList  = "QCDJets_noVsJets_OfficialForests.txt";
-const string BJetFileList = "BJets_unOfficialHighPt_addStat_Forests.txt";
-const string CJetFileList = "CJets_unOfficialHighPt_addStat_Forests.txt";
+//const string BJetFileList = "BJets_unOfficialHighPt_addStat_Forests.txt";
+//const string CJetFileList = "CJets_unOfficialHighPt_addStat_Forests.txt";
 
 ////Other Available FileLists
 //const string QCDFileList  = "QCDJets_withVsJets_OfficialForests.txt";
@@ -71,8 +71,8 @@ const string CJetFileList = "CJets_unOfficialHighPt_addStat_Forests.txt";
 //const string CJetFileList = "CJets_unOfficialHighPt_Forests.txt";
 //const string BJetFileList = "BJets_OfficialLowPt_Forests.txt";
 //const string CJetFileList = "CJets_OfficialLowPt_Forests.txt";
-//const string BJetFileList = "BJets_allAvailable_Forests.txt";
-//const string CJetFileList = "CJets_allAvailable_Forests.txt";
+const string BJetFileList = "BJets_OfficialLowPtAndPrivateGenHighPT_Forests.txt";
+const string CJetFileList = "CJets_OfficialLowPtAndPrivateGenHighPT_Forests.txt";
 
 //Weight Information Files,  #Events per pthat bin, #BJets per pthat bin, #Cjets per pthat bin
 const string QCDWeightsFile  = "QCDJets_weights_FULL_TEST.txt";
@@ -94,8 +94,10 @@ const string B_NBJetsFile  = "BJets_NBJets_FULL_TEST.txt";
 const string dataNTuple   = "data_NTuple_11.1_";			  
 						
 const string QCDNTuple   = "QCDJets_NTuple_noVsJets_11.1_";	  
-const string BJetNTuple  =   "BJets_NTuple_addStat_11.1_";	  
-const string CJetNTuple  =   "CJets_NTuple_addStat_11.1_";	  
+///const string BJetNTuple  =   "BJets_NTuple_addStat_11.1_";	  
+///const string CJetNTuple  =   "CJets_NTuple_addStat_11.1_";	  
+const string BJetNTuple  =   "BJets_NTuple_oldStat_11.1_";	  
+const string CJetNTuple  =   "CJets_NTuple_oldStat_11.1_";	  
 
 const string QCDNTuple_noWeights    = "QCDJets_NTuple_noWeights_FULL_TEST";	  
 const string BJetNTuple_noWeights   =   "BJets_NTuple_noWeights_FULL_TEST";	  

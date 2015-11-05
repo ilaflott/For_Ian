@@ -3,23 +3,20 @@
 # run this with $ source ppNTuples_condor_submit.sh 
 #if arguments use $ source ppNTuples_condor_submit.sh $arg1 $arg2 ... etc.
 
-echo "inputs are \$flavor \$BeginJob \$EndJob \$NJobs"
+echo "inputs are \$flavor \$BeginJob \$EndJob \$JobSplittng"
 echo "to run one job let BeginJob=EndJob"
 job=0
 flavor=$1
 BeginJob=$2
 EndJob=$3
-NJobs=$4
+
+JobSplitting=$4
 #jobSegment=$3
 
-echo "$NJobs being submitted"
+echo "$NJobSplitting being submitted"
+echo "makeNTuple Jobs Being Submitted"
 
-if [ $job -eq 0 ]; then
-    echo "makeNTuple Jobs Being Submitted"
-fi
-if [ $job -eq 1 ]; then
-    echo "MCCounts Jobs Being Submitted"
-fi
+
 if [ $flavor -eq 0 ]; then
     echo "Data Job Being Submitted"
 fi
@@ -51,13 +48,13 @@ Environment = "HOSTNAME=$HOSTNAME"
 # run my script
 Executable     = condor_run_makeNTuple.sh
 +AccountingGroup = "group_cmshi.ilaflott"
-Arguments      = $flavor $JobNum $NJobs
+Arguments      = $flavor $JobNum $JobSplitting
 #input files. in this case, there are none.
 Input          = /dev/null
 # log files
-Error          = Condor_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${NJobs}.err
-Output         = Condor_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${NJobs}.out
-Log            = Condor_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${NJobs}.log
+Error          = Condor_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.err
+Output         = Condor_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.out
+Log            = Condor_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log
 # get the environment (path, variables set in this submit script etc.)
 Getenv         = True
 # prefer to run on fast computers
@@ -75,8 +72,6 @@ EOF
 
     #submit the job
     echo "submitting subfile..."
-    #bTNT->bTagNTuple
-#    echo "Condor Job name is bTNT_${job}_${flavor}_p${JobNum}_of_${NJobs}"
     condor_submit  subfile
     JobNum=$(($JobNum + 1))
 done
