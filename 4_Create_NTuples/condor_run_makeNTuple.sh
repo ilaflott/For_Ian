@@ -32,7 +32,16 @@ NJobs=$3
 #rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/*.root
 echo "Running makeNTuple Job"
 
-#for makentuple
+#additional instructions for specific job...
+if [ $JobNum -eq 1 ]; then
+    echo "running other instructions too.."
+#    rm -rf /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING/*.root
+#    rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_Official_noVsJets/*of_300.root
+    mkdir /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_OfficialLowPtAndPrivateGenHighPT_11.1
+    mkdir /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPtAndPrivateGenHighPT_11.1
+fi
+
+#run the code
 root -b -l <<EOF
 .x bTagNTuple.C+(${job}, ${flavor},${JobNum},${NJobs})
 .q
@@ -53,24 +62,19 @@ if [ $flavor -eq 1 ]; then
 fi
 if [ $flavor -eq 2 ]; then
     echo "moving BJets file to BJets Folder..."
-    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_addStat_11.1"
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_addStat_11.1"
 #    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_OfficialLowPt_11.1
 #    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_HighPtOnly_11.1
+    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_OfficialLowPtAndPrivateGenHighPT_11.1"
 fi
 if [ $flavor -eq 3 ]; then
     echo "moving CJets file to CJets Folder..."
-    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_addStat_11.1"
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_addStat_11.1"
 #    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPt_11.1
 #    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_HighPtOnly_11.1
+    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPtAndPrivateGenHighPT_11.1"
 fi
 
 mv *.root "${NTupleDir}"
-#additional instructions for specific job...
-
-if [ $JobNum -eq 1 ]; then
-    echo "running other instructions too.."
-#    rm -rf /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING/*.root
-    rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_Official_noVsJets/*of_300.root
-fi
 
 echo "done!"

@@ -74,4 +74,5 @@ EOF
     echo "submitting subfile..."
     condor_submit  subfile
     JobNum=$(($JobNum + 1))
+    sleep 3m
 done

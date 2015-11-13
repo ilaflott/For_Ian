@@ -78,5 +78,6 @@ EOF
     #bTNT->bTagNTuple
 #    echo "Condor Job name is bTNT_${job}_${flavor}_p${JobNum}_of_${NJobs}"
     condor_submit subfile
+    sleep 30s
     JobNum=$(($JobNum + 1))
 done
