@@ -10,12 +10,10 @@ flavor=$1
 BeginJob=$2
 EndJob=$3
 JobSplitting=$4
-#jobSegment=$3
 
-#echo "$NJobSplitting being submitted"
-echo "makeNTuple Jobs Being Submitted"
+echo "makeNTuple Jobs Being Submitted..."
 
-ScratchDir="/net/hidsk0001/d00/scratch/ilaflott/pp_NTuplesC"
+ScratchDir="/net/hidsk0001/d00/scratch/ilaflott/pp_NTuples"
 NTupleDir=""
 NTupleFileName=""
 FinalNTupleFileName=""
@@ -61,7 +59,7 @@ do
         if [ $actualsize -le 8500 ]; then
             echo "file ${FinalNTupleFileName} does exist but isn't big enough!"
 	else
-            echo "file ${FinalNTupleFileName} exists and is big enough! DON'T SUBMIT"
+#            echo "file ${FinalNTupleFileName} exists and is big enough! DON'T SUBMIT"
             JobNum=$(($JobNum + 1))
             continue
         fi
@@ -69,12 +67,13 @@ do
     
     echo "running job..."
     root -b -l -q "bTagNTuple.C+(${job},${flavor},${JobNum},${JobSplitting})" >& "local_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log"
-    
+
+    sleep 5s
+
     JobNum=$(($JobNum + 1))
     echo "moving file"
     mv *.root "${NTupleDir}"
 
-    echo "sleeping for 10s"
-    sleep 10s
+    sleep 5s
     
 done
