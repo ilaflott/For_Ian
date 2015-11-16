@@ -357,6 +357,7 @@ int makeNTuple(int type, int theSeg, int NSeg)
   ostringstream oss;
   oss << "_" << theSeg << "_of_" << NSeg;
   string FileSegNumber = oss.str();
+  //oss.close();
   //cout << "FileSegNumber = " << FileSegNumber << endl;
 
   switch (dataType) 
@@ -379,6 +380,7 @@ int makeNTuple(int type, int theSeg, int NSeg)
   ifstream tempfileStream(fileList.c_str(), ifstream::in);
   int theLineCount = std::count(istreambuf_iterator<char>(tempfileStream),
                                 istreambuf_iterator<char>(), '\n');
+  tempfileStream.close();
   cout << "# files = " << theLineCount << endl;
 
   if(theSeg==0||NSeg==0)
@@ -451,7 +453,6 @@ int makeNTuple(int type, int theSeg, int NSeg)
       fileStream >> fileName;
       if(fileIndex2==fileIndex2Lim-1)cout << "ending second loop ..."<<endl<<endl;
     }
-
 
   int fileIndexLimit;
   if( theSeg<=jobsWCeilFilesPerJob) fileIndexLimit=ceilLinesPerJob ;

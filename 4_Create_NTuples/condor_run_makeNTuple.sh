@@ -38,45 +38,35 @@ if [ $JobNum -eq 1 ]; then
 fi
 
 NTupleDir=""
-NTupleFileName=""
+HadoopDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples"
 if [ $flavor -eq 0 ]; then
-    echo "moving Data file to Data Folder..."
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_MaybeBadAndOldFiles_11.1"
-    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_redo_11.1"
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING"
-    NTupleFileName="${NTupleDir}/data_NTuple_11.1_reForest_${JobNum}_of_${NJobs}.root"
+#    NTupleDir="${HadoopDir}/Data_MaybeBadAndOldFiles_11.1"
+    NTupleDir="${HadoopDir}/Data_redo_11.1"
+#    NTupleDir="${HadoopDir}/TESTING"
 fi
 if [ $flavor -eq 1 ]; then
-    echo "moving QCDJets file to QCDJets Folder..."
-    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_Official_noVsJets"
-    NTupleFileNAme=""
+    NTupleDir="${HadoopDir}/QCDJets_Official_noVsJets"
 fi
 if [ $flavor -eq 2 ]; then
-    echo "moving BJets file to BJets Folder..."
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_addStat_11.1"
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_OfficialLowPt_11.1
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_HighPtOnly_11.1
-    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_OfficialLowPtAndPrivateGenHighPT_11.1"
+#    NTupleDir="${HadoopDir}/BJets_addStat_11.1"
+#    NTupleDir="${HadoopDir}/BJets_OfficialLowPt_11.1
+#    NTupleDir="${HadoopDir}/BJets_HighPtOnly_11.1
+    NTupleDir="${HadoopDir}/BJets_OfficialLowPtAndPrivateGenHighPT_11.1"
 fi
 if [ $flavor -eq 3 ]; then
-    echo "moving CJets file to CJets Folder..."
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_addStat_11.1"
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPt_11.1
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_HighPtOnly_11.1
-    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPtAndPrivateGenHighPT_11.1"
+#    NTupleDir="${HadoopDir}/CJets_addStat_11.1"
+#    NTupleDir="${HadoopDir}/CJets_OfficialLowPt_11.1
+#    NTupleDir="${HadoopDir}/CJets_HighPtOnly_11.1
+    NTupleDir="${HadoopDir}/CJets_OfficialLowPtAndPrivateGenHighPT_11.1"
 fi
 
-#if file exists...
-if [ ! -e $NTupleFileName ]; then
 #run the code
-    root -b -l <<EOF
+root -b -l <<EOF
 .x bTagNTuple.C+(${job}, ${flavor},${JobNum},${NJobs})
 .q
 EOF
+
+echo "moving output to hadoop..."
 mv *.root "${NTupleDir}"
-else
-#file exists, don't run the code!
-    echo "file exists!"
-fi
 
 echo "done!"

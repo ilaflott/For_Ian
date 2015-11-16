@@ -23,7 +23,7 @@ if [ $flavor -eq 0 ]; then
 #    echo "Data Job Being Submitted"
     NTupleDir="${HadoopDir}/Data_redo_11.1"
     NTupleFileName="${NTupleDir}/data_NTuple_11.1_reForest"
-#    NTupleDir="{$HadoopDir}/Data_MaybeBadAndOldFiles_11.1"
+#    NTupleDir="${HadoopDir}/Data_MaybeBadAndOldFiles_11.1"
 #    NTupleFileName="${NTupleDir}/data_NTuple_11.1__"
 fi
 if [ $flavor -eq 1 ]; then
