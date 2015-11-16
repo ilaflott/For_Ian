@@ -35,30 +35,21 @@ echo "Running makeNTuple Job"
 #additional instructions for specific job...
 if [ $JobNum -eq 1 ]; then
     echo "running other instructions too.."
-#    rm -rf /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING/*.root
-#    rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_Official_noVsJets/*of_300.root
-    mkdir /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/BJets_OfficialLowPtAndPrivateGenHighPT_11.1
-    mkdir /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPtAndPrivateGenHighPT_11.1
 fi
 
-#run the code
-root -b -l <<EOF
-.x bTagNTuple.C+(${job}, ${flavor},${JobNum},${NJobs})
-.q
-EOF
-
-#rm /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING/*.root
-#mv *.root /mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING
 NTupleDir=""
+NTupleFileName=""
 if [ $flavor -eq 0 ]; then
     echo "moving Data file to Data Folder..."
-    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_MaybeBadAndOldFiles_11.1"
-#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_redo_11.1"
+#    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_MaybeBadAndOldFiles_11.1"
+    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/Data_redo_11.1"
 #    NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/TESTING"
+    NTupleFileName="${NTupleDir}/data_NTuple_11.1_reForest_${JobNum}_of_${NJobs}.root"
 fi
 if [ $flavor -eq 1 ]; then
     echo "moving QCDJets file to QCDJets Folder..."
     NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/QCDJets_Official_noVsJets"
+    NTupleFileNAme=""
 fi
 if [ $flavor -eq 2 ]; then
     echo "moving BJets file to BJets Folder..."
@@ -75,6 +66,17 @@ if [ $flavor -eq 3 ]; then
     NTupleDir="/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTuples/CJets_OfficialLowPtAndPrivateGenHighPT_11.1"
 fi
 
+#if file exists...
+if [ ! -e $NTupleFileName ]; then
+#run the code
+    root -b -l <<EOF
+.x bTagNTuple.C+(${job}, ${flavor},${JobNum},${NJobs})
+.q
+EOF
 mv *.root "${NTupleDir}"
+else
+#file exists, don't run the code!
+    echo "file exists!"
+fi
 
 echo "done!"

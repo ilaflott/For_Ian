@@ -467,30 +467,32 @@ int makeNTuple(int type, int theSeg, int NSeg)
   //END JOB SEGMENTATION//
   ////////////////////////
 
-  cout << "declaring new tree+branches" << endl;
+  cout << "declaring new tree+branches for jet tree" << endl;
 
   // Jet tree
   TTree * jetTree = new TTree("jet","jet");
   newBranches(jetTree);
   jetTree->SetDirectory(0);
 
+  cout << "declaring event tree for vertex weighting" << endl;
+
   // vtx tree for weighting
   TTree * evtTree = new TTree("evt","evt");
   evtTree->Branch("vz", &nVz ,"vz/D");									       
-  evtTree->Branch("evt", &Evt ,"evt/D");									     
-  evtTree->Branch("pthat", &nPthat ,"pthat/D");								    
+  evtTree->Branch("evt", &Evt ,"evt/D");									     evtTree->Branch("pthat", &nPthat ,"pthat/D");								    
   evtTree->SetDirectory(0);
 
+  cout << "into the file loop we go!" << endl;
   //  for(int kkk = 0 ; kkk < 250 ; kkk++)/*debug*/
   //  while (!fileStream.eof())
   for(int kkk = 0 ; kkk < fileIndexLimit ; kkk++)
     {
       //if (kkk==10) break;/*debug*/
+
       // Open input file
+      if (kkk%5==0)cout << "opening input file #" << kkk << endl;
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
-      if(file_number%100==0 ) cout << "fileName is: " << fileName << endl;
-      //if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;
-      if(file_number%100==0 ) cout << "Opening the " << file_number<< "th file" << endl;/*debug*/
+
       file_number++;
       
       //Open trees

@@ -41,10 +41,6 @@ do
 EOF
     
     JobNum=$(($JobNum + 1))
-#    echo "sleeping for 40s..."
-#    sleep 10s
     echo "moving file"
     mv *.root /net/hidsk0001/d00/scratch/ilaflott/pp_NTuples/oldStat_HF_Pieces
-#    echo "sleeping for 40s..."
-#    sleep 10s
 done
