@@ -491,7 +491,7 @@ int makeNTuple(int type, int theSeg, int NSeg)
       // Open input file
       if (kkk%5==0)cout << "opening input file #" << kkk << endl;
       TFile *inFile = TFile::Open( Form("%s",fileName.c_str() ) );
-
+      if(type==0)cout<< fileName <<endl;
       file_number++;
       
       //Open trees
