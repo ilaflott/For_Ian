@@ -60,8 +60,8 @@ const string NTuplePath = "/mnt/hadoop/cms/store/user/ilaflott/Leos_Analysis_NTu
 //const string weightFilePath = "";/*debug*/
 
 //DATA filelists
-//const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
-const string dataFileList = "ppMuon2013A_reForest_filelist.txt";
+const string dataFileList = "ppMuon2013A_runForest_filelist.txt";
+//const string dataFileList = "ppMuon2013A_reForest_filelist.txt";
 
 //MC filelists
 const string QCDFileList  = "QCDJets_noVsJets_OfficialForests.txt";
@@ -70,14 +70,14 @@ const string QCDFileList  = "QCDJets_noVsJets_OfficialForests.txt";
 
 ////Other Available FileLists
 //const string QCDFileList  = "QCDJets_withVsJets_OfficialForests.txt";
-//const string BJetFileList = "BJets_unOfficialHighPt_Forests.txt";
-//const string CJetFileList = "CJets_unOfficialHighPt_Forests.txt";
+const string BJetFileList = "BJets_unOfficialHighPt_Forests.txt";
+const string CJetFileList = "CJets_unOfficialHighPt_Forests.txt";
 //const string BJetFileList = "BJets_OfficialLowPt_Forests.txt";
 //const string CJetFileList = "CJets_OfficialLowPt_Forests.txt";
 //const string BJetFileList = "BJets_allAvailable_Forests.txt";
 //const string CJetFileList = "CJets_allAvailable_Forests.txt";
-const string BJetFileList = "BJets_OfficialLowPtAndPrivateGenHighPT_Forests.txt";
-const string CJetFileList = "CJets_OfficialLowPtAndPrivateGenHighPT_Forests.txt";
+//const string BJetFileList = "BJets_OfficialLowPtAndPrivateGenHighPT_Forests.txt";
+//const string CJetFileList = "CJets_OfficialLowPtAndPrivateGenHighPT_Forests.txt";
 
 //FOR MC COUNTS
 const string QCD_NEventsFile = "QCDJets_NEvents_FULL_TEST.txt";	  
@@ -97,9 +97,7 @@ const string BJetWeightsFile = "BJets_weights_FULL_TEST.txt";
 const string CJetWeightsFile = "CJets_weights_FULL_TEST.txt";
 
 //NTuple Files FOR ALL FUNCTIONS
-//const string dataNTuple   = "data_NTuple_FULL_TEST.root";			  
-//const string dataNTuple   = "data_NTuple_11.1_";			  
-const string dataNTuple   = "data_NTuple_11.1_reForest";			  
+const string dataNTuple   = "data_NTuple_11.1_";			  
 						
 const string QCDNTuple   = "QCDJets_NTuple_noVsJets_11.1_";	  
 const string BJetNTuple  =   "BJets_NTuple_addStat_11.1_";	  
