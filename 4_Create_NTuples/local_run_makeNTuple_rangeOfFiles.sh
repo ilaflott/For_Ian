@@ -66,15 +66,16 @@ do
         fi
     fi
     echo "running job..."
-    root -b -l -q "bTagNTuple.C+(${job},${flavor},${JobNum},${JobSplitting})" >& "local_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log"
+    nice -n 10 root -b -l -q "bTagNTuple.C+(${job},${flavor},${JobNum},${JobSplitting})" >& "local_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log"
+#    root -b -l -q "bTagNTuple.C+(${job},${flavor},${JobNum},${JobSplitting})" >& "local_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log"
 
-    sleep 5s
+#    sleep 1s
 
     echo "moving file"
     ls *"_${JobNum}_of_${JobSplitting}.root"
     mv *"_${JobNum}_of_${JobSplitting}.root" "${NTupleDir}"
 
-    sleep 5s
+#    sleep 1s
     
     JobNum=$(($JobNum + 1))
     
