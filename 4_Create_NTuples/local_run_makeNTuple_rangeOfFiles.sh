@@ -66,8 +66,8 @@ do
         fi
     fi
     echo "running job..."
-    nice -n 10 root -b -l -q "bTagNTuple.C+(${job},${flavor},${JobNum},${JobSplitting})" >& "local_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log"
-#    root -b -l -q "bTagNTuple.C+(${job},${flavor},${JobNum},${JobSplitting})" >& "local_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log"
+    nice -n 19 root -b -l -q "bTagNTuple.C+(${job},${flavor},${JobNum},${JobSplitting})" >& "local_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log"
+    #root -b -l -q "bTagNTuple.C+(${job},${flavor},${JobNum},${JobSplitting})" >& "local_logs/makeNTuple_Flav_${flavor}_p${JobNum}_of_${JobSplitting}.log"
 
 #    sleep 1s
 
