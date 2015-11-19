@@ -33,6 +33,7 @@ int NTupleWeights(int type);
 //testbeds
 int NTupleTest(int type);//crude script, doesn't even use the type
 int testAnything(int type, int theSeg, int NSeg);//crude script, doesn't even use the type
+string* fileSelector(int type, int theSeg, int NSeg);
 
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
@@ -1434,4 +1435,11 @@ int testAnything(int type, int theSeg, int NSeg)//just a space to try stuff out 
     }
    
   return 0;
+}
+
+string* fileSelector(int type, int theSeg, int NSeg)
+{
+  string* theFiles=new string[1];
+  theFiles[0]="";
+  return theFiles;
 }
