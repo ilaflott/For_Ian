@@ -14,6 +14,8 @@
 #include <string>
 #include <cmath>
 #include <algorithm>
+//#include <array>
+#include<vector>
 
 // Root includes
 #include "TFile.h"
@@ -33,7 +35,7 @@ int NTupleWeights(int type);
 //testbeds
 int NTupleTest(int type);//crude script, doesn't even use the type
 int testAnything(int type, int theSeg, int NSeg);//crude script, doesn't even use the type
-string* fileSelector(int type, int theSeg, int NSeg);
+vector<string> fileSelector(int type, int theSeg, int NSeg);
 
 static inline void newBranches(TTree *newTree);
 static inline void branchAddresses(TTree *akPu3);
@@ -324,6 +326,7 @@ int dataType;
 int bTagNTuple(int job, int type, int theSeg=1, int NSeg = 1)
 {
   dataType = type;  
+  vector<string> theFileList;//testing only
   switch (type) 
     {
       //notice: string fileList is compatible with const char*, which has the + operator overloaded
@@ -341,6 +344,7 @@ int bTagNTuple(int job, int type, int theSeg=1, int NSeg = 1)
     case 2:cout << "You Chose Apply NTuple Weights" << endl; result = NTupleWeights(type) ; break ; 
     case 3:cout << "You Chose to Test NTuple" << endl; result = NTupleTest(type) ; break ; 
     case 4:cout << "You Chose to Test Anything" << endl; result = testAnything(type,theSeg,NSeg) ; break ; 
+    case 5:cout << "you chose to test fileSelector" << endl; theFileList = fileSelector(type,theSeg, NSeg); break;
     default: cerr << "Job must be from {0,1,2} for work and {3,4} for tests" << endl; return -1 ;
     }
 
@@ -479,7 +483,8 @@ int makeNTuple(int type, int theSeg, int NSeg)
   // vtx tree for weighting
   TTree * evtTree = new TTree("evt","evt");
   evtTree->Branch("vz", &nVz ,"vz/D");									       
-  evtTree->Branch("evt", &Evt ,"evt/D");									     evtTree->Branch("pthat", &nPthat ,"pthat/D");								    
+  evtTree->Branch("evt", &Evt ,"evt/D");
+  evtTree->Branch("pthat", &nPthat ,"pthat/D");								    
   evtTree->SetDirectory(0);
 
   cout << "into the file loop we go!" << endl;
@@ -1326,120 +1331,135 @@ int NTupleTest(int type)
 
 //template for file splitting in jobs
 //Seg->Segment
-int testAnything(int type, int theSeg, int NSeg)//just a space to try stuff out in 
+int testAnything(int type,int theSeg, int NSeg)//just a space to try stuff out in 
 {
-  if(theSeg==0||NSeg==0)
-    {
-      cout<<"I can't divide a file list into no segments and i can't compute the segment before the filelist starts!"<<endl;
-      return-1;
-    }
-  if(theSeg>NSeg)
-    {
-      cout<<"job segment doesn't exist. The segment number must be less than the total number of pieces"<<endl;
-      return-1;
-    }
+
+  vector<string> theFiles ;
+  cout << "running fileSelector in testAnything..." << endl;
+  theFiles =    fileSelector(type,theSeg,NSeg);
+  cout << "done running fileSelector in testAnything!" << endl;
   
-  cout << endl;
+  vector<string>::iterator p = theFiles.begin();
+  while (p != theFiles.end())
+    {cout<<*p<<"   "<<endl;p++;
+      }
+     
+  return 0;
+}
+
+vector<string> fileSelector(int type, int theSeg, int NSeg)
+{
   
-  //fileList="testList.txt";
-  cout << "fileList is: " << fileList << endl<<endl;
+
+ //////////////////////////
+  //BEGIN JOB SEGMENTATION//
+  //////////////////////////
+
+  //fileList="testList.txt";/*debug*/
+  cout << endl <<"fileList is: " << fileList << endl<<endl;
   
   //this kills the file stream for some reason
   ifstream tempfileStream(fileList.c_str(), ifstream::in);
-  int theLineCount = std::count(istreambuf_iterator<char>(tempfileStream), 
-				istreambuf_iterator<char>(), '\n');
+  int theLineCount = std::count(istreambuf_iterator<char>(tempfileStream),
+                                istreambuf_iterator<char>(), '\n');
+  tempfileStream.close();
   cout << "# files = " << theLineCount << endl;
-  
+
+  if(theSeg==0||NSeg==0)
+    {
+      cerr<<"theSeg and NSeg can't be zero"<<endl;
+      //      return-1;
+    }
+  if(theSeg>NSeg)
+    {
+      cerr<<"job segment doesn't exist."<<endl;
+      //      return-1;
+    }  
   if(NSeg>theLineCount)
     {
       cerr<<"can't have more jobs than files available" << endl;
-      return -1;
-    }
+      //      return -1;
+    }//end common error condititons
   
   cout << "# jobs requested = "<<NSeg<<endl;
-  
+
   double linesPerJob = (theLineCount/(double)NSeg);
   cout << "avg files per job = " << linesPerJob << endl<<endl;
-  
+
   int ceilLinesPerJob  = (int)ceil(theLineCount/(double)NSeg);
   int floorLinesPerJob = (int)floor(theLineCount/(double)NSeg);
-  
-  cout << "ceilLinesPerJob  = " << ceilLinesPerJob << endl;
-  cout << "floorLinesPerJob = " << floorLinesPerJob<< endl<<endl;
-  
-  int jobsWFloorFilesPerJob  = NSeg*ceilLinesPerJob - theLineCount;  
+
+  //cout << "ceilLinesPerJob  = " << ceilLinesPerJob << endl;
+  //cout << "floorLinesPerJob = " << floorLinesPerJob<< endl<<endl;
+
+  int jobsWFloorFilesPerJob  = NSeg*ceilLinesPerJob - theLineCount;
   int jobsWCeilFilesPerJob = theLineCount - floorLinesPerJob*NSeg;
+  
   if(ceilLinesPerJob==floorLinesPerJob)
     {
       jobsWFloorFilesPerJob=theLineCount/linesPerJob;
       jobsWCeilFilesPerJob=jobsWFloorFilesPerJob;
     }
+  
   cout << "jobsWCeilFilesPerJob  = " <<jobsWCeilFilesPerJob   << endl;
   cout << "jobsWFloorFilesPerJob = " <<jobsWFloorFilesPerJob  << endl<<endl;
   
-  int filesRequested= jobsWCeilFilesPerJob * ceilLinesPerJob + jobsWFloorFilesPerJob * floorLinesPerJob;
+  int filesRequested = jobsWCeilFilesPerJob * ceilLinesPerJob + jobsWFloorFilesPerJob * floorLinesPerJob;
+  if (ceilLinesPerJob == floorLinesPerJob)filesRequested=jobsWFloorFilesPerJob * floorLinesPerJob;
   cout <<"the number of files you're requesting = " << filesRequested << endl;
-
+  
   //ifstream for text maneuvering has to come after the ifstream for line counting
   ifstream fileStream(fileList.c_str(), ifstream::in);
-  string fileName;      
+  string fileName;
   fileStream >> fileName;//this needed before loop so we don't miss the last file available
-  
-  //  for(int kkk = 0 ; kkk < 250 ; kkk++)/*debug*/
-  //  while (!fileStream.eof()) 
-  cout<<"looping to start file..." << endl<<endl;  
-  int jobNum;
+
+  cout<<"looping to start file..." << endl<<endl;
+  int jobNum=0;
   int fileIndex1;
   int fileIndex1Lim=(theSeg-1)*ceilLinesPerJob;
   int fileIndex1LimMax=(jobsWCeilFilesPerJob)*ceilLinesPerJob;
-  for(fileIndex1=0 ; 
+  for(fileIndex1=0 ;
       fileIndex1<fileIndex1Lim && fileIndex1<fileIndex1LimMax;
       fileIndex1++)//designed to loop over initial ceiling jobs
-    { 
-      if((fileIndex1)%ceilLinesPerJob==0)
-	{
-	  jobNum=(fileIndex1)/ceilLinesPerJob + 1;
-	  cout<<"looping over jobs # "<< jobNum << "'s files. " << endl;
-	  cout <<"fileIndex=" << fileIndex1 << endl;
-	}
-      //cout << fileName << endl;
-      fileStream >> fileName;
-    }
-
-  cout <<"ending first loop ..."<<endl<<endl;
-  int fileIndex2Lim=(jobsWCeilFilesPerJob*ceilLinesPerJob + (theSeg-jobsWCeilFilesPerJob-1)*floorLinesPerJob);
-  for(int fileIndex2=fileIndex1 ; 
-      fileIndex2<fileIndex2Lim && theSeg>jobsWCeilFilesPerJob ; 
-      fileIndex2++)//loop over remaining floor jobs
     {
-      if((fileIndex2-fileIndex1)%floorLinesPerJob==0)
-	{
-	  jobNum=((fileIndex1/ceilLinesPerJob) + ((fileIndex2 - fileIndex1)/floorLinesPerJob + 1 ));
-	  cout<<"looping over jobs # "<< jobNum << "'s files. " << endl;
-	  cout <<"fileIndex=" << fileIndex2 << endl;
-	}
-      //cout << fileName << endl;
+      if((fileIndex1)%ceilLinesPerJob==0) jobNum++;
       fileStream >> fileName;
     }
-  cout << "ending second loop ..."<<endl<<endl;
+  cout <<"ending first loop ..."<<endl<<endl;
+
+  int fileIndex2Lim=(jobsWCeilFilesPerJob*ceilLinesPerJob + (theSeg-jobsWCeilFilesPerJob-1)*floorLinesPerJob);
+  int fileIndex2;
+  for(fileIndex2=fileIndex1 ;     fileIndex2<fileIndex2Lim && theSeg>jobsWCeilFilesPerJob ;      fileIndex2++)//loop over remaining floor jobs
+    {
+      if((fileIndex2-fileIndex1)%floorLinesPerJob==0) jobNum++;
+      fileStream >> fileName;
+      if(fileIndex2==fileIndex2Lim-1)cout << "ending second loop ..."<<endl<<endl;
+    }
 
   int fileIndexLimit;
-  cout <<"the REAL loop i want, i run over the following files of job #" <<jobNum+1<< endl;
   if( theSeg<=jobsWCeilFilesPerJob) fileIndexLimit=ceilLinesPerJob ;
   else fileIndexLimit=floorLinesPerJob ;
+  cout <<"fileIndexLimit = "<<fileIndexLimit<<endl;
 
-  for(int kkk = 0 ; kkk < fileIndexLimit ; kkk++)
+  cout <<"the REAL loop i want, i'm running over the files of job #" <<(jobNum+1)<< endl;
+
+  int file_number=fileIndex2+1;
+  string* theFiles=new string[fileIndexLimit];
+  vector<string> v;
+  //fill array with files in this loop..
+  for(int kkk = 0 ;kkk<fileIndexLimit;kkk++ )
     {
-      //      cout << fileName << endl;
+      //cout<<"fileName="<<fileName<<endl;
+      theFiles[kkk]=fileName;
+      v.push_back(fileName);
+      //cout <<"theFiles["<<kkk<<"]= "<<theFiles[kkk]<<endl;
       fileStream >> fileName;
     }
-   
-  return 0;
-}
-
-string* fileSelector(int type, int theSeg, int NSeg)
-{
-  string* theFiles=new string[1];
-  theFiles[0]="";
-  return theFiles;
+  cout <<"vector size = " << v.size() << endl;
+  //vector<string>::iterator p = v.begin();
+  //while (p != v.end())
+  //  {cout<<*p<<"   "<<endl;p++;
+  //	}
+  //fileStream.close();
+  return v;
 }
